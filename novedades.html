@@ -144,35 +144,44 @@ const GID = "195669740";
 const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
 /**
- * Convierte el formato de fecha de Google Sheets (e.g., "Date(2025,10,1)") 
- * o un string de fecha (e.g., "2025-10-01") al formato legible en español: "DD de mes de YYYY".
- * * CORRECCIÓN V3: Se asume que el VIZ API para esta planilla está devolviendo el DÍA
- * donde debería ir el MES (posición 2) y el MES donde debería ir el DÍA (posición 3).
- * * * @param {string} dateString El string de la fecha (puede ser Date(Y, D, M) o ISO).
+ * Convierte el formato de fecha de Google Sheets a DD de mes de YYYY.
+ * Soporta:
+ * 1. String DD/MM/YYYY o DD-MM-YYYY (ej: 11/05/2025)
+ * 2. Formato de función Date() de Sheets (ej: Date(2025, 4, 11) donde 4=Mayo)
+ * @param {string} dateString El string de la fecha.
  * @returns {string} La fecha formateada, o el texto original si es inválida.
  */
 function formatDate(dateString) {
     let date;
     
-    // 1. Intentar parsear el formato Date(Y, X, Z) de Google Sheets
-    // [1]=Año, [2]=Valor 1, [3]=Valor 2
-    const match = dateString.match(/Date\((\d{4}),(\d{1,2}),(\d{1,2})\)/);
-    if (match) {
-        // ASUNCIÓN DE CORRECCIÓN: match[2] es el Día (11) y match[3] es el Mes (4)
-        const year = parseInt(match[1]);
-        const day = parseInt(match[2]);         // Corregido: Día es la segunda posición
-        const monthIndex = parseInt(match[3]);  // Corregido: Mes es la tercera posición
+    // 1. Intentar parsear el formato String DD/MM/YYYY o DD-MM-YYYY (de la imagen que subiste)
+    const stringMatch = dateString.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+    if (stringMatch) {
+        // Formato: DD / MM / YYYY
+        const day = parseInt(stringMatch[1], 10);
+        const month = parseInt(stringMatch[2], 10); // 1-12
+        const year = parseInt(stringMatch[3], 10);
         
-        // MUY IMPORTANTE PARA DEPURACIÓN: revisá estos valores en la consola
-        console.log(`[formatDate Debug - SWAPPED] Entrada Sheets: ${dateString}. Valores extraídos: Año=${year}, MesIndex=${monthIndex}, Día=${day}. (0=Enero)`);
-
         // Creamos la fecha: new Date(Año, Índice del Mes, Día)
-        // JS requiere: Año, Mes (0-11), Día. 
-        date = new Date(year, monthIndex, day); 
-
+        // JS requiere: Mes (0-11), Día. Restamos 1 al mes.
+        date = new Date(year, month - 1, day);
+        
     } else {
-        // 2. Intentar parsear el formato ISO 8601 (2025-11-01) o cualquier otro string de fecha
-        date = new Date(dateString);
+        // 2. Intentar parsear el formato Date(Y, X, Z) de Google Sheets (por si acaso)
+        // [1]=Año, [2]=Valor 1, [3]=Valor 2
+        const vizMatch = dateString.match(/Date\((\d{4}),(\d{1,2}),(\d{1,2})\)/);
+        if (vizMatch) {
+            // Asumiendo la corrección de swap de Mes/Día que hicimos antes
+            const year = parseInt(vizMatch[1]);
+            const day = parseInt(vizMatch[2]);         // Corregido: Día es la segunda posición (ej: 11)
+            const monthIndex = parseInt(vizMatch[3]);  // Corregido: Mes (0-11) es la tercera posición (ej: 4 para Mayo)
+            
+            // Creamos la fecha: new Date(Año, Índice del Mes, Día)
+            date = new Date(year, monthIndex, day);
+        } else {
+            // 3. Intento de parseo estándar de JS para otros formatos.
+            date = new Date(dateString);
+        }
     }
     
     // Verificar si la fecha es válida
@@ -204,15 +213,15 @@ function parseData(text) {
     return rows
         .map(r => {
             const c = r.c;
-            // ATENCIÓN: Las columnas se leen según el nuevo formato de tu planilla:
+            // ATENCIÓN: Columnas basadas en la última imagen que subiste
             // B (c[1]): titulo
             // C (c[2]): Descripción
-            // D (c[3]): fecha_novedad
-            // E (c[4]): ACTIVO
+            // D (c[3]): fecha_novedad (CORREGIDO DE c[4] a c[3] BASADO EN LA IMAGEN)
+            // E (c[4]): ACTIVO (CORREGIDO DE c[3] a c[4] BASADO EN LA IMAGEN)
             return {
                 titulo: c[1]?.v || "",  
                 desc: c[2]?.v || "",    
-                // Usamos el string del formato de fecha de Google Sheets para luego formatearlo
+                // Usamos el valor formateado (f) si existe, si no, el valor crudo (v)
                 fecha: c[3]?.f || c[3]?.v || "", 
                 img: null,              
                 activo: (c[4]?.v || "").toString().toUpperCase() === "SI" 
