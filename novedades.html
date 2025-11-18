@@ -49,10 +49,10 @@
         border-radius: 5px;
         font-weight: bold;
         font-size: 1.2rem;
-        line-height: 1; /* Para que el texto quede centrado */
-        display: flex; /* Para centrar el ícono o texto */
+        line-height: 1; 
+        display: flex; 
         align-items: center;
-        text-decoration: none; /* Para quitar el subrayado si fuera un <a> */
+        text-decoration: none;
     }
 
     /* Estilos del ícono de Bootstrap que usamos para las flechas */
@@ -61,10 +61,7 @@
     }
     
     /* ******************************************************************* */
-    /* *** Flechas Laterales Antiguas (se desactivan quitando las etiquetas) *** */
-    /* ******************************************************************* */
-    /* El resto del CSS de la caption y el logo se mantiene igual */
-    
+    /* EL CAPTION (Contenedor blanco) */
     .carousel-caption { 
         z-index: 10;
         position: static;
@@ -80,13 +77,23 @@
         bottom: 0 !important;
     }
 
+    /* Estilo para la FECHA (nueva ubicación: arriba del título) */
+    .carousel-caption .fecha-novedad {
+        font-size: 0.85rem;
+        color: #888;
+        margin-bottom: 5px; /* Espacio antes del título */
+        display: block; 
+    }
+    
+    /* Estilo para el TÍTULO */
     .carousel-caption h3 {
         color: #5d3f6a;
         font-size: 1.25rem;
         font-weight: bold;
-        margin-bottom: 10px;
+        margin-bottom: 10px; 
     }
-
+    
+    /* Estilo para la DESCRIPCIÓN */
     .carousel-caption p {
         font-size: 0.95rem;
         line-height: 1.4;
@@ -103,7 +110,7 @@
     <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales de General Pueyrredon">
 </div>
 
-<h2 class="text-center mb-4">🟣 Novedades STM</h2>
+<h2 class="text-center mb-4">⚠️ Novedades STM</h2>
 
 <div id="novedadesCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators" id="carouselIndicators"></div>
@@ -114,8 +121,7 @@
             </div>
         </div>
     </div>
-    
-    </div>
+</div>
 
 <div class="carousel-controls-bottom">
     <button class="btn-carousel-nav" type="button" data-bs-target="#novedadesCarousel" data-bs-slide="prev">
@@ -129,6 +135,7 @@
         </svg>
     </button>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // ID de publicación de Google Sheets (Publicar > Web)
@@ -136,17 +143,79 @@ const SHEET_ID = "1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo";
 const GID = "195669740";
 const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
+/**
+ * Convierte el formato de fecha de Google Sheets (e.g., "Date(2025,10,1)") 
+ * o un string de fecha (e.g., "2025-10-01") al formato legible en español: "DD de mes de YYYY".
+ * * CORRECCIÓN V3: Se asume que el VIZ API para esta planilla está devolviendo el DÍA
+ * donde debería ir el MES (posición 2) y el MES donde debería ir el DÍA (posición 3).
+ * * * @param {string} dateString El string de la fecha (puede ser Date(Y, D, M) o ISO).
+ * @returns {string} La fecha formateada, o el texto original si es inválida.
+ */
+function formatDate(dateString) {
+    let date;
+    
+    // 1. Intentar parsear el formato Date(Y, X, Z) de Google Sheets
+    // [1]=Año, [2]=Valor 1, [3]=Valor 2
+    const match = dateString.match(/Date\((\d{4}),(\d{1,2}),(\d{1,2})\)/);
+    if (match) {
+        // ASUNCIÓN DE CORRECCIÓN: match[2] es el Día (11) y match[3] es el Mes (4)
+        const year = parseInt(match[1]);
+        const day = parseInt(match[2]);         // Corregido: Día es la segunda posición
+        const monthIndex = parseInt(match[3]);  // Corregido: Mes es la tercera posición
+        
+        // MUY IMPORTANTE PARA DEPURACIÓN: revisá estos valores en la consola
+        console.log(`[formatDate Debug - SWAPPED] Entrada Sheets: ${dateString}. Valores extraídos: Año=${year}, MesIndex=${monthIndex}, Día=${day}. (0=Enero)`);
+
+        // Creamos la fecha: new Date(Año, Índice del Mes, Día)
+        // JS requiere: Año, Mes (0-11), Día. 
+        date = new Date(year, monthIndex, day); 
+
+    } else {
+        // 2. Intentar parsear el formato ISO 8601 (2025-11-01) o cualquier otro string de fecha
+        date = new Date(dateString);
+    }
+    
+    // Verificar si la fecha es válida
+    if (isNaN(date.getTime())) {
+        console.error("Fecha inválida recibida:", dateString);
+        return dateString; // Devolver el texto original si no se puede formatear
+    }
+
+    // Opciones de formato: DD de MesLargo de YYYY
+    const options = { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric' 
+    };
+
+    // Usamos Intl.DateTimeFormat para garantizar el español (es-AR)
+    const formatter = new Intl.DateTimeFormat('es-AR', options);
+    let formattedDate = formatter.format(date);
+    
+    // Eliminamos cualquier punto o coma que pudiera haber quedado (como 10 de junio, 2025)
+    formattedDate = formattedDate.replace(/\./g, '').replace(/,/g, '').trim();
+
+    return formattedDate;
+}
+
 function parseData(text) {
     const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
     const rows = json.table.rows;
     return rows
         .map(r => {
             const c = r.c;
+            // ATENCIÓN: Las columnas se leen según el nuevo formato de tu planilla:
+            // B (c[1]): titulo
+            // C (c[2]): Descripción
+            // D (c[3]): fecha_novedad
+            // E (c[4]): ACTIVO
             return {
-                titulo: c[1]?.v || "",
-                desc: c[2]?.v || "",
-                img: c[4]?.v || "", // columna opcional de imagen
-                activo: (c[3]?.v || "").toString().toUpperCase() === "SI"
+                titulo: c[1]?.v || "",  
+                desc: c[2]?.v || "",    
+                // Usamos el string del formato de fecha de Google Sheets para luego formatearlo
+                fecha: c[3]?.f || c[3]?.v || "", 
+                img: null,              
+                activo: (c[4]?.v || "").toString().toUpperCase() === "SI" 
             };
         })
         .filter(r => r.activo);
@@ -170,6 +239,9 @@ async function loadData() {
         }
 
         novedades.forEach((n, i) => {
+            // Formateamos la fecha antes de insertarla
+            const fechaFormateada = formatDate(n.fecha);
+            
             // indicadores
             const ind = document.createElement("button");
             ind.type = "button";
@@ -182,15 +254,17 @@ async function loadData() {
             const item = document.createElement("div");
             item.className = "carousel-item" + (i === 0 ? " active" : "");
 
-            if (n.img) {
-                const img = document.createElement("img");
-                img.src = n.img;
-                item.appendChild(img);
-            }
-
+            // La imagen ya no se carga, usamos solo el fondo oscuro por defecto
+            
             const cap = document.createElement("div");
             cap.className = "carousel-caption";
-            cap.innerHTML = `<h3>${n.titulo}</h3><p>${n.desc}</p>`; 
+            
+            // Insertamos la fecha formateada
+            cap.innerHTML = `
+                <span class="fecha-novedad">Fecha de la novedad: ${fechaFormateada}</span>
+                <h3>${n.titulo}</h3>
+                <p>${n.desc}</p>
+            `; 
             item.appendChild(cap);
             inner.appendChild(item);
         });
