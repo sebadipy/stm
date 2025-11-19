@@ -14,14 +14,19 @@
     }
     
     .carousel-item { 
-        height: auto;
-        min-height: 280px; 
+        height: auto; /* Mantenemos 'auto' */
+        min-height: 0; /* <--- ¡CORRECCIÓN CLAVE! Eliminamos el mínimo fijo para que se adapte. */
         max-height: 550px;
         background:#444; 
         color:white; 
         position:relative;
         display: flex;
         align-items: center;
+    }
+
+    .carousel-inner {
+        /* Agregado para forzar la adaptación del contenedor principal */
+        height: auto !important; 
     }
 
     .carousel-item img { 
@@ -216,8 +221,8 @@ function parseData(text) {
             // ATENCIÓN: Columnas basadas en la última imagen que subiste
             // B (c[1]): titulo
             // C (c[2]): Descripción
-            // D (c[3]): fecha_novedad (CORREGIDO DE c[4] a c[3] BASADO EN LA IMAGEN)
-            // E (c[4]): ACTIVO (CORREGIDO DE c[3] a c[4] BASADO EN LA IMAGEN)
+            // D (c[3]): fecha_novedad 
+            // E (c[4]): ACTIVO 
             return {
                 titulo: c[1]?.v || "",  
                 desc: c[2]?.v || "",    
@@ -277,6 +282,10 @@ async function loadData() {
             item.appendChild(cap);
             inner.appendChild(item);
         });
+
+        // Este código asegura que Bootstrap recalcule la altura después de cargar los datos
+        const carousel = new bootstrap.Carousel(document.getElementById('novedadesCarousel'));
+        carousel.cycle();
 
     } catch (e) {
         inner.innerHTML = `<div class="carousel-item active"><div class="carousel-caption"><h3>Error al cargar</h3><p>${e.message}</p></div></div>`;
