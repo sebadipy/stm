@@ -13,19 +13,26 @@
         font-family:Roboto, sans-serif; 
     }
     
+    /* *** MODIFICACIÓN CLAVE PARA ALTURA ***
+    1. Quitamos display:flex y align-items para no interferir con la altura de transición.
+    2. min-height: 0; es obligatorio para sobrescribir cualquier valor anterior.
+    */
     .carousel-item { 
-        height: auto; /* Mantenemos 'auto' */
-        min-height: 0; /* <--- ¡CORRECCIÓN CLAVE! Eliminamos el mínimo fijo para que se adapte. */
+        height: auto; 
+        min-height: 0; 
         max-height: 550px;
         background:#444; 
         color:white; 
         position:relative;
-        display: flex;
-        align-items: center;
+        /* Lineas eliminadas: display: flex; y align-items: center; */
     }
 
+    /* *** MODIFICACIÓN CLAVE PARA CORTAR TEXTO ***
+    overflow: hidden; asegura que el contenido que se desliza (el item anterior/siguiente) 
+    no sea visible fuera del borde del contenedor principal.
+    */
     .carousel-inner {
-        /* Agregado para forzar la adaptación del contenedor principal */
+        overflow: hidden;
         height: auto !important; 
     }
 
@@ -39,15 +46,15 @@
 
     /* Estilos para el nuevo contenedor de flechas */
     .carousel-controls-bottom {
-        display: flex; /* Para poner los botones uno al lado del otro */
-        justify-content: center; /* Para centrarlos */
-        gap: 15px; /* Espacio entre los botones */
-        margin-top: 15px; /* Espacio arriba del control */
+        display: flex; 
+        justify-content: center; 
+        gap: 15px; 
+        margin-top: 15px; 
     }
 
     /* Estilo de los botones de navegación inferiores */
     .btn-carousel-nav {
-        background-color: #5d3f6a; /* Color principal del STM */
+        background-color: #5d3f6a; 
         color: white;
         border: none;
         padding: 8px 15px;
@@ -69,7 +76,8 @@
     /* EL CAPTION (Contenedor blanco) */
     .carousel-caption { 
         z-index: 10;
-        position: static;
+        /* position: static; es CRUCIAL para que el height sea bien calculado */
+        position: static; 
         color: #333;
         background-color: white;
         padding: 20px;
@@ -86,7 +94,7 @@
     .carousel-caption .fecha-novedad {
         font-size: 0.85rem;
         color: #888;
-        margin-bottom: 5px; /* Espacio antes del título */
+        margin-bottom: 5px; 
         display: block; 
     }
     
@@ -284,8 +292,8 @@ async function loadData() {
         });
 
         // Este código asegura que Bootstrap recalcule la altura después de cargar los datos
-        const carousel = new bootstrap.Carousel(document.getElementById('novedadesCarousel'));
-        carousel.cycle();
+        // Y lo inicializa para que las transiciones funcionen bien desde el principio
+        new bootstrap.Carousel(document.getElementById('novedadesCarousel')).cycle();
 
     } catch (e) {
         inner.innerHTML = `<div class="carousel-item active"><div class="carousel-caption"><h3>Error al cargar</h3><p>${e.message}</p></div></div>`;
