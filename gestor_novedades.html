@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <base target="_top"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Novedades - STM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Agregamos Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --stm-purple: #5A377B;
+            --stm-teal: #34B3C5;
+            --stm-red: #dc3545;
+        }
+
+        body { 
+            background-color: #f8f9fa; 
+            font-size: 15px;
+            font-family: 'Roboto', sans-serif; 
+        }
+        .main-container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .logo-container {
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .logo-container img {
+            max-width: 150px; 
+            height: auto; 
+        }
+        
+        /* BOTÓN CREAR */
+        .btn-stm-create {
+            background-color: var(--stm-teal); 
+            border-color: var(--stm-teal); 
+            color: #ffffff; 
+        }
+        .btn-stm-create:hover, 
+        .btn-stm-create:focus {
+            background-color: #2a8e9b;
+            border-color: #2a8e9b;
+            color: #ffffff; /* Aseguramos que el color no se pierda */
+        }
+
+        /* BOTÓN GUARDAR */
+        .btn-stm-save {
+            background-color: var(--stm-purple); 
+            border-color: var(--stm-purple); 
+            color: #ffffff;
+        }
+        .btn-stm-save:hover, 
+        .btn-stm-save:focus {
+            background-color: #492a63;
+            border-color: #492a63;
+            color: #ffffff;
+        }
+        
+        /* BOTÓN ELIMINAR */
+        .btn-stm-delete {
+            background-color: var(--stm-red); 
+            border-color: var(--stm-red); 
+            color: #ffffff; 
+        }
+        .btn-stm-delete:hover, 
+        .btn-stm-delete:focus {
+            background-color: #b02a37;
+            border-color: #b02a37;
+            color: #ffffff;
+        }
+
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        
+        #loadingSpinner {
+            text-align: center;
+            padding: 40px;
+        }
+
+        /* Estilo para que los botones con iconos se vean bien */
+        .btn-action {
+            padding: 0.3rem 0.5rem; 
+            font-size: 0.8rem;
+            line-height: 1;
+            margin: 0 2px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-container">
+            
+            <div class="logo-container">
+                <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
+            </div>
+
+            <h2 class="text-center mb-4">📢 Gestor de Novedades</h2>
+            
+            <div class="d-flex justify-content-end mb-3">
+                <button type="button" class="btn btn-stm-create" onclick="openModal()">
+                    <i class="fas fa-plus-circle"></i> Crear Nueva Novedad
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col"># ID</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Contenido</th>
+                            <th scope="col">Activo</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="novedadesTableBody">
+                    </tbody>
+                </table>
+                <div id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando novedades...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando novedades...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="modal fade" id="novedadModal" tabindex="-1" aria-labelledby="novedadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="novedadForm" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="novedadModalLabel">Crear Novedad</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="inputIdNovedad" name="ID">
+                        
+                        <div class="mb-3">
+                            <label for="inputTitulo" class="form-label">
+                                Título: <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="inputTitulo" name="Titulo" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="inputFecha" class="form-label">
+                                Fecha (YYYY-MM-DD): <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control" id="inputFecha" name="Fecha" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="textareaContenido" class="form-label">
+                                Contenido: <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" id="textareaContenido" name="Contenido" rows="6" required></textarea>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="inputActivo" name="Activo" value="SI">
+                            <label class="form-check-label" for="inputActivo">
+                                ¿Novedad Activa? (Marcar para mostrar)
+                            </label>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCancelarModal">Cancelar</button>
+                        <button type="submit" class="btn btn-stm-save" id="btnGuardar">Guardar Novedad</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">⚠️ Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro/a que querés eliminar la novedad con ID: <strong id="deleteNovedadId"></strong>?</p>
+                    <p class="text-danger">¡Esta acción no se puede deshacer!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-stm-delete" id="btnAceptarEliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Resultado de la Operación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="feedbackModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfNlhTU4hO8linQddyhVvd5rTrsAQxx1XvlsJO5tbBvUeyzczi1q-LbwU6-dSsLPvt9w/exec'; 
+
+        const novedadesTableBody = document.getElementById('novedadesTableBody');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        const novedadForm = document.getElementById('novedadForm');
+        const novedadModal = new bootstrap.Modal(document.getElementById('novedadModal'));
+        const novedadModalLabel = document.getElementById('novedadModalLabel');
+        const btnGuardar = document.getElementById('btnGuardar');
+        const btnCancelarModal = document.getElementById('btnCancelarModal'); 
+        
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const btnAceptarEliminar = document.getElementById('btnAceptarEliminar');
+        
+        const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+        const feedbackModalBody = document.getElementById('feedbackModalBody');
+
+        let novedadIdToDelete = null;
+
+        let originalGuardarText = '';
+        let originalEliminarText = '';
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            originalGuardarText = btnGuardar.textContent;
+            originalEliminarText = btnAceptarEliminar.textContent;
+            fetchNovedades();
+        });
+
+
+        novedadForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const id = document.getElementById('inputIdNovedad').value;
+            const accion = id ? 'ACTUALIZAR' : 'CREAR';
+            await manejarEnvio(accion, id);
+        });
+
+        btnAceptarEliminar.addEventListener('click', async function() {
+            if (novedadIdToDelete) {
+                setLoadingState(true, 'ELIMINAR');
+                confirmDeleteModal.hide();
+                await manejarEnvio('ELIMINAR', novedadIdToDelete);
+                novedadIdToDelete = null; 
+            }
+        });
+
+        /**
+         * Maneja el estado de carga de los botones principales del CRUD.
+         * @param {boolean} isLoading - Si debe entrar en estado de carga (true) o salir (false).
+         * @param {string} [accion] - Opcional. 'GUARDAR' o 'ELIMINAR'.
+         */
+        function setLoadingState(isLoading, accion) {
+            const isGuardar = !accion || accion === 'GUARDAR';
+            const isEliminar = accion === 'ELIMINAR';
+
+            if (isGuardar) {
+                btnGuardar.disabled = isLoading;
+                btnCancelarModal.disabled = isLoading; 
+
+                if (isLoading) {
+                    btnGuardar.innerHTML = `
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Aguarde...
+                    `;
+                } else {
+                    btnGuardar.textContent = originalGuardarText;
+                }
+            }
+
+            if (isEliminar) {
+                btnAceptarEliminar.disabled = isLoading;
+
+                if (isLoading) {
+                    btnAceptarEliminar.innerHTML = `
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Aguarde...
+                    `;
+                } else {
+                    btnAceptarEliminar.textContent = originalEliminarText;
+                }
+            }
+        }
+
+
+        function renderTable(novedades) {
+            novedadesTableBody.innerHTML = '';
+            loadingSpinner.style.display = 'none';
+
+            if (novedades.length === 0) {
+                novedadesTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted"> 
+                            Aún no hay novedades cargadas. ¡Creá la primera!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            novedades.forEach(novedad => {
+                const isActive = (novedad.Activo || '').toUpperCase().trim() === 'SI'; 
+                const activoText = isActive ? '✅ SI' : '❌ NO';
+                
+                const row = novedadesTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${novedad.ID}</td>
+                    <td>${novedad.Titulo}</td>
+                    <td>${novedad.Fecha}</td>
+                    <td>${novedad.Contenido.substring(0, 50)}...</td>
+                    <td>${activoText}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-2 btn-action" 
+                            title="Editar"
+                            onclick="openModal(
+                                '${novedad.ID}', 
+                                '${novedad.Titulo}', 
+                                '${novedad.Fecha}', 
+                                \`${novedad.Contenido}\`,
+                                '${novedad.Activo}'
+                            )">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-stm-delete btn-action" 
+                                title="Borrar"
+                                onclick="showDeleteConfirm('${novedad.ID}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function openModal(id = '', titulo = '', fecha = '', contenido = '', activo = 'SI') {
+            novedadForm.reset(); 
+            document.getElementById('inputIdNovedad').value = id;
+            const inputActivo = document.getElementById('inputActivo');
+
+            if (id) {
+                novedadModalLabel.textContent = 'Editar Novedad';
+                // Al abrir en edición, actualizamos el texto original
+                originalGuardarText = 'Guardar Cambios';
+                
+                document.getElementById('inputTitulo').value = titulo;
+                document.getElementById('inputFecha').value = fecha;
+                document.getElementById('textareaContenido').value = contenido;
+                
+                inputActivo.checked = (activo || '').toUpperCase().trim() === 'SI'; 
+                
+            } else {
+                novedadModalLabel.textContent = 'Crear Nueva Novedad';
+                 // Al abrir en creación, actualizamos el texto original
+                originalGuardarText = 'Guardar Novedad';
+                inputActivo.checked = true; 
+            }
+            
+            setLoadingState(false, 'GUARDAR');
+
+            novedadModal.show();
+        }
+
+        function showDeleteConfirm(id) {
+            novedadIdToDelete = id;
+            document.getElementById('deleteNovedadId').textContent = id;
+            setLoadingState(false, 'ELIMINAR');
+            confirmDeleteModal.show();
+        }
+
+        function showFeedback(message, success = true) {
+            const title = success ? '✅ ¡Operación Exitosa!' : '❌ ¡Error!';
+            const header = document.getElementById('feedbackModal').querySelector('.modal-header');
+            const titleEl = document.getElementById('feedbackModalLabel');
+            
+            titleEl.textContent = title;
+            feedbackModalBody.innerHTML = `<p>${message}</p>`;
+
+            if (success) {
+                header.style.backgroundColor = '#d4edda'; 
+            } else {
+                header.style.backgroundColor = '#f8d7da'; 
+            }
+
+            feedbackModal.show();
+        }
+
+
+        async function fetchNovedades() {
+            loadingSpinner.style.display = 'block';
+            novedadesTableBody.innerHTML = ''; 
+
+            try {
+                const response = await fetch(APPSSCRIPT_URL + '?action=READ_ALL');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'success' && Array.isArray(data.novedades)) {
+                        renderTable(data.novedades);
+                    } else {
+                        throw new Error(data.message || 'Error en el formato de datos devueltos.');
+                    }
+                } else {
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                loadingSpinner.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        Error al cargar las novedades: ${error.message}
+                        <br>Revisá la configuración de tu AppScript.
+                    </div>
+                `;
+                console.error('Error al cargar novedades:', error);
+            }
+        }
+
+        async function manejarEnvio(accion, id) {
+            let method, body, apiUrl, successMessage;
+
+            setLoadingState(true, accion === 'ELIMINAR' ? 'ELIMINAR' : 'GUARDAR');
+            
+            const formData = new FormData(novedadForm); 
+            
+            const inputActivo = document.getElementById('inputActivo');
+            if (!inputActivo.checked) {
+                formData.set('Activo', 'NO'); 
+            }
+
+            switch (accion) {
+                case 'CREAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    formData.append('action', 'CREATE');
+                    body = formData;
+                    successMessage = 'La novedad se creó exitosamente.';
+                    break;
+                case 'ACTUALIZAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    formData.append('action', 'UPDATE');
+                    formData.append('ID', id);
+                    body = formData;
+                    successMessage = `La novedad ${id} se actualizó correctamente.`;
+                    break;
+                case 'ELIMINAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    const deleteData = new FormData();
+                    deleteData.append('action', 'DELETE');
+                    deleteData.append('ID', id);
+                    body = deleteData;
+                    successMessage = `La novedad ${id} fue eliminada.`;
+                    break;
+                default:
+                    showFeedback('Acción desconocida.', false);
+                    return;
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: method,
+                    body: body 
+                });
+
+                const responseText = await response.text();
+                let result = {};
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    if (responseText.includes('Error')) {
+                        throw new Error('Error desconocido del servidor de AppScript.');
+                    }
+                    result = { status: 'success' };
+                }
+
+                if (response.ok && result.status === 'success') {
+                    novedadModal.hide();
+                    showFeedback(successMessage, true);
+                    await fetchNovedades();
+                } else {
+                    const errorDetail = result.message || 'Error en la operación en la planilla.';
+                    throw new Error(errorDetail);
+                }
+
+            } catch (error) {
+                if (accion !== 'ELIMINAR') {
+                    novedadModal.hide();
+                }
+                showFeedback(`¡Error al ejecutar la operación! Detalle: ${error.message}`, false);
+                console.error(`Error de ${accion}:`, error);
+            } finally {
+                setLoadingState(false, accion === 'ELIMINAR' ? 'ELIMINAR' : 'GUARDAR');
+            }
+        }
+
+    </script>
+</body>
+</html>
