@@ -13,10 +13,34 @@
             font-family: 'Inter', sans-serif;
             background-color: #eef2f7;
         }
-        /* Solo se muestra la vista de tabla */
-        #data-table-view {
-            display: none; 
+        /* Estilos del Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
         }
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         /* Estilos de los botones de navegación */
         .btn-custom {
             transition: all 0.2s ease-in-out;
@@ -46,7 +70,6 @@
             color: white !important;
             border-color: #5A377B !important;
             box-shadow: 0 4px 15px -3px rgba(90, 55, 123, 0.4) !important;
-            /* Si quieres que se vea igual que el activo siempre: */
             transform: translateY(-2px); 
         }
         .btn-novedades:hover {
@@ -59,19 +82,18 @@
             white-space: nowrap;
         }
 
-        /* NUEVOS ESTILOS PARA EL LOGO (Basado en la estructura de gestor_novedades.html pero adaptado a la estética del dashboard) */
+        /* NUEVOS ESTILOS PARA EL LOGO */
         .logo-container {
-            width: 4rem; /* Equivalente a h-16 */
-            height: 4rem; /* Equivalente a w-16 */
+            width: 4rem; 
+            height: 4rem; 
             overflow: hidden;
-            border-radius: 9999px; /* rounded-full */
-            /* Sombra Tailwind: shadow-lg */
+            border-radius: 9999px; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
         }
         .logo-container img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* object-cover */
+            object-fit: cover; 
         }
     </style>
 </head>
@@ -82,7 +104,8 @@
         <header class="mb-6 flex items-center justify-between border-b-4 border-indigo-500 pb-2">
             <div class="flex items-center">
                 <div class="logo-container mr-4">
-                    <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
+                    <!-- Placeholder de imagen: Reemplazar con tu logo_STM.png -->
+                    <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales" onerror="this.onerror=null; this.src='https://placehold.co/100x100/4f46e5/ffffff?text=STM'">
                 </div>
                 <div>
                     <h1 class="text-4xl font-extrabold text-gray-800">
@@ -103,7 +126,7 @@
                 data-sheet="tabla_consulta"
                 class="btn-custom py-3 px-8 text-lg font-semibold rounded-full shadow-lg active-indigo"
             >
-                Tabla Consulta
+                Consultas
             </button>
             <button 
                 data-sheet="afiliacion"
@@ -127,6 +150,35 @@
         </div>
     </div>
 
+    <!-- MODAL DE DETALLE DE CONSULTA -->
+    <div id="data-modal-overlay" class="modal-overlay">
+        <div class="modal-content w-full md:w-1/2 lg:w-1/3">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <!-- Título actualizado a 'Contenido de la Consulta' -->
+                <h3 class="text-xl font-bold text-indigo-700">Contenido de la Consulta</h3> 
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2004/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div id="modal-details" class="space-y-4">
+                <!-- Se insertará el texto de la columna 'CONSULTA' aquí -->
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <!-- Se cambió el label a "CONSULTA" -->
+                    <p class="text-xs font-semibold uppercase text-gray-500 mb-2">CONSULTA:</p>
+                    <p id="consulta-text-content" class="text-base whitespace-pre-wrap text-gray-800"></p>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t flex justify-end">
+                <button onclick="closeModal()" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- FIN MODAL -->
+
     <script>
         
         // ¡IMPORTANTE! REEMPLAZÁ ESTO CON TU URL REAL DE APPS SCRIPT
@@ -145,8 +197,57 @@
         const tableContainer = document.getElementById('table-container');
         const dataLoadingMessage = document.getElementById('data-loading-message');
         const currentSheetTitle = document.getElementById('current-sheet-title');
+        const dataModalOverlay = document.getElementById('data-modal-overlay');
+        const consultaTextContent = document.getElementById('consulta-text-content'); 
+
+        // Almacena los encabezados globales para usarlos al abrir el modal (ahora menos necesarios)
+        let currentHeaders = [];
         
         let lastActiveSheet = 'tabla_consulta'; // Para recordar qué vista estaba activa
+
+        // --- FUNCIONES DEL MODAL ---
+
+        /**
+         * Muestra el modal con solo el contenido de la columna "CONSULTA".
+         * AHORA LEE EL CONTENIDO DEL data-attribute EN LA FILA (TR).
+         * @param {HTMLElement} rowElement La fila (tr) que fue clickeada.
+         */
+        window.showModal = function(rowElement) {
+            // Solo abrimos el modal si estamos en la vista 'tabla_consulta'
+            if (lastActiveSheet !== 'tabla_consulta') {
+                return; 
+            }
+
+            // 1. Extraer el valor codificado de la consulta del atributo de la fila
+            const encodedConsulta = rowElement.getAttribute('data-consulta');
+            
+            if (encodedConsulta) {
+                // 2. Decodificar el valor
+                const consultaValue = decodeURIComponent(encodedConsulta);
+
+                // 3. Rellenar el contenido del modal
+                consultaTextContent.textContent = consultaValue;
+                
+                // 4. Mostrar el modal
+                dataModalOverlay.style.display = 'flex';
+            } else {
+                console.error("Error: No se encontró el atributo 'data-consulta' en la fila. El modal no puede cargar el contenido.");
+            }
+        }
+
+        /**
+         * Cierra el modal.
+         */
+        window.closeModal = function() {
+            dataModalOverlay.style.display = 'none';
+        }
+
+        // Permitir cerrar el modal haciendo click fuera de su contenido
+        dataModalOverlay.addEventListener('click', (e) => {
+            if (e.target === dataModalOverlay) {
+                closeModal();
+            }
+        });
 
         // --- FUNCIONES ESPECÍFICAS ---
 
@@ -156,41 +257,126 @@
 
         // --- FUNCIONES GVIZ (Tablas de Consulta) ---
 
-        function createGvizUrl(gid) {
-            return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}`;
+        /**
+         * Crea la URL de Google Visualization.
+         * Para la hoja 'afiliacion' y 'tabla_consulta', agrega una cláusula 'select' para filtrar columnas.
+         * @param {string} gid El GID (identificador de hoja) de la hoja de cálculo.
+         * @param {string} sheetName El nombre de la hoja (clave del objeto sheetGids).
+         * @returns {string} La URL de consulta GViz.
+         */
+        function createGvizUrl(gid, sheetName) {
+            let baseUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}`;
+            
+            let selectQuery = '';
+
+            if (sheetName === 'afiliacion') {
+                // Afiliación: Columna B (Nom_Ap), Columna D (legajo), Columna E (cuil), 
+                // Columna H (email). Ajustado para que coincida con lo anterior.
+                selectQuery = 'select B, D, E, H'; 
+            } else if (sheetName === 'tabla_consulta') {
+                // Para la tabla consulta, seleccionamos B, C, D, E (visibles) y F (CONSULTA - oculta, pero necesaria para el modal).
+                selectQuery = 'select B, C, D, E, F'; 
+            }
+
+            if (selectQuery) {
+                baseUrl += `&tq=${encodeURIComponent(selectQuery)}`;
+            }
+            
+            return baseUrl;
         }
 
-        function parseGvizData(jsonText) {
+        /**
+         * Parsea los datos JSON de Google Visualization.
+         * @param {string} jsonText El texto JSON de respuesta GViz.
+         * @param {string} sheetName El nombre de la hoja actual.
+         * @returns {{headers: string[], data: any[][], originalData: any[][]}} Los encabezados (visibles), los datos (visibles) y los datos originales (completos).
+         */
+        function parseGvizData(jsonText, sheetName) {
             try {
                 const jsonString = jsonText.substring(jsonText.indexOf('(') + 1, jsonText.lastIndexOf(')'));
                 const json = JSON.parse(jsonString);
                 const table = json.table;
                 
                 if (!table || !table.rows || table.rows.length === 0) {
-                    return { headers: [], data: [] };
+                    return { headers: [], data: [], originalData: [] };
                 }
                 
-                const headers = table.cols.map(col => col.label || col.id);
+                // Mapeo de nombres de columna para las vistas
+                let headersMap = {}; 
                 
-                const data = table.rows.map(row => {
-                    return headers.map((header, index) => {
-                        const cell = row.c[index];
+                if (sheetName === 'afiliacion') {
+                    // Mapeo para Afiliación (B, D, E, H)
+                    headersMap = {
+                        'B': 'NOMBRE Y APELLIDO', 
+                        'D': 'LEGAJO', 
+                        'E': 'DNI / CUIL', 
+                        'H': 'EMAIL', 
+                    };
+                } else if (sheetName === 'tabla_consulta') {
+                    // Mapeo para Tabla Consulta. (B, C, D, E, F)
+                    headersMap = {
+                        'B': 'APELLIDO', 
+                        'C': 'NOMBRE', 
+                        'D': 'TEL/CELULAR DE CONTACTO', 
+                        'E': 'EMAIL', 
+                        'F': 'CONSULTA', 
+                    };
+                }
+
+                // Generar encabezados usando el mapeo
+                let headers = table.cols.map(col => {
+                    return headersMap[col.id] || col.label || col.id;
+                });
+                
+                // Generar data original (todas las columnas pedidas)
+                const originalData = table.rows.map(row => {
+                    return row.c.map(cell => {
                         return cell ? (cell.f || (cell.v !== undefined ? cell.v : '')) : '';
                     });
                 });
                 
-                return { headers, data };
+                // --- Aplicar el filtro de visibilidad (Quitar 'CONSULTA') ---
+
+                // 1. Quitar el encabezado 'CONSULTA'
+                const consultaIndex = headers.findIndex(h => h === 'CONSULTA');
+                if (consultaIndex !== -1) {
+                    headers.splice(consultaIndex, 1);
+                }
+                
+                // 2. Quitar la columna 'CONSULTA' de los datos que se van a renderizar (quedan B, C, D, E)
+                const finalData = originalData.map(row => {
+                    // Si la columna 'CONSULTA' está al final (índice 4, columna F), cortamos antes
+                    return row.slice(0, 4); 
+                });
+                
+                // Guardamos los encabezados visibles
+                currentHeaders = headers;
+
+                return { 
+                    headers: headers, // 4 encabezados visibles
+                    data: finalData, // Data con 4 columnas (visible)
+                    originalData: originalData // Data con 5 columnas (para el modal)
+                };
+
             } catch (error) {
                 console.error("Error al parsear el JSON de Google Sheets (GViz):", error);
-                return { headers: [], data: [] };
+                return { headers: [], data: [], originalData: [] };
             }
         }
 
-        function renderDataTable(headers, data) {
+        /**
+         * Renderiza la tabla con solo las columnas visibles, pero pasa el contenido de CONSULTA 
+         * en un data-attribute para que el modal funcione.
+         */
+        function renderDataTable(headers, data, originalData) {
             if (data.length === 0) {
                 tableContainer.innerHTML = '<p class="text-center py-8 text-gray-500">No hay datos disponibles en esta hoja.</p>';
                 return;
             }
+
+            const sheetName = lastActiveSheet;
+            const clickHandler = sheetName === 'tabla_consulta' ? 'onclick="showModal(this)"' : '';
+            const rowCursor = sheetName === 'tabla_consulta' ? 'cursor-pointer' : '';
 
             let html = `
                 <div class="rounded-xl overflow-hidden shadow-2xl">
@@ -204,9 +390,20 @@
                             <tbody class="bg-white divide-y divide-gray-200">
             `;
 
-            data.forEach((row, index) => {
-                const rowClass = index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100';
-                html += `<tr class="${rowClass}">`;
+            originalData.forEach((originalRow, index) => {
+                // originalRow tiene 5 columnas (B, C, D, E, F). F es el índice 4.
+                const consultaContent = originalRow.length > 4 ? originalRow[4] : 'N/A';
+                
+                // Codificamos el contenido de la consulta para pasarlo como data-attribute en el TR
+                const encodedConsulta = encodeURIComponent(consultaContent);
+
+                // La variable 'data[index]' tiene SOLO las 4 columnas visibles para renderizar
+                const row = data[index];
+
+                const rowClass = index % 2 === 0 ? 'bg-white hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-100';
+                
+                // Agregamos el handler de click y el atributo data-consulta
+                html += `<tr class="${rowClass} ${rowCursor}" ${clickHandler} data-consulta="${encodedConsulta}">`;
                 html += row.map(cell => `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${cell}</td>`).join('');
                 html += `</tr>`;
             });
@@ -230,13 +427,16 @@
             tableContainer.innerHTML = ''; 
             
             try {
-                const response = await fetch(createGvizUrl(gid));
+                const response = await fetch(createGvizUrl(gid, sheetName));
                 const text = await response.text();
-                const { headers, data } = parseGvizData(text);
+                // Ahora parseGvizData devuelve la data filtrada (data) y la original (originalData)
+                const { headers, data, originalData } = parseGvizData(text, sheetName);
                 
-                renderDataTable(headers, data);
+                // Pasamos la data visible y la data original a renderDataTable
+                renderDataTable(headers, data, originalData);
                 
             } catch (error) {
+                console.error('Error al cargar datos:', error);
                 dataLoadingMessage.textContent = `Error al cargar los datos: ${error.message}`;
             } finally {
                 dataLoadingMessage.style.display = 'none';
@@ -259,9 +459,6 @@
                 // La vista anterior (Tabla Consulta o Afiliación) sigue "activa".
                 return; 
             }
-
-            // 2. Mostrar la vista de tabla
-            dataTableView.style.display = 'block';
             
             // 3. Cargar datos
             loadSheetData(sheetName);
