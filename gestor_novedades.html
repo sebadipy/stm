@@ -16,6 +16,7 @@
             --stm-teal: #34B3C5;   /* Turquesa (Crear Novedad) */
             --stm-red: #dc3545;    /* Rojo (Eliminar) */
             --stm-indigo: #4f46e5; /* Índigo del dashboard (Cabecera de Tabla) */
+            --stm-dark-purple: #492a63; /* Variante oscura del púrpura para hover */
         }
 
         body { 
@@ -32,16 +33,40 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border-top: 4px solid var(--stm-indigo); /* Borde superior como el dashboard */
         }
+        
+        /* ESTILOS DEL NUEVO ENCABEZADO (COMO EL DASHBOARD) */
         .logo-container {
-            text-align: left; 
+            /* Flexbox para alinear el logo y el texto horizontalmente */
+            display: flex; 
+            align-items: center; /* Centrado vertical */
+            justify-content: space-between; /* Espacio entre el título y el botón */
             margin-bottom: 20px; 
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0; /* Separador sutil */
         }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
         .logo-container img {
-            max-width: 100px; 
+            max-width: 60px; /* Reducido para que se parezca más al dashboard */
             height: auto; 
-            border-radius: 50%; /* Redondeo del logo */
+            border-radius: 50%; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-right: 15px; /* Espacio entre el logo y el texto */
         }
+
+        .header-title {
+            /* Nuevo estilo para el título grande junto al logo */
+            font-size: 1.8rem; /* Tamaño grande */
+            font-weight: 700;
+            color: #1f2937; /* Color oscuro */
+            margin: 0; /* Sin márgenes predeterminados */
+        }
+        
+        /* --- BOTONES --- */
         
         /* BOTÓN CREAR (Turquesa - stm-teal) */
         .btn-stm-create {
@@ -75,8 +100,28 @@
         }
         .btn-stm-save:hover, 
         .btn-stm-save:focus {
-            background-color: #492a63; 
-            border-color: #492a63;
+            background-color: var(--stm-dark-purple); 
+            border-color: var(--stm-dark-purple);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* BOTÓN 'Tablero de mando' */
+        .btn-dashboard {
+            background-color: var(--stm-purple); 
+            border-color: var(--stm-dark-purple); 
+            color: #ffffff;
+            font-weight: 600;
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(90, 55, 123, 0.4);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none; /* Asegurar que no tenga subrayado */
+        }
+        .btn-dashboard:hover,
+        .btn-dashboard:focus {
+            background-color: var(--stm-dark-purple); 
+            border-color: var(--stm-dark-purple);
             color: #ffffff;
             transform: translateY(-1px);
         }
@@ -99,7 +144,7 @@
             transform: translateY(-1px);
         }
         
-        /* Estilo para unificar el contenedor del formulario/tabla */
+        /* --- TABLA --- */
         .table-responsive {
             margin-top: 20px;
             border-radius: 8px;
@@ -107,7 +152,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        /* Encabezado de la tabla al estilo del dashboard */
         .table thead {
             background-color: var(--stm-indigo);
             color: white;
@@ -126,24 +170,21 @@
             padding: 40px;
         }
         
-        /* Estilo para que las filas sean clickeables */
         .table-hover tbody tr {
             cursor: pointer;
         }
         .table-hover tbody tr:hover {
-            background-color: #f0f4f9; /* Color más suave al pasar el mouse */
+            background-color: #f0f4f9; 
         }
 
-        /* Estilo específico para los íconos de Activo/No Activo */
         .activo-icon {
             font-size: 1.2rem;
             display: block;
             text-align: center;
         }
-        .text-success { color: #28a745 !important; } /* Bootstrap default green */
-        .text-danger { color: #dc3545 !important; } /* Bootstrap default red */
+        .text-success { color: #28a745 !important; } 
+        .text-danger { color: #dc3545 !important; } 
 
-        /* Columna Activo pequeña */
         .table th.col-activo {
             width: 1%;
             text-align: center;
@@ -158,12 +199,26 @@
     <div class="container">
         <div class="main-container">
             
+            <!-- EL NUEVO LOGO-CONTAINER CON EL ESTILO DASHBOARD -->
             <div class="logo-container">
-                <!-- Se asume que el logo_STM.png está disponible -->
-                <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
-            </div>
+                <!-- Contenedor del Logo y Título -->
+                <div class="header-content">
+                    <!-- El logo es un poco más pequeño para el estilo de dashboard -->
+                    <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
+                    
+                    <!-- Título principal al estilo de dashboard -->
+                    <h1 class="header-title">
+                        📢 Gestor de <span style="color: var(--stm-indigo);">Novedades</span>
+                    </h1>
+                </div>
 
-            <h2 class="fs-4 fw-bold text-gray-800 border-bottom pb-2 mb-4">📢 Gestor de <span style="color: #4f46e5;">Novedades</span></h2>
+                <!-- Botón de vuelta al Tablero de Mando -->
+                <a href="dashboard.html" class="btn btn-dashboard">
+                    <i class="fas fa-chart-line me-2"></i> Tablero de mando
+                </a>
+            </div>
+            
+            <!-- El título <h2> anterior fue movido y estilizado como <h1> dentro de logo-container -->
             
             <div class="d-flex justify-content-end mb-4">
                 <button type="button" class="btn btn-stm-create" onclick="openModal()">
@@ -171,7 +226,7 @@
                 </button>
             </div>
             
-            <!-- CAMBIO CLAVE: Se elimina #ID y se agrega ACTIVO al inicio -->
+            <!-- Resto del contenido (tabla, modales, scripts) se mantiene igual -->
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead>
@@ -310,8 +365,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script>
-        // LÓGICA DE JAVASCRIPT MODIFICADA
-        // URL de tu AppScript (Mantenida por si acaso)
+        // LÓGICA DE JAVASCRIPT
         const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfNlhTU4hO8linQddyhVvd5rTrsAQxx1XvlsJO5tbBvUeyzczi1q-LbwU6-dSsLPvt9w/exec'; 
 
         const novedadesTableBody = document.getElementById('novedadesTableBody');
@@ -330,7 +384,6 @@
         const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
         const feedbackModalBody = document.getElementById('feedbackModalBody');
         
-        // Elementos para la nueva funcionalidad
         const textareaContenido = document.getElementById('textareaContenido');
         const charCountElement = document.getElementById('charCount');
 
@@ -452,8 +505,6 @@
         function renderTable(novedades) {
             novedadesTableBody.innerHTML = '';
             loadingSpinner.style.display = 'none';
-            // COLSPAN AJUSTADO A 3 (Activo, Título, Fecha, Contenido)
-            // Se asume que Contenido tiene un colspan mayor implícito, pero el número de columnas visibles es 4.
             const COLSPAN_COUNT = 4; 
 
             if (novedades.length === 0) {
@@ -470,13 +521,11 @@
             novedades.forEach(novedad => {
                 const isActive = (novedad.Activo || '').toUpperCase().trim() === 'SI'; 
                 
-                // Nuevo: Ícono de Activo
                 const activoIcono = isActive 
                     ? '<i class="activo-icon fas fa-check-circle text-success" title="Activo"></i>' 
                     : '<i class="activo-icon fas fa-times-circle text-danger" title="No Activo"></i>';
                 
                 const row = novedadesTableBody.insertRow();
-                // Se agrega el evento onclick a la fila completa, pasando todos los datos
                 row.setAttribute('onclick', `openModal(
                     '${novedad.ID}', 
                     '${novedad.Titulo.replace(/'/g, "\\'")}', 
@@ -500,7 +549,6 @@
 
         function openModal(id = '', titulo = '', fecha = '', contenido = '', activo = 'SI') {
             novedadForm.reset(); 
-            // Elimina la validación de Bootstrap al abrir el modal
             novedadForm.classList.remove('was-validated'); 
             
             const inputIdNovedad = document.getElementById('inputIdNovedad');
@@ -512,25 +560,22 @@
 
             if (id) {
                 // Modo Edición
-                novedadModalLabel.textContent = 'Editar Novedad (ID: ' + id + ')';
+                novedadModalLabel.textContent = 'Editar Novedad';
                 originalGuardarText = 'Guardar Cambios';
                 
                 inputTitulo.value = titulo;
                 inputFecha.value = fecha;
                 textareaContenido.value = contenido;
-                // El estado 'activo' se sigue cargando en el checkbox del modal
                 inputActivo.checked = (activo || '').toUpperCase().trim() === 'SI'; 
                 
-                // Muestra el botón de eliminar
                 btnEliminarEnModal.style.display = 'block'; 
                 
             } else {
-                // Modo Creación: Establecer valores por defecto
+                // Modo Creación
                 novedadModalLabel.textContent = 'Crear Nueva Novedad';
                 originalGuardarText = 'Guardar Novedad';
                 inputActivo.checked = true; 
 
-                // Oculta el botón de eliminar
                 btnEliminarEnModal.style.display = 'none'; 
 
                 // Poner la fecha actual por defecto
@@ -575,7 +620,6 @@
             } else {
                 header.classList.add('bg-danger', 'text-white'); 
             }
-            // Asegurarse de que el botón de cerrar sea blanco si el fondo es oscuro
             document.getElementById('feedbackModal').querySelector('.btn-close').classList.add('btn-close-white');
 
 
@@ -639,7 +683,7 @@
                     formData.append('action', 'UPDATE');
                     formData.append('ID', id);
                     body = formData;
-                    successMessage = `La novedad ${id} se actualizó correctamente.`;
+                    successMessage = `La novedad se actualizó correctamente.`;
                     break;
                 case 'ELIMINAR':
                     method = 'POST';
@@ -648,7 +692,7 @@
                     deleteData.append('action', 'DELETE');
                     deleteData.append('ID', id);
                     body = deleteData;
-                    successMessage = `La novedad ${id} fue eliminada.`;
+                    successMessage = `La novedad fue eliminada.`;
                     break;
                 default:
                     showFeedback('Acción desconocida.', false);
