@@ -104,7 +104,6 @@
         <header class="mb-6 flex items-center justify-between border-b-4 border-indigo-500 pb-2">
             <div class="flex items-center">
                 <div class="logo-container mr-4">
-                    <!-- Placeholder de imagen: Reemplazar con tu logo_STM.png -->
                     <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales" onerror="this.onerror=null; this.src='https://placehold.co/100x100/4f46e5/ffffff?text=STM'">
                 </div>
                 <div>
@@ -115,9 +114,13 @@
                 </div>
             </div>
 
-
-            
-        </header>
+            <button 
+                onclick="logout()"
+                class="bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition duration-150 shadow-md"
+            >
+                Cerrar Sesión
+            </button>
+            </header>
 
         <div id="btn-group" class="flex flex-wrap justify-center gap-4 mb-6 p-4 bg-white rounded-xl shadow-xl">
             <button 
@@ -148,21 +151,17 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALLE DE CONSULTA -->
     <div id="data-modal-overlay" class="modal-overlay">
         <div class="modal-content w-full md:w-1/2 lg:w-1/3">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
-                <!-- Título actualizado a 'Contenido de la Consulta' -->
                 <h3 class="text-xl font-bold text-indigo-700">Contenido de la Consulta</h3> 
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2004/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
             <div id="modal-details" class="space-y-4">
-                <!-- Se insertará el texto de la columna 'CONSULTA' aquí -->
                 <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <!-- Se cambió el label a "CONSULTA" -->
                     <p class="text-xs font-semibold uppercase text-gray-500 mb-2">CONSULTA:</p>
                     <p id="consulta-text-content" class="text-base whitespace-pre-wrap text-gray-800"></p>
                 </div>
@@ -175,9 +174,15 @@
             </div>
         </div>
     </div>
-    <!-- FIN MODAL -->
-
     <script>
+        
+        // --- 🚨 CÓDIGO DE VERIFICACIÓN DE SEGURIDAD 🚨 ---
+        // Chequea si la bandera de autenticación existe en el localStorage
+        if (localStorage.getItem('isAuthenticatedSTM') !== 'true') {
+            // Si no está autenticado, redirigir al login
+            window.location.href = 'index.html';
+        }
+        // --- FIN CÓDIGO DE VERIFICACIÓN ---
         
         // ¡IMPORTANTE! REEMPLAZÁ ESTO CON TU URL REAL DE APPS SCRIPT
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfNlhTU4hO8linQddyhVvd5rTrsAQxx1XvlsJO5tbBvUeyzczi1q-LbwU6-dSsLPvt9w/exec'; 
@@ -251,6 +256,14 @@
 
         function openGestorNovedades() {
             window.open('gestor_novedades.html', '_blank');
+        }
+
+        /**
+         * Función para cerrar la sesión (eliminar la bandera) y redirigir al login.
+         */
+        window.logout = function() {
+            localStorage.removeItem('isAuthenticatedSTM');
+            window.location.href = 'index.html';
         }
 
         // --- FUNCIONES GVIZ (Tablas de Consulta) ---

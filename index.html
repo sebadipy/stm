@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - STM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos generales limpios */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #eef2f7; /* Mismo fondo que el dashboard */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* NUEVOS ESTILOS PARA EL LOGO (Copiados del dashboard.html) */
+        .logo-container {
+            width: 4rem; 
+            height: 4rem; 
+            overflow: hidden;
+            border-radius: 9999px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
+        }
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+        }
+
+        /* Estilo para el botón */
+        .btn-primary {
+            transition: all 0.2s ease-in-out;
+            background-color: #4f46e5;
+            box-shadow: 0 4px 15px -3px rgba(79, 70, 229, 0.4);
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px -5px rgba(79, 70, 229, 0.6);
+        }
+        .input-text:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-2xl border-t-4 border-indigo-600">
+        
+        <header class="mb-8 flex flex-col items-center">
+            <div class="logo-container mb-4">
+                <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales" onerror="this.onerror=null; this.src='https://placehold.co/100x100/4f46e5/ffffff?text=STM'">
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 text-center">
+                Acceso al <span class="text-indigo-600">Tablero de Mando</span>
+            </h1>
+            <p class="text-gray-500 mt-1 text-center">
+                Ingresá tus credenciales para continuar.
+            </p>
+        </header>
+
+        <form id="login-form" class="space-y-6">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario (CUIL/DNI)</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    placeholder="Usuario"
+                    class="input-text w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500"
+                >
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="Ingresá tu clave"
+                    class="input-text w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500"
+                >
+            </div>
+
+
+            <p id="error-message" class="text-red-600 text-sm hidden">
+                Usuario o Contraseña incorrectos. Por favor, verificá tus datos.
+            </p>
+
+            <button 
+                type="submit" 
+                class="btn-primary w-full text-white py-2.5 px-4 rounded-lg text-lg font-semibold tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <p id="loading-message" class="text-center text-indigo-600 font-medium mt-4 hidden">
+            Verificando credenciales...
+        </p>
+
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN Y CONSTANTES ---
+
+        // ¡IMPORTANTE! Reemplazá este placeholder con la URL de tu Google Apps Script DESPUÉS de desplegarlo.
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxv_GHi7vqVUdfiAAkhG1F_-MSj6z3vBNnHCpkb08pxOSzF7Ztk-5zhYkSImxevLGc8yQ/exec'; 
+        
+        // El SHEET_ID de tu planilla:
+        const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
+        
+        // Nombre de la hoja donde están los usuarios y contraseñas.
+        const SHEET_NAME_FOR_VALIDATION = 'user'; 
+        
+        // Columna que contiene el Nombre de Usuario (CUIL/DNI).
+        // Columna D en la planilla -> Índice 3 en JavaScript (D-1)
+        const USERNAME_COLUMN_INDEX = 3; 
+        
+        // Columna que contiene la Contraseña.
+        // Columna E en la planilla -> Índice 4 en JavaScript (E-1)
+        const PASSWORD_COLUMN_INDEX = 4; 
+        
+        // Elementos de UI
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username'); 
+        const passwordInput = document.getElementById('password'); 
+        const errorMessage = document.getElementById('error-message');
+        const loadingMessage = document.getElementById('loading-message');
+
+        /**
+         * Limpia el valor del Nombre de Usuario (CUIL/DNI) eliminando guiones, puntos y espacios.
+         * La contraseña se envía sin limpiar.
+         * @param {string} value El Nombre de Usuario (CUIL/DNI) ingresado.
+         * @returns {string} El valor limpio.
+         */
+        function cleanInput(value) {
+            return value.replace(/[-\s\.]/g, '').trim();
+        }
+
+        /**
+         * Maneja el envío del formulario de inicio de sesión, comunicándose con Apps Script.
+         * @param {Event} event El evento de envío del formulario.
+         */
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            // Ocultar mensaje de error anterior y mostrar cargando
+            errorMessage.classList.add('hidden');
+            loadingMessage.classList.remove('hidden');
+            usernameInput.disabled = true;
+            passwordInput.disabled = true;
+            loginForm.querySelector('button').disabled = true;
+
+            const rawUsername = usernameInput.value;
+            const rawPassword = passwordInput.value;
+
+            const cleanUsername = cleanInput(rawUsername);
+
+            if (!cleanUsername || !rawPassword) {
+                errorMessage.textContent = 'Por favor, ingresá tu Nombre de Usuario y Contraseña.';
+                errorMessage.classList.remove('hidden');
+                loadingMessage.classList.add('hidden');
+                usernameInput.disabled = false;
+                passwordInput.disabled = false;
+                loginForm.querySelector('button').disabled = false;
+                return;
+            }
+
+            try {
+                // Preparamos los datos a enviar al Apps Script
+                const dataToSend = {
+                    sheetId: SHEET_ID,
+                    sheetName: SHEET_NAME_FOR_VALIDATION,
+                    username: cleanUsername, // Enviamos el usuario limpio
+                    password: rawPassword, // Enviamos la contraseña tal cual
+                    usernameColumnIndex: USERNAME_COLUMN_INDEX, 
+                    passwordColumnIndex: PASSWORD_COLUMN_INDEX
+                };
+
+                // Función de reintento con backoff exponencial para Apps Script
+                const maxRetries = 3;
+                let attempt = 0;
+                let response = null;
+                
+                while (attempt < maxRetries) {
+                    try {
+                        response = await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'cors', // Necesario para peticiones a Apps Script
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded' // Formato esperado por doPost
+                            },
+                            // Convertimos el objeto dataToSend en formato URLSearchParams
+                            body: new URLSearchParams(dataToSend).toString()
+                        });
+
+                        if (response.ok) {
+                            break; // Salir del bucle si la respuesta es exitosa
+                        } else {
+                            // Si la respuesta no es OK pero no es un error de conexión (e.g., 404, 500)
+                            throw new Error(`Error en la solicitud al servidor: ${response.statusText}`);
+                        }
+                    } catch (error) {
+                        attempt++;
+                        if (attempt >= maxRetries) {
+                            throw error; // Lanzar el último error
+                        }
+                        // Espera exponencial: 1s, 2s, 4s
+                        const delay = Math.pow(2, attempt) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                }
+
+                if (!response) {
+                     throw new Error('No se pudo obtener una respuesta del servidor.');
+                }
+                
+                const result = await response.json();
+
+                // 2. Verificar el resultado devuelto por Apps Script
+                if (result.success) {
+                    // ¡USUARIO AUTORIZADO!
+                    
+                    // --- 🔑 AGREGAMOS ESTA LÍNEA PARA GUARDAR LA SESIÓN ---
+                    localStorage.setItem('isAuthenticatedSTM', 'true'); 
+                    // ----------------------------------------------------
+                    
+                    // Redirigir al dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Usuario no existe o credenciales incorrectas
+                    errorMessage.textContent = 'Usuario o Contraseña incorrectos. Por favor, verificá tus datos.';
+                    errorMessage.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Error durante la verificación:', error);
+                errorMessage.textContent = `Error de conexión: ${error.message}. Asegurate de haber desplegado correctamente el Apps Script y de que la URL esté bien configurada.`;
+                errorMessage.classList.remove('hidden');
+            } finally {
+                // Ocultar cargando y habilitar inputs/botón
+                loadingMessage.classList.add('hidden');
+                usernameInput.disabled = false;
+                passwordInput.disabled = false;
+                loginForm.querySelector('button').disabled = false;
+            }
+        }
+
+        // Asignar el listener al formulario
+        loginForm.addEventListener('submit', handleLogin);
+
+    </script>
+</body>
+</html>
