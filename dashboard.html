@@ -58,6 +58,21 @@
         #table-container th {
             white-space: nowrap;
         }
+
+        /* NUEVOS ESTILOS PARA EL LOGO (Basado en la estructura de gestor_novedades.html pero adaptado a la estética del dashboard) */
+        .logo-container {
+            width: 4rem; /* Equivalente a h-16 */
+            height: 4rem; /* Equivalente a w-16 */
+            overflow: hidden;
+            border-radius: 9999px; /* rounded-full */
+            /* Sombra Tailwind: shadow-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
+        }
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* object-cover */
+        }
     </style>
 </head>
 <body class="p-4 sm:p-6">
@@ -66,7 +81,9 @@
         
         <header class="mb-6 flex items-center justify-between border-b-4 border-indigo-500 pb-2">
             <div class="flex items-center">
-                <img src="https://placehold.co/100x100/4f46e5/ffffff?text=STM+Logo" alt="Logo STM" class="h-16 w-16 mr-4 rounded-full shadow-lg object-cover">
+                <div class="logo-container mr-4">
+                    <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
+                </div>
                 <div>
                     <h1 class="text-4xl font-extrabold text-gray-800">
                         Tablero de Mando <span class="text-indigo-600">STM</span>
@@ -74,6 +91,8 @@
                     <p class="text-gray-600 mt-1 text-lg">Consulta rápida de datos clave.</p>
                 </div>
             </div>
+
+
             <div id="user-info" class="text-right text-sm text-gray-500 hidden sm:block">
                 Conexión: <span id="user-id-display" class="font-mono text-xs bg-gray-100 p-1 rounded text-green-600">Apps Script Activo</span>
             </div>
@@ -161,8 +180,8 @@
                 });
                 
                 return { headers, data };
-            } catch (e) {
-                console.error("Error al parsear el JSON de Google Sheets (GViz):", e);
+            } catch (error) {
+                console.error("Error al parsear el JSON de Google Sheets (GViz):", error);
                 return { headers: [], data: [] };
             }
         }
