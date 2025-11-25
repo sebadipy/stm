@@ -1,497 +1,638 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <base target="_top"> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero de Mando - STM (Consulta)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <title>Gestor de Novedades - STM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome para los íconos (tilde verde / cruz roja) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* Estilos generales limpios */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #eef2f7;
-        }
-        /* Estilos del Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 24px;
-            border-radius: 12px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        /* CONSTANTES DE COLOR DE consulta.html */
+        :root {
+            --stm-purple: #5A377B; /* Púrpura principal (Guardar/Gestor Novedades) */
+            --stm-teal: #34B3C5;   /* Turquesa (Crear Novedad) */
+            --stm-red: #dc3545;    /* Rojo (Eliminar) */
+            --stm-indigo: #4f46e5; /* Índigo del dashboard (Cabecera de Tabla) */
         }
 
-        /* Estilos de los botones de navegación */
-        .btn-custom {
-            transition: all 0.2s ease-in-out;
-            border: 1px solid transparent;
+        body { 
+            background-color: #eef2f7; /* Fondo del dashboard */
+            font-size: 15px;
+            font-family: 'Roboto', sans-serif; 
         }
-        /* ESTILOS ACTIVOS (Azul Índigo por defecto para las vistas de tabla) */
-        .btn-custom.active-indigo {
-            background-color: #4f46e5 !important;
-            color: white !important;
-            border-color: #4f46e5;
-            box-shadow: 0 4px 15px -3px rgba(79, 70, 229, 0.4);
-            transform: translateY(-2px);
-        }
-        .btn-custom:not(.active-indigo) {
+        .main-container {
+            max-width: 1100px; 
+            margin: 30px auto;
+            padding: 30px;
             background-color: #ffffff;
-            color: #4f46e5;
-            border-color: #c7d2fe;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--stm-indigo); /* Borde superior como el dashboard */
         }
-        .btn-custom:not(.active-indigo):hover {
-            background-color: #f5f6fa;
-            border-color: #a5b4fc;
-        }
-        
-        /* ESTILOS ESPECÍFICOS PARA GESTOR NOVEDADES (PÚRPURA STM: #5A377B) */
-        .btn-novedades {
-            background-color: #5A377B !important; 
-            color: white !important;
-            border-color: #5A377B !important;
-            box-shadow: 0 4px 15px -3px rgba(90, 55, 123, 0.4) !important;
-            transform: translateY(-2px); 
-        }
-        .btn-novedades:hover {
-            background-color: #492a63 !important; 
-            border-color: #492a63 !important;
-        }
-        
-        /* Ajuste para las cabeceras de la tabla */
-        #table-container th {
-            white-space: nowrap;
-        }
-
-        /* NUEVOS ESTILOS PARA EL LOGO */
         .logo-container {
-            width: 4rem; 
-            height: 4rem; 
-            overflow: hidden;
-            border-radius: 9999px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
+            text-align: left; 
+            margin-bottom: 20px; 
         }
         .logo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
+            max-width: 100px; 
+            height: auto; 
+            border-radius: 50%; /* Redondeo del logo */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* BOTÓN CREAR (Turquesa - stm-teal) */
+        .btn-stm-create {
+            background-color: var(--stm-teal); 
+            border-color: var(--stm-teal); 
+            color: #ffffff; 
+            font-weight: 600;
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            box-shadow: 0 4px 15px -3px rgba(52, 179, 197, 0.5); 
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-stm-create:hover, 
+        .btn-stm-create:focus {
+            background-color: #2a8e9b; 
+            border-color: #2a8e9b;
+            color: #ffffff;
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 18px -3px rgba(52, 179, 197, 0.7);
+        }
+
+        /* BOTÓN GUARDAR (Púrpura - stm-purple) */
+        .btn-stm-save {
+            background-color: var(--stm-purple); 
+            border-color: var(--stm-purple); 
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(90, 55, 123, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-stm-save:hover, 
+        .btn-stm-save:focus {
+            background-color: #492a63; 
+            border-color: #492a63;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        
+        /* BOTÓN ELIMINAR (Rojo - stm-red) */
+        .btn-stm-delete {
+            background-color: var(--stm-red); 
+            border-color: var(--stm-red); 
+            color: #ffffff; 
+            border-radius: 8px; 
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-stm-delete:hover, 
+        .btn-stm-delete:focus {
+            background-color: #b02a37;
+            border-color: #b02a37;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        
+        /* Estilo para unificar el contenedor del formulario/tabla */
+        .table-responsive {
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Encabezado de la tabla al estilo del dashboard */
+        .table thead {
+            background-color: var(--stm-indigo);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .table th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        
+        #loadingSpinner {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        /* Estilo para que las filas sean clickeables */
+        .table-hover tbody tr {
+            cursor: pointer;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f0f4f9; /* Color más suave al pasar el mouse */
+        }
+
+        /* Estilo específico para los íconos de Activo/No Activo */
+        .activo-icon {
+            font-size: 1.2rem;
+            display: block;
+            text-align: center;
+        }
+        .text-success { color: #28a745 !important; } /* Bootstrap default green */
+        .text-danger { color: #dc3545 !important; } /* Bootstrap default red */
+
+        /* Columna Activo pequeña */
+        .table th.col-activo {
+            width: 1%;
+            text-align: center;
+        }
+        .table td.col-activo {
+            text-align: center;
         }
     </style>
 </head>
-<body class="p-4 sm:p-6">
+<body>
 
-    <div class="max-w-7xl mx-auto">
-        
-        <header class="mb-6 flex items-center justify-between border-b-4 border-indigo-500 pb-2">
-            <div class="flex items-center">
-                <div class="logo-container mr-4">
-                    <!-- Placeholder de imagen: Reemplazar con tu logo_STM.png -->
-                    <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales" onerror="this.onerror=null; this.src='https://placehold.co/100x100/4f46e5/ffffff?text=STM'">
-                </div>
-                <div>
-                    <h1 class="text-4xl font-extrabold text-gray-800">
-                        Tablero de Mando <span class="text-indigo-600">STM</span>
-                    </h1>
-                    <p class="text-gray-600 mt-1 text-lg">Consulta rápida de datos clave.</p>
-                </div>
+    <div class="container">
+        <div class="main-container">
+            
+            <div class="logo-container">
+                <!-- Se asume que el logo_STM.png está disponible -->
+                <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
             </div>
 
-
-            <div id="user-info" class="text-right text-sm text-gray-500 hidden sm:block">
-                Conexión: <span id="user-id-display" class="font-mono text-xs bg-gray-100 p-1 rounded text-green-600">Apps Script Activo</span>
-            </div>
-        </header>
-
-        <div id="btn-group" class="flex flex-wrap justify-center gap-4 mb-6 p-4 bg-white rounded-xl shadow-xl">
-            <button 
-                data-sheet="tabla_consulta"
-                class="btn-custom py-3 px-8 text-lg font-semibold rounded-full shadow-lg active-indigo"
-            >
-                Consultas
-            </button>
-            <button 
-                data-sheet="afiliacion"
-                class="btn-custom py-3 px-8 text-lg font-semibold rounded-full shadow-lg"
-            >
-                Afiliación
-            </button>
-            <button 
-                data-sheet="gestor_novedades_external"
-                class="btn-custom py-3 px-8 text-lg font-semibold rounded-full shadow-lg btn-novedades"
-            >
-                Gestor Novedades
-            </button>
-        </div>
-        
-        <div id="data-table-view" class="bg-white p-6 rounded-xl shadow-2xl border-t-4 border-indigo-500">
-            <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Datos de la Hoja de Cálculo: <span id="current-sheet-title" class="text-indigo-600">Tabla Consulta</span></h2>
-            <p id="data-loading-message" class="text-center text-indigo-600 font-medium py-8">Cargando datos desde Google Sheets...</p>
-            <div id="table-container" class="overflow-x-auto">
-                </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE DETALLE DE CONSULTA -->
-    <div id="data-modal-overlay" class="modal-overlay">
-        <div class="modal-content w-full md:w-1/2 lg:w-1/3">
-            <div class="flex justify-between items-center border-b pb-3 mb-4">
-                <!-- Título actualizado a 'Contenido de la Consulta' -->
-                <h3 class="text-xl font-bold text-indigo-700">Contenido de la Consulta</h3> 
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2004/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <h2 class="fs-4 fw-bold text-gray-800 border-bottom pb-2 mb-4">📢 Gestor de <span style="color: #4f46e5;">Novedades</span></h2>
+            
+            <div class="d-flex justify-content-end mb-4">
+                <button type="button" class="btn btn-stm-create" onclick="openModal()">
+                    <i class="fas fa-plus-circle me-2"></i> Crear Nueva Novedad
                 </button>
             </div>
             
-            <div id="modal-details" class="space-y-4">
-                <!-- Se insertará el texto de la columna 'CONSULTA' aquí -->
-                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <!-- Se cambió el label a "CONSULTA" -->
-                    <p class="text-xs font-semibold uppercase text-gray-500 mb-2">CONSULTA:</p>
-                    <p id="consulta-text-content" class="text-base whitespace-pre-wrap text-gray-800"></p>
+            <!-- CAMBIO CLAVE: Se elimina #ID y se agrega ACTIVO al inicio -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <!-- Columna 'Activo' con estilo para ser pequeña -->
+                            <th scope="col" class="col-activo">ACTIVO</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Contenido</th>
+                        </tr>
+                    </thead>
+                    <tbody id="novedadesTableBody">
+                    </tbody >
+                </table>
+                <div id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando novedades...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando novedades...</p>
                 </div>
             </div>
 
-            <div class="mt-6 pt-4 border-t flex justify-end">
-                <button onclick="closeModal()" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150">
-                    Cerrar
-                </button>
+        </div>
+    </div>
+    
+    <!-- MODAL DE CREACIÓN/EDICIÓN -->
+    <div class="modal fade" id="novedadModal" tabindex="-1" aria-labelledby="novedadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="novedadForm" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="novedadModalLabel">Crear Novedad</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- El ID se sigue manteniendo como campo oculto -->
+                        <input type="hidden" id="inputIdNovedad" name="ID">
+                        
+                        <div class="mb-3">
+                            <label for="inputTitulo" class="form-label">
+                                Título: <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="inputTitulo" name="Titulo" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="inputFecha" class="form-label">
+                                Fecha novedad: <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control" id="inputFecha" name="Fecha" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="textareaContenido" class="form-label">
+                                Contenido: <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" id="textareaContenido" name="Contenido" rows="6" required></textarea>
+                        </div>
+                        
+                        <!-- El checkbox Activo se mantiene en el modal, que es donde se edita -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="inputActivo" name="Activo" value="SI">
+                            <label class="form-check-label" for="inputActivo">
+                                ¿Novedad Activa? (Marcar para mostrar)
+                            </label>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <!-- Botón de Eliminar: Solo visible en modo edición -->
+                        <button type="button" class="btn btn-stm-delete" id="btnEliminarEnModal" style="display: none;">
+                            <i class="fas fa-trash-alt me-2"></i> Eliminar Novedad
+                        </button>
+                        
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCancelarModal">Cancelar</button>
+                            <button type="submit" class="btn btn-stm-save" id="btnGuardar">Guardar Novedad</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <!-- FIN MODAL -->
+
+    <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN (SIN CAMBIOS) -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">⚠️ Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro/a que querés eliminar la novedad con ID: <strong id="deleteNovedadId" class="text-danger"></strong>?</p>
+                    <p class="text-danger">¡Esta acción no se puede deshacer!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-stm-delete" id="btnAceptarEliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL DE FEEDBACK (SIN CAMBIOS) -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Resultado de la Operación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="feedbackModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script>
+        // LÓGICA DE JAVASCRIPT MODIFICADA
+        // URL de tu AppScript (Mantenida por si acaso)
+        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfNlhTU4hO8linQddyhVvd5rTrsAQxx1XvlsJO5tbBvUeyzczi1q-LbwU6-dSsLPvt9w/exec'; 
+
+        const novedadesTableBody = document.getElementById('novedadesTableBody');
+        const loadingSpinner = document.getElementById('loadingSpinner');
         
-        // ¡IMPORTANTE! REEMPLAZÁ ESTO CON TU URL REAL DE APPS SCRIPT
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfNlhTU4hO8linQddyhVvd5rTrsAQxx1XvlsJO5tbBvUeyzczi1q-LbwU6-dSsLPvt9w/exec'; 
+        const novedadForm = document.getElementById('novedadForm');
+        const novedadModal = new bootstrap.Modal(document.getElementById('novedadModal'));
+        const novedadModalLabel = document.getElementById('novedadModalLabel');
+        const btnGuardar = document.getElementById('btnGuardar');
+        const btnCancelarModal = document.getElementById('btnCancelarModal'); 
         
-        const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
-        const sheetGids = {
-            'tabla_consulta': '0',
-            'afiliacion': '1038720919',
-            'gestor_novedades_external': null 
-        };
-
-        // Elementos de UI
-        const dataTableView = document.getElementById('data-table-view');
-        const buttons = document.querySelectorAll('#btn-group button'); 
-        const tableContainer = document.getElementById('table-container');
-        const dataLoadingMessage = document.getElementById('data-loading-message');
-        const currentSheetTitle = document.getElementById('current-sheet-title');
-        const dataModalOverlay = document.getElementById('data-modal-overlay');
-        const consultaTextContent = document.getElementById('consulta-text-content'); 
-
-        // Almacena los encabezados globales para usarlos al abrir el modal (ahora menos necesarios)
-        let currentHeaders = [];
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const btnAceptarEliminar = document.getElementById('btnAceptarEliminar');
+        const btnEliminarEnModal = document.getElementById('btnEliminarEnModal'); 
         
-        let lastActiveSheet = 'tabla_consulta'; // Para recordar qué vista estaba activa
+        const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+        const feedbackModalBody = document.getElementById('feedbackModalBody');
 
-        // --- FUNCIONES DEL MODAL ---
+        let novedadIdToDelete = null;
 
-        /**
-         * Muestra el modal con solo el contenido de la columna "CONSULTA".
-         * AHORA LEE EL CONTENIDO DEL data-attribute EN LA FILA (TR).
-         * @param {HTMLElement} rowElement La fila (tr) que fue clickeada.
-         */
-        window.showModal = function(rowElement) {
-            // Solo abrimos el modal si estamos en la vista 'tabla_consulta'
-            if (lastActiveSheet !== 'tabla_consulta') {
-                return; 
-            }
+        let originalGuardarText = '';
+        let originalEliminarText = '';
 
-            // 1. Extraer el valor codificado de la consulta del atributo de la fila
-            const encodedConsulta = rowElement.getAttribute('data-consulta');
-            
-            if (encodedConsulta) {
-                // 2. Decodificar el valor
-                const consultaValue = decodeURIComponent(encodedConsulta);
 
-                // 3. Rellenar el contenido del modal
-                consultaTextContent.textContent = consultaValue;
-                
-                // 4. Mostrar el modal
-                dataModalOverlay.style.display = 'flex';
-            } else {
-                console.error("Error: No se encontró el atributo 'data-consulta' en la fila. El modal no puede cargar el contenido.");
-            }
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            originalGuardarText = btnGuardar.textContent;
+            originalEliminarText = btnAceptarEliminar.textContent;
+            fetchNovedades();
+        });
 
-        /**
-         * Cierra el modal.
-         */
-        window.closeModal = function() {
-            dataModalOverlay.style.display = 'none';
-        }
 
-        // Permitir cerrar el modal haciendo click fuera de su contenido
-        dataModalOverlay.addEventListener('click', (e) => {
-            if (e.target === dataModalOverlay) {
-                closeModal();
+        novedadForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const id = document.getElementById('inputIdNovedad').value;
+            const accion = id ? 'ACTUALIZAR' : 'CREAR';
+            await manejarEnvio(accion, id);
+        });
+
+        // Evento para el nuevo botón "Eliminar Novedad" dentro del modal de edición
+        btnEliminarEnModal.addEventListener('click', function() {
+            const id = document.getElementById('inputIdNovedad').value;
+            if (id) {
+                // Cerramos el modal de edición y abrimos el de confirmación
+                novedadModal.hide(); 
+                showDeleteConfirm(id);
             }
         });
 
-        // --- FUNCIONES ESPECÍFICAS ---
-
-        function openGestorNovedades() {
-            window.open('gestor_novedades.html', '_blank');
-        }
-
-        // --- FUNCIONES GVIZ (Tablas de Consulta) ---
+        btnAceptarEliminar.addEventListener('click', async function() {
+            if (novedadIdToDelete) {
+                setLoadingState(true, 'ELIMINAR');
+                confirmDeleteModal.hide();
+                await manejarEnvio('ELIMINAR', novedadIdToDelete);
+                novedadIdToDelete = null; 
+            }
+        });
 
         /**
-         * Crea la URL de Google Visualization.
-         * Para la hoja 'afiliacion' y 'tabla_consulta', agrega una cláusula 'select' para filtrar columnas.
-         * @param {string} gid El GID (identificador de hoja) de la hoja de cálculo.
-         * @param {string} sheetName El nombre de la hoja (clave del objeto sheetGids).
-         * @returns {string} La URL de consulta GViz.
+         * Maneja el estado de carga de los botones principales del CRUD.
+         * @param {boolean} isLoading - Si debe entrar en estado de carga (true) o salir (false).
+         * @param {string} [accion] - Opcional. 'GUARDAR' o 'ELIMINAR'.
          */
-        function createGvizUrl(gid, sheetName) {
-            let baseUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}`;
-            
-            let selectQuery = '';
+        function setLoadingState(isLoading, accion) {
+            const isGuardar = !accion || accion === 'GUARDAR';
+            const isEliminar = accion === 'ELIMINAR';
 
-            if (sheetName === 'afiliacion') {
-                // Afiliación: Columna B (Nom_Ap), Columna D (legajo), Columna E (cuil), 
-                // Columna H (email). Ajustado para que coincida con lo anterior.
-                selectQuery = 'select B, D, E, H'; 
-            } else if (sheetName === 'tabla_consulta') {
-                // Para la tabla consulta, seleccionamos B, C, D, E (visibles) y F (CONSULTA - oculta, pero necesaria para el modal).
-                selectQuery = 'select B, C, D, E, F'; 
+            if (isGuardar) {
+                btnGuardar.disabled = isLoading;
+                btnCancelarModal.disabled = isLoading; 
+                btnEliminarEnModal.disabled = isLoading; // Deshabilita también el nuevo botón de eliminar
+
+                if (isLoading) {
+                    btnGuardar.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        Aguarde...
+                    `;
+                    // Añadimos la clase d-flex para que el spinner y texto queden centrados si hace falta
+                    btnGuardar.classList.add('d-flex', 'align-items-center', 'justify-content-center'); 
+                } else {
+                    btnGuardar.textContent = originalGuardarText;
+                    btnGuardar.classList.remove('d-flex', 'align-items-center', 'justify-content-center'); 
+                }
             }
 
-            if (selectQuery) {
-                baseUrl += `&tq=${encodeURIComponent(selectQuery)}`;
-            }
-            
-            return baseUrl;
-        }
+            if (isEliminar) {
+                btnAceptarEliminar.disabled = isLoading;
 
-        /**
-         * Parsea los datos JSON de Google Visualization.
-         * @param {string} jsonText El texto JSON de respuesta GViz.
-         * @param {string} sheetName El nombre de la hoja actual.
-         * @returns {{headers: string[], data: any[][], originalData: any[][]}} Los encabezados (visibles), los datos (visibles) y los datos originales (completos).
-         */
-        function parseGvizData(jsonText, sheetName) {
-            try {
-                const jsonString = jsonText.substring(jsonText.indexOf('(') + 1, jsonText.lastIndexOf(')'));
-                const json = JSON.parse(jsonString);
-                const table = json.table;
-                
-                if (!table || !table.rows || table.rows.length === 0) {
-                    return { headers: [], data: [], originalData: [] };
+                if (isLoading) {
+                    btnAceptarEliminar.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        Aguarde...
+                    `;
+                    btnAceptarEliminar.classList.add('d-flex', 'align-items-center', 'justify-content-center');
+                } else {
+                    btnAceptarEliminar.textContent = originalEliminarText;
+                    btnAceptarEliminar.classList.remove('d-flex', 'align-items-center', 'justify-content-center');
                 }
-                
-                // Mapeo de nombres de columna para las vistas
-                let headersMap = {}; 
-                
-                if (sheetName === 'afiliacion') {
-                    // Mapeo para Afiliación (B, D, E, H)
-                    headersMap = {
-                        'B': 'NOMBRE Y APELLIDO', 
-                        'D': 'LEGAJO', 
-                        'E': 'DNI / CUIL', 
-                        'H': 'EMAIL', 
-                    };
-                } else if (sheetName === 'tabla_consulta') {
-                    // Mapeo para Tabla Consulta. (B, C, D, E, F)
-                    headersMap = {
-                        'B': 'APELLIDO', 
-                        'C': 'NOMBRE', 
-                        'D': 'TEL/CELULAR DE CONTACTO', 
-                        'E': 'EMAIL', 
-                        'F': 'CONSULTA', 
-                    };
-                }
-
-                // Generar encabezados usando el mapeo
-                let headers = table.cols.map(col => {
-                    return headersMap[col.id] || col.label || col.id;
-                });
-                
-                // Generar data original (todas las columnas pedidas)
-                const originalData = table.rows.map(row => {
-                    return row.c.map(cell => {
-                        return cell ? (cell.f || (cell.v !== undefined ? cell.v : '')) : '';
-                    });
-                });
-                
-                // --- Aplicar el filtro de visibilidad (Quitar 'CONSULTA') ---
-
-                // 1. Quitar el encabezado 'CONSULTA'
-                const consultaIndex = headers.findIndex(h => h === 'CONSULTA');
-                if (consultaIndex !== -1) {
-                    headers.splice(consultaIndex, 1);
-                }
-                
-                // 2. Quitar la columna 'CONSULTA' de los datos que se van a renderizar (quedan B, C, D, E)
-                const finalData = originalData.map(row => {
-                    // Si la columna 'CONSULTA' está al final (índice 4, columna F), cortamos antes
-                    return row.slice(0, 4); 
-                });
-                
-                // Guardamos los encabezados visibles
-                currentHeaders = headers;
-
-                return { 
-                    headers: headers, // 4 encabezados visibles
-                    data: finalData, // Data con 4 columnas (visible)
-                    originalData: originalData // Data con 5 columnas (para el modal)
-                };
-
-            } catch (error) {
-                console.error("Error al parsear el JSON de Google Sheets (GViz):", error);
-                return { headers: [], data: [], originalData: [] };
             }
         }
 
-        /**
-         * Renderiza la tabla con solo las columnas visibles, pero pasa el contenido de CONSULTA 
-         * en un data-attribute para que el modal funcione.
-         */
-        function renderDataTable(headers, data, originalData) {
-            if (data.length === 0) {
-                tableContainer.innerHTML = '<p class="text-center py-8 text-gray-500">No hay datos disponibles en esta hoja.</p>';
+
+        function renderTable(novedades) {
+            novedadesTableBody.innerHTML = '';
+            loadingSpinner.style.display = 'none';
+            // COLSPAN AJUSTADO A 3 (Activo, Título, Fecha, Contenido)
+            // Se asume que Contenido tiene un colspan mayor implícito, pero el número de columnas visibles es 4.
+            const COLSPAN_COUNT = 4; 
+
+            if (novedades.length === 0) {
+                novedadesTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="${COLSPAN_COUNT}" class="text-center py-4 text-muted"> 
+                            Aún no hay novedades cargadas. ¡Creá la primera!
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
-            const sheetName = lastActiveSheet;
-            const clickHandler = sheetName === 'tabla_consulta' ? 'onclick="showModal(this)"' : '';
-            const rowCursor = sheetName === 'tabla_consulta' ? 'cursor-pointer' : '';
-
-            let html = `
-                <div class="rounded-xl overflow-hidden shadow-2xl">
-                    <div class="overflow-x-auto max-h-[70vh]">
-                        <table class="min-w-full divide-y divide-gray-200 border border-gray-200">
-                            <thead class="bg-indigo-600 text-white sticky top-0">
-                                <tr>
-                                    ${headers.map(header => `<th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">${header}</th>`).join('')}
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-            `;
-
-            originalData.forEach((originalRow, index) => {
-                // originalRow tiene 5 columnas (B, C, D, E, F). F es el índice 4.
-                const consultaContent = originalRow.length > 4 ? originalRow[4] : 'N/A';
+            novedades.forEach(novedad => {
+                const isActive = (novedad.Activo || '').toUpperCase().trim() === 'SI'; 
                 
-                // Codificamos el contenido de la consulta para pasarlo como data-attribute en el TR
-                const encodedConsulta = encodeURIComponent(consultaContent);
-
-                // La variable 'data[index]' tiene SOLO las 4 columnas visibles para renderizar
-                const row = data[index];
-
-                const rowClass = index % 2 === 0 ? 'bg-white hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-100';
+                // Nuevo: Ícono de Activo
+                const activoIcono = isActive 
+                    ? '<i class="activo-icon fas fa-check-circle text-success" title="Activo"></i>' 
+                    : '<i class="activo-icon fas fa-times-circle text-danger" title="No Activo"></i>';
                 
-                // Agregamos el handler de click y el atributo data-consulta
-                html += `<tr class="${rowClass} ${rowCursor}" ${clickHandler} data-consulta="${encodedConsulta}">`;
-                html += row.map(cell => `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${cell}</td>`).join('');
-                html += `</tr>`;
+                const row = novedadesTableBody.insertRow();
+                // Se agrega el evento onclick a la fila completa, pasando todos los datos
+                row.setAttribute('onclick', `openModal(
+                    '${novedad.ID}', 
+                    '${novedad.Titulo.replace(/'/g, "\\'")}', 
+                    '${novedad.Fecha}', 
+                    \`${novedad.Contenido.replace(/`/g, '\\`')}\`,
+                    '${novedad.Activo}' 
+                )`);
+
+                row.innerHTML = `
+                    <!-- Columna Activo con el ícono -->
+                    <td class="col-activo">${activoIcono}</td>
+                    <!-- Título -->
+                    <td>${novedad.Titulo}</td>
+                    <!-- Fecha -->
+                    <td>${novedad.Fecha}</td>
+                    <!-- Contenido (recortado) -->
+                    <td>${novedad.Contenido.substring(0, 50).trim()}${novedad.Contenido.length > 50 ? '...' : ''}</td>
+                `;
             });
-
-            html += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
-
-            tableContainer.innerHTML = html;
         }
 
-        async function loadSheetData(sheetName) {
-            const gid = sheetGids[sheetName];
-            if (!gid) return; 
+        function openModal(id = '', titulo = '', fecha = '', contenido = '', activo = 'SI') {
+            novedadForm.reset(); 
+            const inputIdNovedad = document.getElementById('inputIdNovedad');
+            const inputTitulo = document.getElementById('inputTitulo');
+            const inputFecha = document.getElementById('inputFecha'); 
+            const textareaContenido = document.getElementById('textareaContenido');
+            const inputActivo = document.getElementById('inputActivo');
             
-            currentSheetTitle.textContent = sheetName.charAt(0).toUpperCase() + sheetName.slice(1).replace('_', ' '); 
-            dataLoadingMessage.style.display = 'block';
-            tableContainer.innerHTML = ''; 
+            inputIdNovedad.value = id;
+
+            if (id) {
+                // Modo Edición
+                novedadModalLabel.textContent = 'Editar Novedad (ID: ' + id + ')';
+                originalGuardarText = 'Guardar Cambios';
+                
+                inputTitulo.value = titulo;
+                inputFecha.value = fecha;
+                textareaContenido.value = contenido;
+                // El estado 'activo' se sigue cargando en el checkbox del modal
+                inputActivo.checked = (activo || '').toUpperCase().trim() === 'SI'; 
+                
+                // Muestra el botón de eliminar
+                btnEliminarEnModal.style.display = 'block'; 
+                
+            } else {
+                // Modo Creación: Establecer valores por defecto
+                novedadModalLabel.textContent = 'Crear Nueva Novedad';
+                originalGuardarText = 'Guardar Novedad';
+                inputActivo.checked = true; 
+
+                // Oculta el botón de eliminar
+                btnEliminarEnModal.style.display = 'none'; 
+
+                // Poner la fecha actual por defecto
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+                const dd = String(today.getDate()).padStart(2, '0');
+                const formattedDate = `${yyyy}-${mm}-${dd}`;
+                inputFecha.value = formattedDate; 
+            }
             
+            setLoadingState(false, 'GUARDAR');
+
+            novedadModal.show();
+        }
+
+        function showDeleteConfirm(id) {
+            novedadIdToDelete = id;
+            document.getElementById('deleteNovedadId').textContent = id;
+            setLoadingState(false, 'ELIMINAR');
+            confirmDeleteModal.show();
+        }
+
+        function showFeedback(message, success = true) {
+            const title = success ? '✅ ¡Operación Exitosa!' : '❌ ¡Error!';
+            const header = document.getElementById('feedbackModal').querySelector('.modal-header');
+            const titleEl = document.getElementById('feedbackModalLabel');
+            
+            titleEl.textContent = title;
+            feedbackModalBody.innerHTML = `<p>${message}</p>`;
+
+            // Cambiar el color del header del modal de feedback
+            header.classList.remove('bg-danger', 'bg-success', 'text-white');
+            if (success) {
+                header.classList.add('bg-success', 'text-white'); 
+            } else {
+                header.classList.add('bg-danger', 'text-white'); 
+            }
+            // Asegurarse de que el botón de cerrar sea blanco si el fondo es oscuro
+            document.getElementById('feedbackModal').querySelector('.btn-close').classList.add('btn-close-white');
+
+
+            feedbackModal.show();
+        }
+
+
+        async function fetchNovedades() {
+            loadingSpinner.style.display = 'block';
+            novedadesTableBody.innerHTML = ''; 
+
             try {
-                const response = await fetch(createGvizUrl(gid, sheetName));
-                const text = await response.text();
-                // Ahora parseGvizData devuelve la data filtrada (data) y la original (originalData)
-                const { headers, data, originalData } = parseGvizData(text, sheetName);
+                const response = await fetch(APPSSCRIPT_URL + '?action=READ_ALL');
                 
-                // Pasamos la data visible y la data original a renderDataTable
-                renderDataTable(headers, data, originalData);
-                
-            } catch (error) {
-                console.error('Error al cargar datos:', error);
-                dataLoadingMessage.textContent = `Error al cargar los datos: ${error.message}`;
-            } finally {
-                dataLoadingMessage.style.display = 'none';
-            }
-        }
-
-
-        // --- NAVEGACIÓN Y CARGA INICIAL ---
-
-        /**
-         * Controla la visibilidad de la vista y la carga de datos.
-         */
-        function loadView(sheetName) {
-            
-            // 1. Manejo especial para el gestor de novedades (abre nueva ventana)
-            if (sheetName === 'gestor_novedades_external') {
-                openGestorNovedades();
-                
-                // Si la ventana se abre, NO modificamos el estado de los botones. 
-                // La vista anterior (Tabla Consulta o Afiliación) sigue "activa".
-                return; 
-            }
-            
-            // 3. Cargar datos
-            loadSheetData(sheetName);
-            
-            // 4. Actualizar el estado del último botón activo
-            lastActiveSheet = sheetName;
-
-            // 5. Actualizar botones activos (solo los de las vistas de tabla)
-            buttons.forEach(btn => {
-                const btnSheet = btn.getAttribute('data-sheet');
-                
-                // Desactiva el estilo 'active-indigo' para todos
-                btn.classList.remove('active-indigo');
-
-                // Si es un botón de vista de tabla y es el seleccionado, lo activa.
-                if (btnSheet !== 'gestor_novedades_external' && btnSheet === sheetName) {
-                    btn.classList.add('active-indigo');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'success' && Array.isArray(data.novedades)) {
+                        renderTable(data.novedades);
+                    } else {
+                        throw new Error(data.message || 'Error en el formato de datos devueltos.');
+                    }
+                } else {
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
                 }
-            });
+            } catch (error) {
+                loadingSpinner.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        Error al cargar las novedades: ${error.message}
+                        <br>Revisá la configuración de tu AppScript.
+                    </div>
+                `;
+                console.error('Error al cargar novedades:', error);
+            }
         }
 
-        // Asignar listeners a los botones de navegación
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                loadView(button.getAttribute('data-sheet'));
-            });
-        });
+        async function manejarEnvio(accion, id) {
+            let method, body, apiUrl, successMessage;
 
-        // Carga inicial
-        document.addEventListener('DOMContentLoaded', () => {
-            // Carga la vista de "Tabla Consulta" por defecto
-            loadView('tabla_consulta');
-        });
+            setLoadingState(true, accion === 'ELIMINAR' ? 'ELIMINAR' : 'GUARDAR');
+            
+            const formData = new FormData(novedadForm); 
+            
+            const inputActivo = document.getElementById('inputActivo');
+            if (!inputActivo.checked) {
+                formData.set('Activo', 'NO'); 
+            } else {
+                 formData.set('Activo', 'SI');
+            }
+
+            switch (accion) {
+                case 'CREAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    formData.append('action', 'CREATE');
+                    body = formData;
+                    successMessage = 'La novedad se creó exitosamente.';
+                    break;
+                case 'ACTUALIZAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    formData.append('action', 'UPDATE');
+                    formData.append('ID', id);
+                    body = formData;
+                    successMessage = `La novedad ${id} se actualizó correctamente.`;
+                    break;
+                case 'ELIMINAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    const deleteData = new FormData();
+                    deleteData.append('action', 'DELETE');
+                    deleteData.append('ID', id);
+                    body = deleteData;
+                    successMessage = `La novedad ${id} fue eliminada.`;
+                    break;
+                default:
+                    showFeedback('Acción desconocida.', false);
+                    return;
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: method,
+                    body: body 
+                });
+
+                const responseText = await response.text();
+                let result = {};
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    if (responseText.includes('Error')) {
+                        throw new Error('Error desconocido del servidor de AppScript.');
+                    }
+                    result = { status: 'success' };
+                }
+
+                if (response.ok && result.status === 'success') {
+                    novedadModal.hide();
+                    showFeedback(successMessage, true);
+                    await fetchNovedades();
+                } else {
+                    const errorDetail = result.message || 'Error en la operación en la planilla.';
+                    throw new Error(errorDetail);
+                }
+
+            } catch (error) {
+                if (accion !== 'ELIMINAR') {
+                    novedadModal.hide();
+                }
+                showFeedback(`¡Error al ejecutar la operación! Detalle: ${error.message}`, false);
+                console.error(`Error de ${accion}:`, error);
+            } finally {
+                setLoadingState(false, accion === 'ELIMINAR' ? 'ELIMINAR' : 'GUARDAR');
+            }
+        }
 
     </script>
 </body>
