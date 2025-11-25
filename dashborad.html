@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero de Mando - STM (Consulta)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos generales limpios */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #eef2f7;
+        }
+        /* Solo se muestra la vista de tabla */
+        #data-table-view {
+            display: none; 
+        }
+        /* Estilos de los botones de navegación */
+        .btn-custom {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid transparent;
+        }
+        /* ESTILOS ACTIVOS (Azul Índigo por defecto para las vistas de tabla) */
+        .btn-custom.active-indigo {
+            background-color: #4f46e5 !important;
+            color: white !important;
+            border-color: #4f46e5;
+            box-shadow: 0 4px 15px -3px rgba(79, 70, 229, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-custom:not(.active-indigo) {
+            background-color: #ffffff;
+            color: #4f46e5;
+            border-color: #c7d2fe;
+        }
+        .btn-custom:not(.active-indigo):hover {
+            background-color: #f5f6fa;
+            border-color: #a5b4fc;
+        }
+        
+        /* ESTILOS ESPECÍFICOS PARA GESTOR NOVEDADES (PÚRPURA STM: #5A377B) */
+        .btn-novedades {
+            background-color: #5A377B !important; 
+            color: white !important;
+            border-color: #5A377B !important;
+            box-shadow: 0 4px 15px -3px rgba(90, 55, 123, 0.4) !important;
+            /* Si quieres que se vea igual que el activo siempre: */
+            transform: translateY(-2px); 
+        }
+        .btn-novedades:hover {
+            background-color: #492a63 !important; 
+            border-color: #492a63 !important;
+        }
+        
+        /* Ajuste para las cabeceras de la tabla */
+        #table-container th {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <header class="mb-6 flex items-center justify-between border-b-4 border-indigo-500 pb-2">
+            <div class="flex items-center">
+                <img src="https://placehold.co/100x100/4f46e5/ffffff?text=STM+Logo" alt="Logo STM" class="h-16 w-16 mr-4 rounded-full shadow-lg object-cover">
+                <div>
+                    <h1 class="text-4xl font-extrabold text-gray-800">
+                        Tablero de Mando <span class="text-indigo-600">STM</span>
+                    </h1>
+                    <p class="text-gray-600 mt-1 text-lg">Consulta rápida de datos clave.</p>
+                </div>
+            </div>
+            <div id="user-info" class="text-right text-sm text-gray-500 hidden sm:block">
+                Conexión: <span id="user-id-display" class="font-mono text-xs bg-gray-100 p-1 rounded text-green-600">Apps Script Activo</span>
+            </div>
+        </header>
+
+        <div id="btn-group" class="flex flex-wrap justify-center gap-4 mb-6 p-4 bg-white rounded-xl shadow-xl">
+            <button 
+                data-sheet="tabla_consulta"
+                class="btn-custom py-3 px-8 text-lg font-semibold rounded-full shadow-lg active-indigo"
+            >
+                Tabla Consulta
+            </button>
+            <button 
+                data-sheet="afiliacion"
+                class="btn-custom py-3 px-8 text-lg font-semibold rounded-full shadow-lg"
+            >
+                Afiliación
+            </button>
+            <button 
+                data-sheet="gestor_novedades_external"
+                class="btn-custom py-3 px-8 text-lg font-semibold rounded-full shadow-lg btn-novedades"
+            >
+                Gestor Novedades
+            </button>
+        </div>
+        
+        <div id="data-table-view" class="bg-white p-6 rounded-xl shadow-2xl border-t-4 border-indigo-500">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Datos de la Hoja de Cálculo: <span id="current-sheet-title" class="text-indigo-600">Tabla Consulta</span></h2>
+            <p id="data-loading-message" class="text-center text-indigo-600 font-medium py-8">Cargando datos desde Google Sheets...</p>
+            <div id="table-container" class="overflow-x-auto">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        
+        // ¡IMPORTANTE! REEMPLAZÁ ESTO CON TU URL REAL DE APPS SCRIPT
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfNlhTU4hO8linQddyhVvd5rTrsAQxx1XvlsJO5tbBvUeyzczi1q-LbwU6-dSsLPvt9w/exec'; 
+        
+        const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
+        const sheetGids = {
+            'tabla_consulta': '0',
+            'afiliacion': '1038720919',
+            'gestor_novedades_external': null 
+        };
+
+        // Elementos de UI
+        const dataTableView = document.getElementById('data-table-view');
+        const buttons = document.querySelectorAll('#btn-group button'); 
+        const tableContainer = document.getElementById('table-container');
+        const dataLoadingMessage = document.getElementById('data-loading-message');
+        const currentSheetTitle = document.getElementById('current-sheet-title');
+        
+        let lastActiveSheet = 'tabla_consulta'; // Para recordar qué vista estaba activa
+
+        // --- FUNCIONES ESPECÍFICAS ---
+
+        function openGestorNovedades() {
+            window.open('gestor_novedades.html', '_blank');
+        }
+
+        // --- FUNCIONES GVIZ (Tablas de Consulta) ---
+
+        function createGvizUrl(gid) {
+            return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}`;
+        }
+
+        function parseGvizData(jsonText) {
+            try {
+                const jsonString = jsonText.substring(jsonText.indexOf('(') + 1, jsonText.lastIndexOf(')'));
+                const json = JSON.parse(jsonString);
+                const table = json.table;
+                
+                if (!table || !table.rows || table.rows.length === 0) {
+                    return { headers: [], data: [] };
+                }
+                
+                const headers = table.cols.map(col => col.label || col.id);
+                
+                const data = table.rows.map(row => {
+                    return headers.map((header, index) => {
+                        const cell = row.c[index];
+                        return cell ? (cell.f || (cell.v !== undefined ? cell.v : '')) : '';
+                    });
+                });
+                
+                return { headers, data };
+            } catch (e) {
+                console.error("Error al parsear el JSON de Google Sheets (GViz):", e);
+                return { headers: [], data: [] };
+            }
+        }
+
+        function renderDataTable(headers, data) {
+            if (data.length === 0) {
+                tableContainer.innerHTML = '<p class="text-center py-8 text-gray-500">No hay datos disponibles en esta hoja.</p>';
+                return;
+            }
+
+            let html = `
+                <div class="rounded-xl overflow-hidden shadow-2xl">
+                    <div class="overflow-x-auto max-h-[70vh]">
+                        <table class="min-w-full divide-y divide-gray-200 border border-gray-200">
+                            <thead class="bg-indigo-600 text-white sticky top-0">
+                                <tr>
+                                    ${headers.map(header => `<th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">${header}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+            data.forEach((row, index) => {
+                const rowClass = index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100';
+                html += `<tr class="${rowClass}">`;
+                html += row.map(cell => `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${cell}</td>`).join('');
+                html += `</tr>`;
+            });
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            tableContainer.innerHTML = html;
+        }
+
+        async function loadSheetData(sheetName) {
+            const gid = sheetGids[sheetName];
+            if (!gid) return; 
+            
+            currentSheetTitle.textContent = sheetName.charAt(0).toUpperCase() + sheetName.slice(1).replace('_', ' '); 
+            dataLoadingMessage.style.display = 'block';
+            tableContainer.innerHTML = ''; 
+            
+            try {
+                const response = await fetch(createGvizUrl(gid));
+                const text = await response.text();
+                const { headers, data } = parseGvizData(text);
+                
+                renderDataTable(headers, data);
+                
+            } catch (error) {
+                dataLoadingMessage.textContent = `Error al cargar los datos: ${error.message}`;
+            } finally {
+                dataLoadingMessage.style.display = 'none';
+            }
+        }
+
+
+        // --- NAVEGACIÓN Y CARGA INICIAL ---
+
+        /**
+         * Controla la visibilidad de la vista y la carga de datos.
+         */
+        function loadView(sheetName) {
+            
+            // 1. Manejo especial para el gestor de novedades (abre nueva ventana)
+            if (sheetName === 'gestor_novedades_external') {
+                openGestorNovedades();
+                
+                // Si la ventana se abre, NO modificamos el estado de los botones. 
+                // La vista anterior (Tabla Consulta o Afiliación) sigue "activa".
+                return; 
+            }
+
+            // 2. Mostrar la vista de tabla
+            dataTableView.style.display = 'block';
+            
+            // 3. Cargar datos
+            loadSheetData(sheetName);
+            
+            // 4. Actualizar el estado del último botón activo
+            lastActiveSheet = sheetName;
+
+            // 5. Actualizar botones activos (solo los de las vistas de tabla)
+            buttons.forEach(btn => {
+                const btnSheet = btn.getAttribute('data-sheet');
+                
+                // Desactiva el estilo 'active-indigo' para todos
+                btn.classList.remove('active-indigo');
+
+                // Si es un botón de vista de tabla y es el seleccionado, lo activa.
+                if (btnSheet !== 'gestor_novedades_external' && btnSheet === sheetName) {
+                    btn.classList.add('active-indigo');
+                }
+            });
+        }
+
+        // Asignar listeners a los botones de navegación
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                loadView(button.getAttribute('data-sheet'));
+            });
+        });
+
+        // Carga inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carga la vista de "Tabla Consulta" por defecto
+            loadView('tabla_consulta');
+        });
+
+    </script>
+</body>
+</html>

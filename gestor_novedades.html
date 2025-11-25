@@ -5,72 +5,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Novedades - STM</title>
-    <!-- Usamos la misma fuente 'Roboto' -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* CONSTANTES DE COLOR DE consulta.html */
         :root {
-            --stm-purple: #5A377B; /* Púrpura principal */
-            --stm-teal: #34B3C5;   /* Turquesa para acciones secundarias/creación */
-            --stm-red: #dc3545;    /* Rojo para eliminar/alerta */
+            --stm-purple: #5A377B; /* Púrpura principal (Guardar/Gestor Novedades) */
+            --stm-teal: #34B3C5;   /* Turquesa (Crear Novedad) */
+            --stm-red: #dc3545;    /* Rojo (Eliminar) */
+            --stm-indigo: #4f46e5; /* Índigo del dashboard (Cabecera de Tabla) */
         }
 
         body { 
-            background-color: #f8f9fa; 
+            background-color: #eef2f7; /* Fondo del dashboard */
             font-size: 15px;
-            font-family: 'Roboto', sans-serif; /* Fuente unificada */
+            font-family: 'Roboto', sans-serif; 
         }
         .main-container {
-            /* Mantenemos el ancho original de 1100px para la tabla */
             max-width: 1100px; 
-            margin: 50px auto;
+            margin: 30px auto;
             padding: 30px;
             background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--stm-indigo); /* Borde superior como el dashboard */
         }
         .logo-container {
-            text-align: center; 
+            text-align: left; 
             margin-bottom: 20px; 
         }
         .logo-container img {
-            max-width: 150px; 
+            max-width: 100px; 
             height: auto; 
+            border-radius: 50%; /* Redondeo del logo */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        /* BOTÓN CREAR (Usamos el color Teal de afiliar en consulta.html) */
+        /* BOTÓN CREAR (Turquesa - stm-teal): Estilo moderno y con sombra */
         .btn-stm-create {
             background-color: var(--stm-teal); 
             border-color: var(--stm-teal); 
             color: #ffffff; 
+            font-weight: 600;
+            padding: 10px 20px; /* Más grande */
+            border-radius: 50px; /* Bordes super redondeados */
+            box-shadow: 0 4px 15px -3px rgba(52, 179, 197, 0.5); /* Sombra turquesa */
+            transition: all 0.2s ease-in-out;
         }
         .btn-stm-create:hover, 
         .btn-stm-create:focus {
-            background-color: #2a8e9b; /* Color de hover de btn-stm-afiliar */
+            background-color: #2a8e9b; 
             border-color: #2a8e9b;
             color: #ffffff;
+            transform: translateY(-2px); /* Pequeño efecto 3D */
+            box-shadow: 0 6px 18px -3px rgba(52, 179, 197, 0.7);
         }
 
-        /* BOTÓN GUARDAR (Usamos el color Purple de enviar en consulta.html) */
+        /* BOTÓN GUARDAR (Púrpura - stm-purple): Estilo unificado */
         .btn-stm-save {
             background-color: var(--stm-purple); 
             border-color: var(--stm-purple); 
             color: #ffffff;
+            font-weight: 600;
+            border-radius: 8px; /* Redondeo normal */
+            box-shadow: 0 2px 8px rgba(90, 55, 123, 0.4);
+            transition: all 0.2s ease-in-out;
         }
         .btn-stm-save:hover, 
         .btn-stm-save:focus {
-            background-color: #492a63; /* Color de hover de btn-stm-send */
+            background-color: #492a63; 
             border-color: #492a63;
             color: #ffffff;
+            transform: translateY(-1px);
         }
         
-        /* BOTÓN ELIMINAR (Mantenemos el rojo) */
+        /* BOTÓN ELIMINAR (Rojo - stm-red) */
         .btn-stm-delete {
             background-color: var(--stm-red); 
             border-color: var(--stm-red); 
             color: #ffffff; 
+            border-radius: 6px;
         }
         .btn-stm-delete:hover, 
         .btn-stm-delete:focus {
@@ -82,10 +97,23 @@
         /* Estilo para unificar el contenedor del formulario/tabla */
         .table-responsive {
             margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden; /* Para contener los bordes redondeados */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .table th, .table td {
-            vertical-align: middle;
+        /* Encabezado de la tabla al estilo del dashboard */
+        .table thead {
+            background-color: var(--stm-indigo);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .table th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            white-space: nowrap;
         }
         
         #loadingSpinner {
@@ -93,13 +121,23 @@
             padding: 40px;
         }
 
-        /* Estilo para que los botones con iconos se vean bien */
+        /* Botones de acción en la tabla (pequeños y solo con icono) */
         .btn-action {
             padding: 0.3rem 0.5rem; 
             font-size: 0.8rem;
             line-height: 1;
             margin: 0 2px;
             border-radius: 6px;
+            /* Quitamos el borde blanco de outline-primary para que el color base se vea */
+            border: none !important; 
+        }
+
+        .btn-outline-primary {
+            color: var(--stm-indigo);
+        }
+        .btn-outline-primary:hover {
+            color: white;
+            background-color: var(--stm-indigo);
         }
     </style>
 </head>
@@ -112,11 +150,11 @@
                 <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
             </div>
 
-            <h2 class="text-center mb-4">📢 Gestor de Novedades</h2>
+            <h2 class="fs-4 fw-bold text-gray-800 border-bottom pb-2 mb-4">📢 Gestor de <span style="color: #4f46e5;">Novedades</span></h2>
             
-            <div class="d-flex justify-content-end mb-3">
+            <div class="d-flex justify-content-end mb-4">
                 <button type="button" class="btn btn-stm-create" onclick="openModal()">
-                    <i class="fas fa-plus-circle"></i> Crear Nueva Novedad
+                    <i class="fas fa-plus-circle me-2"></i> Crear Nueva Novedad
                 </button>
             </div>
 
@@ -198,12 +236,12 @@
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="confirmDeleteModalLabel">⚠️ Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro/a que querés eliminar la novedad con ID: <strong id="deleteNovedadId"></strong>?</p>
+                    <p>¿Estás seguro/a que querés eliminar la novedad con ID: <strong id="deleteNovedadId" class="text-danger"></strong>?</p>
                     <p class="text-danger">¡Esta acción no se puede deshacer!</p>
                 </div>
                 <div class="modal-footer">
@@ -295,11 +333,14 @@
 
                 if (isLoading) {
                     btnGuardar.innerHTML = `
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                         Aguarde...
                     `;
+                    // Añadimos la clase d-flex para que el spinner y texto queden centrados si hace falta
+                    btnGuardar.classList.add('d-flex', 'align-items-center', 'justify-content-center'); 
                 } else {
                     btnGuardar.textContent = originalGuardarText;
+                    btnGuardar.classList.remove('d-flex', 'align-items-center', 'justify-content-center'); 
                 }
             }
 
@@ -308,11 +349,13 @@
 
                 if (isLoading) {
                     btnAceptarEliminar.innerHTML = `
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                         Aguarde...
                     `;
+                    btnAceptarEliminar.classList.add('d-flex', 'align-items-center', 'justify-content-center');
                 } else {
                     btnAceptarEliminar.textContent = originalEliminarText;
+                    btnAceptarEliminar.classList.remove('d-flex', 'align-items-center', 'justify-content-center');
                 }
             }
         }
@@ -342,16 +385,16 @@
                     <td>${novedad.ID}</td>
                     <td>${novedad.Titulo}</td>
                     <td>${novedad.Fecha}</td>
-                    <td>${novedad.Contenido.substring(0, 50)}...</td>
-                    <td>${activoText}</td>
-                    <td>
+                    <td>${novedad.Contenido.substring(0, 50).trim()}${novedad.Contenido.length > 50 ? '...' : ''}</td>
+                    <td class="whitespace-nowrap">${activoText}</td>
+                    <td class="whitespace-nowrap">
                         <button class="btn btn-sm btn-outline-primary me-2 btn-action" 
                             title="Editar"
                             onclick="openModal(
                                 '${novedad.ID}', 
                                 '${novedad.Titulo}', 
                                 '${novedad.Fecha}', 
-                                \`${novedad.Contenido}\`,
+                                \`${novedad.Contenido.replace(/`/g, '\\`')}\`,
                                 '${novedad.Activo}'
                             )">
                             <i class="fas fa-pencil-alt"></i>
@@ -370,7 +413,7 @@
             novedadForm.reset(); 
             const inputIdNovedad = document.getElementById('inputIdNovedad');
             const inputTitulo = document.getElementById('inputTitulo');
-            const inputFecha = document.getElementById('inputFecha'); // Obtener el input de fecha
+            const inputFecha = document.getElementById('inputFecha'); 
             const textareaContenido = document.getElementById('textareaContenido');
             const inputActivo = document.getElementById('inputActivo');
             
@@ -387,21 +430,18 @@
                 inputActivo.checked = (activo || '').toUpperCase().trim() === 'SI'; 
                 
             } else {
-                // Modo Creación: Establecer valores por defecto, incluyendo la fecha actual
+                // Modo Creación: Establecer valores por defecto
                 novedadModalLabel.textContent = 'Crear Nueva Novedad';
                 originalGuardarText = 'Guardar Novedad';
                 inputActivo.checked = true; 
 
-                // ----------------------------------------------------
-                // NUEVO: Poner la fecha actual por defecto
+                // Poner la fecha actual por defecto
                 const today = new Date();
                 const yyyy = today.getFullYear();
-                // Los meses son 0-indexados, sumamos 1 y aseguramos dos dígitos
                 const mm = String(today.getMonth() + 1).padStart(2, '0'); 
                 const dd = String(today.getDate()).padStart(2, '0');
                 const formattedDate = `${yyyy}-${mm}-${dd}`;
                 inputFecha.value = formattedDate; 
-                // ----------------------------------------------------
             }
             
             setLoadingState(false, 'GUARDAR');
@@ -424,11 +464,16 @@
             titleEl.textContent = title;
             feedbackModalBody.innerHTML = `<p>${message}</p>`;
 
+            // Cambiar el color del header del modal de feedback
+            header.classList.remove('bg-danger', 'bg-success', 'text-white');
             if (success) {
-                header.style.backgroundColor = '#d4edda'; 
+                header.classList.add('bg-success', 'text-white'); 
             } else {
-                header.style.backgroundColor = '#f8d7da'; 
+                header.classList.add('bg-danger', 'text-white'); 
             }
+            // Asegurarse de que el botón de cerrar sea blanco si el fondo es oscuro
+            document.getElementById('feedbackModal').querySelector('.btn-close').classList.add('btn-close-white');
+
 
             feedbackModal.show();
         }
@@ -472,6 +517,8 @@
             const inputActivo = document.getElementById('inputActivo');
             if (!inputActivo.checked) {
                 formData.set('Activo', 'NO'); 
+            } else {
+                 formData.set('Activo', 'SI');
             }
 
             switch (accion) {
