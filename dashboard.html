@@ -31,6 +31,8 @@
             padding: 24px;
             border-radius: 12px;
             max-width: 90%;
+            /* Aumentamos el ancho máximo para el modal de afiliación con más campos */
+            max-width: 700px; 
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -201,8 +203,8 @@
         const dataLoadingMessage = document.getElementById('data-loading-message');
         const currentSheetTitle = document.getElementById('current-sheet-title');
         const dataModalOverlay = document.getElementById('data-modal-overlay');
-        const modalTitle = document.getElementById('modal-title'); // Nuevo/Actualizado
-        const modalDetails = document.getElementById('modal-details'); // Nuevo/Actualizado
+        const modalTitle = document.getElementById('modal-title'); 
+        const modalDetails = document.getElementById('modal-details'); 
 
         // Almacena los encabezados completos para usar en el modal de Afiliación
         let currentFullHeaders = [];
@@ -246,7 +248,7 @@
                 }
 
             } else if (lastActiveSheet === 'afiliacion') {
-                // --- LÓGICA PARA AFILIACIÓN (Datos estructurados) ---
+                // --- LÓGICA PARA AFILIACIÓN (Datos estructurados - Ahora incluye TODOS los campos de B a Q) ---
                 const encodedFullData = rowElement.getAttribute('data-full-data');
 
                 if (encodedFullData) {
@@ -255,21 +257,46 @@
                         const fullData = JSON.parse(jsonString);
 
                         // Usamos el campo 'NOMBRE Y APELLIDO' como título del modal
-                        const affiliationName = fullData['NOMBRE Y APELLIDO'] || 'Afiliado/a';
+                        const affiliationName = fullData['Nombre y Apellido'] || 'Afiliado/a';
                         modalTitle.textContent = `Detalles de Afiliación: ${affiliationName}`;
 
                         let detailsHtml = '';
+                        
+                        // Lista de los campos que queremos mostrar y cómo llamarlos
+                        const fieldsToShow = [
+                            { key: 'Nombre y Apellido', label: 'NOMBRE Y APELLIDO' },
+                            { key: 'DNI', label: 'DNI' },
+                            { key: 'Legajo', label: 'LEGAJO' },
+                            { key: 'CUIL', label: 'CUIL' },
+                            { key: 'Teléfono Celular', label: 'TELÉFONO CELULAR' },
+                            { key: 'Teléfono Alternativo', label: 'TELÉFONO ALTERNATIVO' },
+                            { key: 'Email', label: 'EMAIL' },
+                            { key: 'Dirección', label: 'DIRECCIÓN' },
+                            { key: 'Localidad', label: 'LOCALIDAD' },
+                            { key: 'Provincia', label: 'PROVINCIA' },
+                            { key: 'Dependencia', label: 'DEPENDENCIA' },
+                            { key: 'Área', label: 'ÁREA/SECTOR' },
+                            { key: 'Puesto', label: 'PUESTO' },
+                            { key: 'Fecha de Ingreso', label: 'FECHA DE INGRESO' },
+                            { key: 'Antigüedad', label: 'ANTIGÜEDAD' },
+                            { key: 'Fecha de Solicitud', label: 'FECHA DE SOLICITUD' },
+                            // Quitamos TIMESTAMP si existiera, ya que no es relevante para el usuario final
+                        ];
+
 
                         // Usamos una lista de descripción (key-value) para mostrar los datos
                         detailsHtml += '<dl class="divide-y divide-gray-200">';
                         
-                        // Recorrer todos los campos de la fila completa
-                        Object.entries(fullData).forEach(([key, value]) => {
-                            // No mostramos campos vacíos o 'TIMESTAMP'
-                            if (value && key.toUpperCase() !== 'TIMESTAMP') { 
+                        // Recorrer la lista definida
+                        fieldsToShow.forEach(field => {
+                            const value = fullData[field.key] || 'N/A'; // Usar 'N/A' si el valor es nulo o indefinido
+                            const displayLabel = field.label;
+
+                            // Mostrar solo si el campo no está completamente vacío (solo espacios o N/A)
+                            if (value.trim() && value.toUpperCase() !== 'N/A') { 
                                 detailsHtml += `
                                     <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-indigo-50 transition duration-100 rounded-lg">
-                                        <dt class="text-sm font-medium text-gray-500">${key}</dt>
+                                        <dt class="text-sm font-medium text-gray-500">${displayLabel}</dt>
                                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 whitespace-pre-wrap">${value}</dd>
                                     </div>
                                 `;
@@ -278,7 +305,12 @@
                         
                         detailsHtml += '</dl>';
 
-                        modalDetails.innerHTML = detailsHtml;
+                        // Si no hay detalles para mostrar, indicarlo.
+                        if (detailsHtml === '<dl class="divide-y divide-gray-200"></dl>') {
+                            modalDetails.innerHTML = `<p class="text-center py-4 text-gray-500">No se encontraron detalles adicionales para este registro.</p>`;
+                        } else {
+                            modalDetails.innerHTML = detailsHtml;
+                        }
                         
                         dataModalOverlay.style.display = 'flex';
 
@@ -333,9 +365,8 @@
             let selectQuery = '';
 
             if (sheetName === 'afiliacion') {
-                // Afiliación: Seleccionamos hasta la columna O para obtener la información completa.
-                // Las visibles siguen siendo B, D, E, H.
-                selectQuery = 'select A, B, C, D, E, F, G, H, I, J, K, L, M, N, O'; 
+                // Afiliación: Seleccionamos A (Timestamp) y de B a Q (Todos los campos de datos de la tabla)
+                selectQuery = 'select A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q'; 
             } else if (sheetName === 'tabla_consulta') {
                 // Para la tabla consulta, seleccionamos B, C, D, E (visibles) y F (CONSULTA - para el modal).
                 selectQuery = 'select B, C, D, E, F'; 
@@ -361,31 +392,33 @@
                     return { headers: [], data: [], originalData: [], fullHeaders: [] };
                 }
                 
-                // Mapeo de nombres de columna para las vistas
+                // Mapeo de nombres de columna para las vistas (usando la estructura de la imagen)
                 let headersMap = {}; 
                 let visibleColumnsIndices = []; 
                 
                 if (sheetName === 'afiliacion') {
-                    // Mapeo para Afiliación (Columnas A-O)
+                    // Mapeo para Afiliación (Columnas A-Q)
                     headersMap = {
                         'A': 'TIMESTAMP', 
-                        'B': 'NOMBRE Y APELLIDO', // Visible
+                        'B': 'Nombre y Apellido', // Visible
                         'C': 'DNI', 
-                        'D': 'LEGAJO', // Visible
-                        'E': 'DNI / CUIL', // Usamos el nombre que ya estaba
-                        'F': 'ÁREA/SECTOR',
-                        'G': 'DIRECCIÓN',
-                        'H': 'EMAIL', // Visible
-                        'I': 'TELÉFONO',
-                        'J': 'CUMPLEAÑOS',
-                        'K': 'FECHA DE INGRESO',
-                        'L': 'ESTADO CIVIL',
-                        'M': 'HIJOS',
-                        'N': 'CÓNYUGE',
-                        'O': 'OBSERVACIONES',
+                        'D': 'Legajo', // Visible
+                        'E': 'CUIL', // Usamos CUIL aunque en la tabla decía CUIL/DNI
+                        'F': 'Teléfono Celular', 
+                        'G': 'Teléfono Alternativo',
+                        'H': 'Email', // Visible
+                        'I': 'Dirección',
+                        'J': 'Localidad',
+                        'K': 'Provincia',
+                        'L': 'Dependencia',
+                        'M': 'Área',
+                        'N': 'Puesto',
+                        'O': 'Fecha de Ingreso',
+                        'P': 'Antigüedad',
+                        'Q': 'Fecha de Solicitud',
                     };
-                    // Índices de las columnas VISIBLES (B, D, E, H) en el array de A-O.
-                    // A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7
+                    // Índices de las columnas VISIBLES (B, D, E, H) en el array de A-Q.
+                    // B=1, D=3, E=4, H=7
                     visibleColumnsIndices = [1, 3, 4, 7]; 
 
                 } else if (sheetName === 'tabla_consulta') {
@@ -406,7 +439,7 @@
                     return headersMap[col.id] || col.label || col.id;
                 });
 
-                // Generar data original (todas las columnas pedidas: A-O para afiliación)
+                // Generar data original (todas las columnas pedidas: A-Q para afiliación, B-F para consulta)
                 const originalData = table.rows.map(row => {
                     return row.c.map(cell => {
                         return cell ? (cell.f || (cell.v !== undefined ? cell.v : '')) : '';
@@ -425,9 +458,15 @@
                     finalData = originalData.map(row => {
                         return visibleColumnsIndices.map(index => row[index]);
                     });
+                    
+                    // Eliminamos el TIMESTAMP del fullHeaders para el modal, ya que no es un dato de afiliación
+                    const timestampIndex = fullHeaders.findIndex(h => h === 'TIMESTAMP');
+                    if (timestampIndex !== -1) {
+                        fullHeaders.splice(timestampIndex, 1);
+                    }
 
                 } else if (sheetName === 'tabla_consulta') {
-                    // Lógica existente para tabla_consulta (ocultar la columna 'CONSULTA' (F))
+                    // Lógica para tabla_consulta (ocultar la columna 'CONSULTA' (F))
                     
                     // 1. Quitar el encabezado 'CONSULTA' (índice 4 de B, C, D, E, F)
                     const consultaIndex = fullHeaders.findIndex(h => h === 'CONSULTA');
@@ -444,19 +483,19 @@
                     // originalData sigue teniendo 5 columnas (B, C, D, E, F) para el modal de consulta
 
                 } else {
-                    // Otros casos (no deberían ocurrir con la lógica actual)
+                    // Otros casos 
                     headers = fullHeaders;
                     finalData = originalData;
                 }
                 
-                // Guardamos los encabezados COMPLETOS (B-F para consulta, A-O para afiliación)
+                // Guardamos los encabezados COMPLETOS (B-F para consulta, B-Q para afiliación)
                 currentFullHeaders = fullHeaders;
 
                 return { 
                     headers: headers, // Encabezados visibles
                     data: finalData, // Data visible
                     originalData: originalData, // Data completa
-                    fullHeaders: currentFullHeaders // Todos los encabezados
+                    fullHeaders: currentFullHeaders // Todos los encabezados de datos (sin TIMESTAMP)
                 };
 
             } catch (error) {
@@ -493,6 +532,7 @@
                             <tbody class="bg-white divide-y divide-gray-200">
             `;
 
+            // originalData siempre incluye el TIMESTAMP (columna A) para Afiliación
             originalData.forEach((originalRow, index) => {
                 const row = data[index]; // Solo las columnas visibles
 
@@ -505,12 +545,17 @@
                     // Codificamos el contenido de la consulta
                     dataAttribute = `data-consulta="${encodeURIComponent(consultaContent)}"`;
                 } else if (sheetName === 'afiliacion') {
-                    // originalRow tiene TODAS las columnas (A-O).
-                    // Convertimos la fila completa a JSON y la codificamos.
-                    const rowObject = fullHeaders.reduce((acc, header, i) => {
-                        acc[header] = originalRow[i];
-                        return acc;
-                    }, {});
+                    // originalRow tiene TODAS las columnas (A-Q, 17 columnas). 
+                    // fullHeaders tiene TODAS las columnas de datos (B-Q, 16 columnas).
+                    
+                    const rowObject = {};
+                    
+                    // Recorremos los fullHeaders (B-Q)
+                    for (let i = 0; i < fullHeaders.length; i++) {
+                        // El dato en originalRow está en el índice i + 1 (porque el índice 0 es A=TIMESTAMP)
+                        rowObject[fullHeaders[i]] = originalRow[i + 1];
+                    }
+                    
                     dataAttribute = `data-full-data="${encodeURIComponent(JSON.stringify(rowObject))}"`;
                 }
                 
