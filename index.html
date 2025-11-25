@@ -68,7 +68,7 @@
 
         <form id="login-form" class="space-y-6">
             <div>
-                <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario (CUIL/DNI)</label>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario</label>
                 <input 
                     type="text" 
                     id="username" 
@@ -109,12 +109,33 @@
         </p>
 
     </div>
-
+    
+    <div id="welcome-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center transition-opacity duration-300 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-sm transform transition-all duration-300 scale-95 opacity-0" id="modal-content">
+            <div class="text-center">
+                <svg class="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="mt-4 text-2xl font-bold text-gray-900" id="modal-greeting">¡Bienvenido!</h3>
+                <p class="mt-2 text-md text-gray-500">
+                    Acceso concedido para:
+                </p>
+                <p class="mt-1 text-xl font-extrabold text-indigo-600" id="user-fullname">
+                    [Nombre Completo del Usuario]
+                </p>
+            </div>
+            <div class="mt-5 sm:mt-6">
+                <button type="button" id="modal-continue-btn" class="btn-primary w-full text-white py-2.5 px-4 rounded-lg text-lg font-semibold tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Continuar al Tablero
+                </button>
+            </div>
+        </div>
+    </div>
     <script>
         // --- CONFIGURACIÓN Y CONSTANTES ---
 
         // ¡IMPORTANTE! Reemplazá este placeholder con la URL de tu Google Apps Script DESPUÉS de desplegarlo.
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxv_GHi7vqVUdfiAAkhG1F_-MSj6z3vBNnHCpkb08pxOSzF7Ztk-5zhYkSImxevLGc8yQ/exec'; 
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx33wIu0oWlX9dwJwU3AkU54xPjDKji_RLiXar-vNf-FczTGsvABOdZS4bnX1PHlBLLXQ/exec'; 
         
         // El SHEET_ID de tu planilla:
         const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
@@ -136,6 +157,13 @@
         const passwordInput = document.getElementById('password'); 
         const errorMessage = document.getElementById('error-message');
         const loadingMessage = document.getElementById('loading-message');
+        
+        // --- NUEVOS ELEMENTOS DE UI PARA EL MODAL ---
+        const welcomeModal = document.getElementById('welcome-modal');
+        const modalContent = document.getElementById('modal-content');
+        const userFullnameDisplay = document.getElementById('user-fullname');
+        const modalContinueBtn = document.getElementById('modal-continue-btn');
+        // ------------------------------------------
 
         /**
          * Limpia el valor del Nombre de Usuario (CUIL/DNI) eliminando guiones, puntos y espacios.
@@ -145,6 +173,29 @@
          */
         function cleanInput(value) {
             return value.replace(/[-\s\.]/g, '').trim();
+        }
+
+        /**
+         * Muestra el modal de bienvenida con el nombre del usuario.
+         * @param {string} fullName El nombre completo del usuario.
+         */
+        function showWelcomeModal(fullName) {
+            userFullnameDisplay.textContent = fullName;
+            welcomeModal.classList.remove('hidden');
+            welcomeModal.classList.add('flex'); // Lo mostramos
+            
+            // Animación de entrada
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        
+        /**
+         * Redirige al dashboard.
+         */
+        function redirectToDashboard() {
+            window.location.href = 'dashboard.html';
         }
 
         /**
@@ -235,8 +286,11 @@
                     localStorage.setItem('isAuthenticatedSTM', 'true'); 
                     // ----------------------------------------------------
                     
-                    // Redirigir al dashboard
-                    window.location.href = 'dashboard.html';
+                    // 🛑 MOSTRAMOS EL MODAL CON EL NOMBRE Y APELLIDO (que Apps Script debe devolver como 'fullName')
+                    const fullName = result.fullName || 'Usuario Desconocido'; 
+                    showWelcomeModal(fullName);
+                    
+                    // NO redirigimos aquí. La redirección pasa en el botón del modal.
                 } else {
                     // Usuario no existe o credenciales incorrectas
                     errorMessage.textContent = 'Usuario o Contraseña incorrectos. Por favor, verificá tus datos.';
@@ -249,15 +303,23 @@
                 errorMessage.classList.remove('hidden');
             } finally {
                 // Ocultar cargando y habilitar inputs/botón
-                loadingMessage.classList.add('hidden');
-                usernameInput.disabled = false;
-                passwordInput.disabled = false;
-                loginForm.querySelector('button').disabled = false;
+                // Solo re-habilitamos el formulario si el modal NO se mostró
+                if (!welcomeModal.classList.contains('flex')) {
+                    loadingMessage.classList.add('hidden');
+                    usernameInput.disabled = false;
+                    passwordInput.disabled = false;
+                    loginForm.querySelector('button').disabled = false;
+                } else {
+                    loadingMessage.classList.add('hidden'); // Ocultar solo el mensaje de carga
+                }
             }
         }
 
         // Asignar el listener al formulario
         loginForm.addEventListener('submit', handleLogin);
+        
+        // NUEVO: Asignar el listener al botón del modal
+        modalContinueBtn.addEventListener('click', redirectToDashboard);
 
     </script>
 </body>
