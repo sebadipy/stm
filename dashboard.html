@@ -151,20 +151,20 @@
         </div>
     </div>
 
+    <!-- ESTRUCTURA DEL MODAL UNIFICADA -->
     <div id="data-modal-overlay" class="modal-overlay">
         <div class="modal-content w-full md:w-1/2 lg:w-1/3">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
-                <h3 class="text-xl font-bold text-indigo-700">Contenido de la Consulta</h3> 
+                <!-- Título dinámico para Afiliación o Consulta -->
+                <h3 id="modal-title" class="text-xl font-bold text-indigo-700">Detalles de la Fila</h3> 
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
+            <!-- Contenido dinámico para la información detallada (lista o texto) -->
             <div id="modal-details" class="space-y-4">
-                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <p class="text-xs font-semibold uppercase text-gray-500 mb-2">CONSULTA:</p>
-                    <p id="consulta-text-content" class="text-base whitespace-pre-wrap text-gray-800"></p>
-                </div>
+                <!-- Este contenido se llenará dinámicamente con JS -->
             </div>
 
             <div class="mt-6 pt-4 border-t flex justify-end">
@@ -201,40 +201,93 @@
         const dataLoadingMessage = document.getElementById('data-loading-message');
         const currentSheetTitle = document.getElementById('current-sheet-title');
         const dataModalOverlay = document.getElementById('data-modal-overlay');
-        const consultaTextContent = document.getElementById('consulta-text-content'); 
+        const modalTitle = document.getElementById('modal-title'); // Nuevo/Actualizado
+        const modalDetails = document.getElementById('modal-details'); // Nuevo/Actualizado
 
-        // Almacena los encabezados globales para usarlos al abrir el modal (ahora menos necesarios)
-        let currentHeaders = [];
+        // Almacena los encabezados completos para usar en el modal de Afiliación
+        let currentFullHeaders = [];
         
         let lastActiveSheet = 'tabla_consulta'; // Para recordar qué vista estaba activa
 
         // --- FUNCIONES DEL MODAL ---
 
         /**
-         * Muestra el modal con solo el contenido de la columna "CONSULTA".
-         * AHORA LEE EL CONTENIDO DEL data-attribute EN LA FILA (TR).
+         * Muestra el modal con el contenido apropiado (texto de consulta o detalles de afiliación).
          * @param {HTMLElement} rowElement La fila (tr) que fue clickeada.
          */
         window.showModal = function(rowElement) {
-            // Solo abrimos el modal si estamos en la vista 'tabla_consulta'
-            if (lastActiveSheet !== 'tabla_consulta') {
+            
+            // Solo abrimos el modal si estamos en las vistas 'tabla_consulta' o 'afiliacion'
+            if (lastActiveSheet !== 'tabla_consulta' && lastActiveSheet !== 'afiliacion') {
                 return; 
             }
 
-            // 1. Extraer el valor codificado de la consulta del atributo de la fila
-            const encodedConsulta = rowElement.getAttribute('data-consulta');
-            
-            if (encodedConsulta) {
-                // 2. Decodificar el valor
-                const consultaValue = decodeURIComponent(encodedConsulta);
+            modalDetails.innerHTML = ''; // Limpiar contenido previo
 
-                // 3. Rellenar el contenido del modal
-                consultaTextContent.textContent = consultaValue;
+            if (lastActiveSheet === 'tabla_consulta') {
+                // --- LÓGICA PARA TABLA CONSULTA (Texto único) ---
+                const encodedConsulta = rowElement.getAttribute('data-consulta');
                 
-                // 4. Mostrar el modal
-                dataModalOverlay.style.display = 'flex';
-            } else {
-                console.error("Error: No se encontró el atributo 'data-consulta' en la fila. El modal no puede cargar el contenido.");
+                if (encodedConsulta) {
+                    const consultaValue = decodeURIComponent(encodedConsulta);
+
+                    modalTitle.textContent = 'Consulta Completa';
+                    // Renderiza el contenido como un bloque de texto
+                    modalDetails.innerHTML = `
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <p class="text-xs font-semibold uppercase text-gray-500 mb-2">CONSULTA:</p>
+                            <p class="text-base whitespace-pre-wrap text-gray-800">${consultaValue}</p>
+                        </div>
+                    `;
+                    
+                    dataModalOverlay.style.display = 'flex';
+                } else {
+                    console.error("Error: No se encontró el atributo 'data-consulta' en la fila. El modal no puede cargar el contenido.");
+                }
+
+            } else if (lastActiveSheet === 'afiliacion') {
+                // --- LÓGICA PARA AFILIACIÓN (Datos estructurados) ---
+                const encodedFullData = rowElement.getAttribute('data-full-data');
+
+                if (encodedFullData) {
+                    try {
+                        const jsonString = decodeURIComponent(encodedFullData);
+                        const fullData = JSON.parse(jsonString);
+
+                        // Usamos el campo 'NOMBRE Y APELLIDO' como título del modal
+                        const affiliationName = fullData['NOMBRE Y APELLIDO'] || 'Afiliado/a';
+                        modalTitle.textContent = `Detalles de Afiliación: ${affiliationName}`;
+
+                        let detailsHtml = '';
+
+                        // Usamos una lista de descripción (key-value) para mostrar los datos
+                        detailsHtml += '<dl class="divide-y divide-gray-200">';
+                        
+                        // Recorrer todos los campos de la fila completa
+                        Object.entries(fullData).forEach(([key, value]) => {
+                            // No mostramos campos vacíos o 'TIMESTAMP'
+                            if (value && key.toUpperCase() !== 'TIMESTAMP') { 
+                                detailsHtml += `
+                                    <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-indigo-50 transition duration-100 rounded-lg">
+                                        <dt class="text-sm font-medium text-gray-500">${key}</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 whitespace-pre-wrap">${value}</dd>
+                                    </div>
+                                `;
+                            }
+                        });
+                        
+                        detailsHtml += '</dl>';
+
+                        modalDetails.innerHTML = detailsHtml;
+                        
+                        dataModalOverlay.style.display = 'flex';
+
+                    } catch (e) {
+                        console.error("Error al parsear datos de afiliación:", e);
+                    }
+                } else {
+                    console.error("Error: No se encontró el atributo 'data-full-data' en la fila. El modal no puede cargar el contenido.");
+                }
             }
         }
 
@@ -270,7 +323,6 @@
 
         /**
          * Crea la URL de Google Visualization.
-         * Para la hoja 'afiliacion' y 'tabla_consulta', agrega una cláusula 'select' para filtrar columnas.
          * @param {string} gid El GID (identificador de hoja) de la hoja de cálculo.
          * @param {string} sheetName El nombre de la hoja (clave del objeto sheetGids).
          * @returns {string} La URL de consulta GViz.
@@ -281,11 +333,11 @@
             let selectQuery = '';
 
             if (sheetName === 'afiliacion') {
-                // Afiliación: Columna B (Nom_Ap), Columna D (legajo), Columna E (cuil), 
-                // Columna H (email). Ajustado para que coincida con lo anterior.
-                selectQuery = 'select B, D, E, H'; 
+                // Afiliación: Seleccionamos hasta la columna O para obtener la información completa.
+                // Las visibles siguen siendo B, D, E, H.
+                selectQuery = 'select A, B, C, D, E, F, G, H, I, J, K, L, M, N, O'; 
             } else if (sheetName === 'tabla_consulta') {
-                // Para la tabla consulta, seleccionamos B, C, D, E (visibles) y F (CONSULTA - oculta, pero necesaria para el modal).
+                // Para la tabla consulta, seleccionamos B, C, D, E (visibles) y F (CONSULTA - para el modal).
                 selectQuery = 'select B, C, D, E, F'; 
             }
 
@@ -298,9 +350,6 @@
 
         /**
          * Parsea los datos JSON de Google Visualization.
-         * @param {string} jsonText El texto JSON de respuesta GViz.
-         * @param {string} sheetName El nombre de la hoja actual.
-         * @returns {{headers: string[], data: any[][], originalData: any[][]}} Los encabezados (visibles), los datos (visibles) y los datos originales (completos).
          */
         function parseGvizData(jsonText, sheetName) {
             try {
@@ -309,20 +358,36 @@
                 const table = json.table;
                 
                 if (!table || !table.rows || table.rows.length === 0) {
-                    return { headers: [], data: [], originalData: [] };
+                    return { headers: [], data: [], originalData: [], fullHeaders: [] };
                 }
                 
                 // Mapeo de nombres de columna para las vistas
                 let headersMap = {}; 
+                let visibleColumnsIndices = []; 
                 
                 if (sheetName === 'afiliacion') {
-                    // Mapeo para Afiliación (B, D, E, H)
+                    // Mapeo para Afiliación (Columnas A-O)
                     headersMap = {
-                        'B': 'NOMBRE Y APELLIDO', 
-                        'D': 'LEGAJO', 
-                        'E': 'DNI / CUIL', 
-                        'H': 'EMAIL', 
+                        'A': 'TIMESTAMP', 
+                        'B': 'NOMBRE Y APELLIDO', // Visible
+                        'C': 'DNI', 
+                        'D': 'LEGAJO', // Visible
+                        'E': 'DNI / CUIL', // Usamos el nombre que ya estaba
+                        'F': 'ÁREA/SECTOR',
+                        'G': 'DIRECCIÓN',
+                        'H': 'EMAIL', // Visible
+                        'I': 'TELÉFONO',
+                        'J': 'CUMPLEAÑOS',
+                        'K': 'FECHA DE INGRESO',
+                        'L': 'ESTADO CIVIL',
+                        'M': 'HIJOS',
+                        'N': 'CÓNYUGE',
+                        'O': 'OBSERVACIONES',
                     };
+                    // Índices de las columnas VISIBLES (B, D, E, H) en el array de A-O.
+                    // A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7
+                    visibleColumnsIndices = [1, 3, 4, 7]; 
+
                 } else if (sheetName === 'tabla_consulta') {
                     // Mapeo para Tabla Consulta. (B, C, D, E, F)
                     headersMap = {
@@ -332,62 +397,89 @@
                         'E': 'EMAIL', 
                         'F': 'CONSULTA', 
                     };
+                    // B=0, C=1, D=2, E=3
+                    visibleColumnsIndices = [0, 1, 2, 3]; // Solo las primeras 4 son visibles (B, C, D, E)
                 }
 
-                // Generar encabezados usando el mapeo
-                let headers = table.cols.map(col => {
+                // Generar encabezados usando el mapeo (usa TODAS las columnas pedidas)
+                let fullHeaders = table.cols.map(col => {
                     return headersMap[col.id] || col.label || col.id;
                 });
-                
-                // Generar data original (todas las columnas pedidas)
+
+                // Generar data original (todas las columnas pedidas: A-O para afiliación)
                 const originalData = table.rows.map(row => {
                     return row.c.map(cell => {
                         return cell ? (cell.f || (cell.v !== undefined ? cell.v : '')) : '';
                     });
                 });
                 
-                // --- Aplicar el filtro de visibilidad (Quitar 'CONSULTA') ---
+                // --- Aplicar el filtro de visibilidad ---
+                let headers;
+                let finalData;
 
-                // 1. Quitar el encabezado 'CONSULTA'
-                const consultaIndex = headers.findIndex(h => h === 'CONSULTA');
-                if (consultaIndex !== -1) {
-                    headers.splice(consultaIndex, 1);
+                if (sheetName === 'afiliacion') {
+                    // 1. Encabezados visibles (B, D, E, H)
+                    headers = visibleColumnsIndices.map(index => fullHeaders[index]);
+
+                    // 2. Datos visibles
+                    finalData = originalData.map(row => {
+                        return visibleColumnsIndices.map(index => row[index]);
+                    });
+
+                } else if (sheetName === 'tabla_consulta') {
+                    // Lógica existente para tabla_consulta (ocultar la columna 'CONSULTA' (F))
+                    
+                    // 1. Quitar el encabezado 'CONSULTA' (índice 4 de B, C, D, E, F)
+                    const consultaIndex = fullHeaders.findIndex(h => h === 'CONSULTA');
+                    if (consultaIndex !== -1) {
+                        fullHeaders.splice(consultaIndex, 1);
+                    }
+                    headers = fullHeaders; // B, C, D, E (Headers visibles)
+
+                    // 2. Quitar la columna 'CONSULTA' de los datos que se van a renderizar (quedan B, C, D, E)
+                    finalData = originalData.map(row => {
+                        // Si la columna 'CONSULTA' está al final (índice 4, columna F), cortamos antes
+                        return row.slice(0, 4); 
+                    });
+                    // originalData sigue teniendo 5 columnas (B, C, D, E, F) para el modal de consulta
+
+                } else {
+                    // Otros casos (no deberían ocurrir con la lógica actual)
+                    headers = fullHeaders;
+                    finalData = originalData;
                 }
                 
-                // 2. Quitar la columna 'CONSULTA' de los datos que se van a renderizar (quedan B, C, D, E)
-                const finalData = originalData.map(row => {
-                    // Si la columna 'CONSULTA' está al final (índice 4, columna F), cortamos antes
-                    return row.slice(0, 4); 
-                });
-                
-                // Guardamos los encabezados visibles
-                currentHeaders = headers;
+                // Guardamos los encabezados COMPLETOS (B-F para consulta, A-O para afiliación)
+                currentFullHeaders = fullHeaders;
 
                 return { 
-                    headers: headers, // 4 encabezados visibles
-                    data: finalData, // Data con 4 columnas (visible)
-                    originalData: originalData // Data con 5 columnas (para el modal)
+                    headers: headers, // Encabezados visibles
+                    data: finalData, // Data visible
+                    originalData: originalData, // Data completa
+                    fullHeaders: currentFullHeaders // Todos los encabezados
                 };
 
             } catch (error) {
                 console.error("Error al parsear el JSON de Google Sheets (GViz):", error);
-                return { headers: [], data: [], originalData: [] };
+                return { headers: [], data: [], originalData: [], fullHeaders: [] };
             }
         }
 
         /**
-         * Renderiza la tabla con solo las columnas visibles, pero pasa el contenido de CONSULTA 
-         * en un data-attribute para que el modal funcione.
+         * Renderiza la tabla con las columnas visibles, agregando data-attributes con el contenido completo.
          */
-        function renderDataTable(headers, data, originalData) {
+        function renderDataTable(headers, data, originalData, fullHeaders) {
             if (data.length === 0) {
                 tableContainer.innerHTML = '<p class="text-center py-8 text-gray-500">No hay datos disponibles en esta hoja.</p>';
                 return;
             }
 
             const sheetName = lastActiveSheet;
-            const clickHandler = sheetName === 'tabla_consulta' ? 'onclick="showModal(this)"' : '';
-            const rowCursor = sheetName === 'tabla_consulta' ? 'cursor-pointer' : '';
+            
+            // Si es 'tabla_consulta' o 'afiliacion', las filas son cliqueables.
+            const isClickable = sheetName === 'tabla_consulta' || sheetName === 'afiliacion';
+            const clickHandler = isClickable ? 'onclick="showModal(this)"' : '';
+            const rowCursor = isClickable ? 'cursor-pointer' : '';
 
             let html = `
                 <div class="rounded-xl overflow-hidden shadow-2xl">
@@ -402,19 +494,30 @@
             `;
 
             originalData.forEach((originalRow, index) => {
-                // originalRow tiene 5 columnas (B, C, D, E, F). F es el índice 4.
-                const consultaContent = originalRow.length > 4 ? originalRow[4] : 'N/A';
+                const row = data[index]; // Solo las columnas visibles
+
+                // --- PREPARAR DATA PARA EL MODAL ---
+                let dataAttribute = '';
+
+                if (sheetName === 'tabla_consulta') {
+                    // originalRow tiene 5 columnas (B, C, D, E, F). F es el índice 4.
+                    const consultaContent = originalRow.length > 4 ? originalRow[4] : 'N/A';
+                    // Codificamos el contenido de la consulta
+                    dataAttribute = `data-consulta="${encodeURIComponent(consultaContent)}"`;
+                } else if (sheetName === 'afiliacion') {
+                    // originalRow tiene TODAS las columnas (A-O).
+                    // Convertimos la fila completa a JSON y la codificamos.
+                    const rowObject = fullHeaders.reduce((acc, header, i) => {
+                        acc[header] = originalRow[i];
+                        return acc;
+                    }, {});
+                    dataAttribute = `data-full-data="${encodeURIComponent(JSON.stringify(rowObject))}"`;
+                }
                 
-                // Codificamos el contenido de la consulta para pasarlo como data-attribute en el TR
-                const encodedConsulta = encodeURIComponent(consultaContent);
-
-                // La variable 'data[index]' tiene SOLO las 4 columnas visibles para renderizar
-                const row = data[index];
-
                 const rowClass = index % 2 === 0 ? 'bg-white hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-100';
                 
-                // Agregamos el handler de click y el atributo data-consulta
-                html += `<tr class="${rowClass} ${rowCursor}" ${clickHandler} data-consulta="${encodedConsulta}">`;
+                // Agregamos el handler de click y el atributo de data
+                html += `<tr class="${rowClass} ${rowCursor}" ${clickHandler} ${dataAttribute}>`;
                 html += row.map(cell => `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${cell}</td>`).join('');
                 html += `</tr>`;
             });
@@ -440,11 +543,11 @@
             try {
                 const response = await fetch(createGvizUrl(gid, sheetName));
                 const text = await response.text();
-                // Ahora parseGvizData devuelve la data filtrada (data) y la original (originalData)
-                const { headers, data, originalData } = parseGvizData(text, sheetName);
+                // Parseamos los datos, obteniendo las cabeceras completas también
+                const { headers, data, originalData, fullHeaders } = parseGvizData(text, sheetName);
                 
                 // Pasamos la data visible y la data original a renderDataTable
-                renderDataTable(headers, data, originalData);
+                renderDataTable(headers, data, originalData, fullHeaders);
                 
             } catch (error) {
                 console.error('Error al cargar datos:', error);
