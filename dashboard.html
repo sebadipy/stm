@@ -66,8 +66,6 @@
             border-color: #a5b4fc;
         }
         
-        /* NOTA: Se eliminaron los estilos .btn-novedades para que el botón tenga el color estándar (blanco/índigo) */
-        
         /* Ajuste para las cabeceras de la tabla */
         #table-container th {
             white-space: nowrap;
@@ -331,8 +329,12 @@
 
         // --- FUNCIONES ESPECÍFICAS ---
 
+        /**
+         * 🚨 CAMBIO AQUÍ: Ahora redirige en la misma ventana 🚨
+         */
         function openGestorNovedades() {
-            window.open('gestor_novedades.html', '_blank');
+            // Utilizamos window.location.href para abrir en la misma pestaña
+            window.location.href = 'gestor_novedades.html';
         }
 
         /**
@@ -346,7 +348,7 @@
         // --- FUNCIONES GVIZ (Tablas de Consulta) ---
 
         /**
-         * Crea la URL de Google Visualization.
+         * Crea la URL de Google Visualization con orden descendente por fecha (columna A).
          * @param {string} gid El GID (identificador de hoja) de la hoja de cálculo.
          * @param {string} sheetName El nombre de la hoja (clave del objeto sheetGids).
          * @returns {string} La URL de consulta GViz.
@@ -358,11 +360,20 @@
 
             if (sheetName === 'afiliacion') {
                 // Afiliación: Seleccionamos A (Timestamp) y de B a Q (Todos los campos de datos de la tabla)
-                selectQuery = 'select A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q'; 
+                // Se agrega 'order by A desc' para ordenar del más nuevo al más viejo
+                selectQuery = 'select A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q order by A desc'; 
             } else if (sheetName === 'tabla_consulta') {
                 // Para la tabla consulta, seleccionamos B, C, D, E (visibles) y F (CONSULTA - para el modal).
-                selectQuery = 'select B, C, D, E, F'; 
+                // Se agrega 'order by A desc' para ordenar del más nuevo al más viejo (Columna A es el Timestamp)
+                selectQuery = 'select A, B, C, D, E, F order by A desc'; 
             }
+            
+            // Si la consulta es para tabla_consulta, debemos seleccionar A también para el sort, aunque no se use en el modal/vista
+            if (sheetName === 'tabla_consulta') {
+                 // La columna A (Timestamp) DEBE estar en la consulta SELECT si se usa en ORDER BY
+                selectQuery = 'select A, B, C, D, E, F order by A desc'; 
+            }
+
 
             if (selectQuery) {
                 baseUrl += `&tq=${encodeURIComponent(selectQuery)}`;
@@ -414,16 +425,17 @@
                     visibleColumnsIndices = [1, 3, 4, 7]; 
 
                 } else if (sheetName === 'tabla_consulta') {
-                    // Mapeo para Tabla Consulta. (B, C, D, E, F)
+                    // Mapeo para Tabla Consulta. (A, B, C, D, E, F)
                     headersMap = {
+                        'A': 'TIMESTAMP', 
                         'B': 'APELLIDO', 
                         'C': 'NOMBRE', 
                         'D': 'TEL/CELULAR DE CONTACTO', 
                         'E': 'EMAIL', 
                         'F': 'CONSULTA', 
                     };
-                    // B=0, C=1, D=2, E=3
-                    visibleColumnsIndices = [0, 1, 2, 3]; // Solo las primeras 4 son visibles (B, C, D, E)
+                    // B=1, C=2, D=3, E=4
+                    visibleColumnsIndices = [1, 2, 3, 4]; // Solo las primeras 4 son visibles (B, C, D, E)
                 }
 
                 // Generar encabezados usando el mapeo (usa TODAS las columnas pedidas)
@@ -431,7 +443,7 @@
                     return headersMap[col.id] || col.label || col.id;
                 });
 
-                // Generar data original (todas las columnas pedidas: A-Q para afiliación, B-F para consulta)
+                // Generar data original (todas las columnas pedidas: A-Q para afiliación, A-F para consulta)
                 const originalData = table.rows.map(row => {
                     return row.c.map(cell => {
                         return cell ? (cell.f || (cell.v !== undefined ? cell.v : '')) : '';
@@ -458,21 +470,28 @@
                     }
 
                 } else if (sheetName === 'tabla_consulta') {
-                    // Lógica para tabla_consulta (ocultar la columna 'CONSULTA' (F))
+                    // Lógica para tabla_consulta (ocultar la columna 'TIMESTAMP' (A) y 'CONSULTA' (F))
                     
-                    // 1. Quitar el encabezado 'CONSULTA' (índice 4 de B, C, D, E, F)
+                    // 1. Quitar los encabezados no visibles ('TIMESTAMP' y 'CONSULTA')
+                    // El índice 0 es TIMESTAMP, el índice 5 es CONSULTA
                     const consultaIndex = fullHeaders.findIndex(h => h === 'CONSULTA');
                     if (consultaIndex !== -1) {
-                        fullHeaders.splice(consultaIndex, 1);
+                        fullHeaders.splice(consultaIndex, 1); // Quitar CONSULTA (F)
                     }
+                    const timestampIndex = fullHeaders.findIndex(h => h === 'TIMESTAMP');
+                    if (timestampIndex !== -1) {
+                         fullHeaders.splice(timestampIndex, 1); // Quitar TIMESTAMP (A)
+                    }
+
                     headers = fullHeaders; // B, C, D, E (Headers visibles)
 
-                    // 2. Quitar la columna 'CONSULTA' de los datos que se van a renderizar (quedan B, C, D, E)
+                    // 2. Quitar la columna 'TIMESTAMP' y 'CONSULTA' de los datos que se van a renderizar (quedan B, C, D, E)
                     finalData = originalData.map(row => {
-                        // Si la columna 'CONSULTA' está al final (índice 4, columna F), cortamos antes
-                        return row.slice(0, 4); 
+                         // originalRow tiene 6 columnas (A, B, C, D, E, F)
+                         // Quitamos A (índice 0) y F (índice 5), quedando B, C, D, E (índices 1, 2, 3, 4)
+                        return row.slice(1, 5); 
                     });
-                    // originalData sigue teniendo 5 columnas (B, C, D, E, F) para el modal de consulta
+                    // originalData sigue teniendo 6 columnas (A, B, C, D, E, F) para el modal de consulta
 
                 } else {
                     // Otros casos 
@@ -524,7 +543,7 @@
                             <tbody class="bg-white divide-y divide-gray-200">
             `;
 
-            // originalData siempre incluye el TIMESTAMP (columna A) para Afiliación
+            // originalData siempre incluye el TIMESTAMP (columna A) en el índice 0.
             originalData.forEach((originalRow, index) => {
                 const row = data[index]; // Solo las columnas visibles
 
@@ -532,8 +551,8 @@
                 let dataAttribute = '';
 
                 if (sheetName === 'tabla_consulta') {
-                    // originalRow tiene 5 columnas (B, C, D, E, F). F es el índice 4.
-                    const consultaContent = originalRow.length > 4 ? originalRow[4] : 'N/A';
+                    // originalRow tiene 6 columnas (A, B, C, D, E, F). F es el índice 5.
+                    const consultaContent = originalRow.length > 5 ? originalRow[5] : 'N/A';
                     // Codificamos el contenido de la consulta
                     dataAttribute = `data-consulta="${encodeURIComponent(consultaContent)}"`;
                 } else if (sheetName === 'afiliacion') {
@@ -615,18 +634,17 @@
          */
         function loadView(sheetName) {
             
-            // 1. Manejo especial para el gestor de novedades (abre nueva ventana)
+            // 1. Manejo especial para el gestor de novedades (AHORA ABRE EN LA MISMA PESTAÑA)
             if (sheetName === 'gestor_novedades_external') {
                 openGestorNovedades();
-                
-                // Si la ventana se abre, NO modificamos el estado de los botones. 
-                // La vista anterior (Tabla Consulta o Afiliación) sigue "activa".
+                // REDIRECCIÓN COMPLETA: Salimos de la función
                 return; 
             }
 
-            // 2. NUEVA REDIRECCIÓN PARA CREDENCIAL_QR
+            // 2. REDIRECCIÓN PARA CREDENCIAL_QR (AHORA ABRE EN LA MISMA PESTAÑA)
             if (sheetName === 'credencial_qr') {
-                window.open('credencial_qr.html', '_blank'); // Abre la credencial en una nueva pestaña
+                window.location.href = 'credencial_qr.html'; // Abre en la misma pestaña
+                // REDIRECCIÓN COMPLETA: Salimos de la función
                 return;
             }
             // ------------------------------------------------

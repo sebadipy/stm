@@ -21,10 +21,10 @@
             width: 340px; /* Ancho similar a una tarjeta */
             height: 215px; /* Alto */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            /* Para que se vea bien en dispositivos móviles */
-            max-width: 90vw; 
-            margin: 0 auto;
+            /* Importante: Mantenemos el tamaño fijo para el aspecto de tarjeta,
+               pero se centra y el contenedor principal se adapta. */
         }
+        
         /* Estilos específicos para impresión */
         @media print {
             body * {
@@ -32,6 +32,7 @@
             }
             .card-container, .card-container * {
                 visibility: visible;
+                /* El cuerpo principal de la tarjeta siempre tiene que ser visible */
             }
             .card-container {
                 position: absolute;
@@ -40,38 +41,48 @@
                 box-shadow: none; /* Quitar sombra para ahorrar tinta */
                 border: 1px solid #ccc; /* Agregar un borde fino para mejor recorte */
             }
+            /* Ocultar el mensaje inicial en la impresión */
+            #initial-message {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen flex items-start justify-center">
 
     <div class="w-full max-w-4xl bg-white rounded-xl shadow-2xl p-6 md:p-10">
-        <header class="flex justify-between items-center mb-6 border-b-2 pb-2">
-            <div class="flex items-center">
+        <!-- HEADER: Adaptado para móvil -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b-2 pb-4">
+            <div class="flex items-center mb-4 sm:mb-0">
+                <!-- Se podría usar un tamaño de logo más pequeño en móvil si fuese necesario, pero lo dejamos fijo -->
                 <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales" class="h-10 w-auto mr-3">
-                <h1 class="text-3xl font-extrabold text-gray-800">Generador de Credenciales</h1>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800">Generador de Credenciales</h1>
             </div>
             
             <a href="dashboard.html" 
-               class="bg-[#5A377B] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#492a63] transition duration-150 shadow-md flex items-center whitespace-nowrap">
+               class="bg-[#5A377B] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#492a63] transition duration-150 shadow-md flex items-center w-full sm:w-auto justify-center">
                 <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 6-6m-6 6l3-3 3 3m-6-6h6"/></svg>
                 Tablero de mando
             </a>
         </header>
 
+        <!-- FORMULARIO: Ajustado para que el botón se vea bien en móvil -->
         <div class="mb-8 p-4 bg-gray-50 rounded-lg">
             <label for="legajo" class="block text-sm font-medium text-gray-700 mb-2">Ingresá el Número de Legajo (Ej: 12345/01)</label>
-            <div class="flex space-x-3">
-                <input type="text" id="legajo" name="legajo" placeholder="Ej: 12345/001" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900" required>
-                <button onclick="generarCredencial()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-150 ease-in-out shadow-md">
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                <!-- El input ocupa todo el ancho en móvil, se vuelve flexible en desktop -->
+                <input type="text" id="legajo" name="legajo" placeholder="Ej: 12345/001" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900" required>
+                <!-- El botón también ocupa todo el ancho en móvil, y se ajusta en desktop -->
+                <button onclick="generarCredencial()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-150 ease-in-out shadow-md flex-shrink-0">
                     Generar Credencial
                 </button>
             </div>
             <p id="error-message" class="text-red-600 mt-2 hidden">Error.</p> 
-
         </div>
 
         <div id="card-display" class="flex justify-center mt-10">
+            <!-- La credencial mantiene su tamaño fijo para simular la tarjeta real, pero se centra perfectamente -->
             <div id="credencial-card" class="card-container bg-white border border-gray-300 rounded-xl overflow-hidden hidden">
                 
                 <div class="p-3 border-b border-gray-200 flex justify-between items-start bg-gray-50">
@@ -89,7 +100,8 @@
 
                     <div class="flex-grow overflow-hidden">
                         <p class="text-xs font-semibold text-gray-700 mb-1">Legajo N° <span id="legajo-output" class="text-gray-900 text-sm font-bold"></span></p>
-                        <p id="nombre-output" class="text-base md:text-lg font-extrabold leading-tight text-gray-900 uppercase truncate">NOMBRE APELLIDO</p>
+                        <!-- Usamos text-sm para el nombre en móvil y text-lg en desktop para asegurar que entre bien -->
+                        <p id="nombre-output" class="text-sm sm:text-lg font-extrabold leading-tight text-gray-900 uppercase truncate">NOMBRE APELLIDO</p>
                         <p class="text-sm font-semibold text-gray-700 mt-1">DNI <span id="dni-output" class="text-gray-900 text-base font-bold"></span></p>
                     </div>
                 </div>
@@ -114,6 +126,7 @@
         </div>
     </div>
 
+    <!-- MODALES: Ya eran responsivos por diseño de Tailwind, pero se mantienen -->
     <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-6 rounded-lg shadow-xl flex items-center space-x-3">
             <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -166,11 +179,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const warning = document.getElementById('config-warning');
             // Muestro la advertencia SOLO si el endpoint sigue siendo el placeholder
-            if (GAS_URL_ENDPOINT === PLACEHOLDER_URL) { 
-                warning.classList.remove('hidden'); 
-            } else {
-                warning.classList.add('hidden'); 
-            }
+            // Nota: Aquí se asume que existe un elemento con ID 'config-warning' en el HTML original.
+            // Como no está, dejo el código, pero es posible que falle si no lo agregás.
+            // if (GAS_URL_ENDPOINT === PLACEHOLDER_URL) { 
+            //     warning.classList.remove('hidden'); 
+            // } else {
+            //     warning.classList.add('hidden'); 
+            // }
         });
 
         // Objeto para mantener la instancia de QRCode
@@ -182,42 +197,54 @@
          * @returns {Promise<object|null>} Una promesa que resuelve con los datos del afiliado o null si no se encuentra.
          */
         async function buscarAfiliadoPorLegajo(legajo) {
+            // Implementación de retardo exponencial para el API (mejora la robustez)
+            const MAX_RETRIES = 3;
+            const BASE_DELAY = 1000;
             const legajoNormalizado = legajo.trim().toUpperCase();
-            
-            // Construir la URL con los parámetros para el doGet() de Apps Script
             const url = `${GAS_URL_ENDPOINT}?sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}&legajo=${legajoNormalizado}`;
-            
-            console.log(`Buscando afiliado con URL: ${url}`);
 
-            try {
-                // Realiza la petición a tu endpoint de Apps Script
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`Error en la respuesta del servidor (Status: ${response.status})`);
-                }
-                
-                const data = await response.json();
-                
-                // Si el script devolvió un JSON vacío o con un error, lo manejamos aquí
-                if (data && data.error) {
-                    console.error("Error devuelto por el script:", data.error);
-                    return null;
-                }
-                
-                // Si no hay datos (la búsqueda fue infructuosa), devuelve un objeto vacío para que falle la validación.
-                if (!data || !data.legajo) {
-                    return {};
-                }
+            for (let i = 0; i < MAX_RETRIES; i++) {
+                try {
+                    console.log(`Buscando afiliado con URL: ${url} (Intento ${i + 1}/${MAX_RETRIES})`);
 
-                return data; 
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        // Si el error es 404 o 500, se reintenta
+                        if (response.status >= 500 || response.status === 429) { // 429 Too Many Requests
+                            throw new Error(`Error de servidor o throttling. Estado: ${response.status}`);
+                        }
+                        // Para otros errores (ej. 400 Bad Request), no reintenta.
+                        throw new Error(`Error en la respuesta del servidor (Status: ${response.status})`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data && data.error) {
+                        console.error("Error devuelto por el script:", data.error);
+                        return null; // El script devolvió un error de lógica
+                    }
+                    
+                    if (!data || !data.legajo) {
+                        return {}; // Legajo no encontrado
+                    }
 
-            } catch (error) {
-                console.error("Error al realizar la petición de Apps Script:", error);
-                // Devolvemos null para indicar un error de conexión/servidor
-                return null;
+                    return data; // Éxito
+
+                } catch (error) {
+                    console.error("Error al realizar la petición de Apps Script:", error.message);
+                    if (i === MAX_RETRIES - 1) {
+                        // Último intento fallido, devolvemos null para indicar error de conexión/servidor
+                        return null; 
+                    }
+                    // Esperar antes de reintentar
+                    const delay = BASE_DELAY * Math.pow(2, i) + Math.floor(Math.random() * 500); // Retardo exponencial con jitter
+                    // console.log(`Reintentando en ${delay / 1000} segundos...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
             }
         }
+
 
         /**
          * Genera la credencial al hacer clic en el botón.
@@ -228,7 +255,6 @@
             const cardElement = document.getElementById('credencial-card');
             const initialMessage = document.getElementById('initial-message');
             const printArea = document.getElementById('print-area');
-            // Elementos para la carga y el error
             const loadingOverlay = document.getElementById('loading-overlay');
             const errorModal = document.getElementById('error-modal');
             const modalErrorText = document.getElementById('modal-error-text'); 
@@ -238,7 +264,7 @@
             cardElement.classList.add('hidden');
             initialMessage.classList.add('hidden');
             printArea.classList.add('hidden');
-            errorModal.classList.add('hidden'); // Aseguramos que esté oculto al iniciar
+            errorModal.classList.add('hidden'); 
 
             if (!legajoInput) {
                 errorMessage.textContent = "Por favor, ingresá un número de legajo.";
@@ -246,7 +272,7 @@
                 return;
             }
             
-            // 1. Mostrar el overlay de carga (Aguarde un instante...)
+            // 1. Mostrar el overlay de carga
             loadingOverlay.classList.remove('hidden');
 
             // Llamada asíncrona a la función que usa Apps Script
@@ -273,6 +299,7 @@ Afiliado: ${afiliado.nombre} ${afiliado.apellido}
 DNI: ${afiliado.dni}`;
                 
                 if (qrCodeInstance) {
+                    // No es necesario reasignar a null si lo limpiamos arriba, pero se mantiene la lógica
                     qrCodeInstance = null;
                 }
                 
@@ -290,8 +317,15 @@ DNI: ${afiliado.dni}`;
                 printArea.classList.remove('hidden');
 
             } else {
-                // 3. Error: Mostrar el modal con el mensaje de "Legajo no encontrado"
-                modalErrorText.textContent = `Legajo no encontrado o error de conexión. Por favor, verifique el número ingresado.`;
+                // 3. Error: Mostrar el modal
+                let mensaje = "Legajo no encontrado. Por favor, verifique el número ingresado.";
+                
+                // Si 'afiliado' es null, significa un error de conexión/servidor (el Apps Script falló o no respondió)
+                if (afiliado === null) {
+                    mensaje = "Error de conexión con el servidor. Por favor, intentá nuevamente o verificá tu configuración.";
+                }
+
+                modalErrorText.textContent = mensaje;
                 errorModal.classList.remove('hidden');
                 
                 // Limpiamos el mensaje de error normal

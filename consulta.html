@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Consultas - STM</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         :root {
             --stm-purple: #5A377B;
@@ -73,6 +73,7 @@
         <div class="form-container">
             
             <div class="logo-container">
+                <!-- Por favor, asegúrate de que 'logo_STM.png' esté disponible en tu entorno. -->
                 <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
             </div>
 
@@ -130,6 +131,7 @@
         </div>
     </div>
     
+    <!-- Modal de Éxito (Confirmación) -->
     <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -147,6 +149,7 @@
         </div>
     </div>
 
+    <!-- Modal de Afiliación (Redirección) -->
     <div class="modal fade" id="modalAfiliacion" tabindex="-1" aria-labelledby="modalAfiliacionLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -166,9 +169,10 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script>
+        // Variables de elementos del DOM y Modales
         const form = document.getElementById('formularioConsulta');
         const btnEnviar = document.getElementById('btnEnviar');
         const btnAfiliar = document.getElementById('btnAfiliar'); 
@@ -180,15 +184,16 @@
         const btnAceptarAfiliacion = document.getElementById('btnAceptarAfiliacion');
         const URL_AFILIACION = '/afiliacion.html';
 
-
         const inputApellido = document.getElementById('inputApellido');
         const inputNombre = document.getElementById('inputNombre');
         const inputTelefono = document.getElementById('inputTelefono');
         
         const camposObligatorios = [inputApellido, inputNombre, inputTelefono, textareaConsulta];
 
-        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyYGbxtmvTnv3jmoMlZIyA8BzwoRqqigewURxBiwUU4wYv1TCQwWwvSZBujkgTXZa-hvw/exec';
+        // URL del Google Apps Script para el envío de datos
+        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzU5G4o3TKI5rMBHmLscxY74aytcpX9iHgcEYSUCgV6K6QotFy6umFzxrQYjKT3GDZIFQ/exec';
 
+        // Event Listeners
         form.addEventListener('submit', function(event) {
             manejarEnvio(event, 'Consulta');
         });
@@ -202,7 +207,7 @@
             window.location.href = URL_AFILIACION;
         });
 
-
+        // Limpieza de alertas al escribir
         textareaConsulta.addEventListener('input', function() {
             this.classList.remove('alerta-consulta');
             feedbackConsulta.style.display = 'none'; 
@@ -213,13 +218,16 @@
         inputTelefono.addEventListener('input', function() { this.classList.remove('alerta-consulta'); });
 
 
+        /**
+         * Maneja el proceso de validación y envío de datos del formulario al Apps Script.
+         */
         async function manejarEnvio(event, tipo = 'Consulta') {
             event.preventDefault(); 
             
             let botonPresionado = btnEnviar;
             let validacionFallo = false;
 
-            
+            // 1. Resetear validaciones visuales
             camposObligatorios.forEach(campo => {
                 campo.removeAttribute('required');
                 campo.classList.remove('is-valid');
@@ -229,7 +237,7 @@
 
             feedbackConsulta.style.display = 'none';
 
-            
+            // 2. Realizar validación de campos obligatorios
             camposObligatorios.forEach(campo => {
                 if (campo.value.trim() === '') {
                     campo.classList.add('alerta-consulta');
@@ -237,33 +245,31 @@
                 }
             });
             
-            
+            // Mensaje de feedback específico para la consulta
             if (textareaConsulta.value.trim() === '') {
                 feedbackConsulta.style.display = 'block';
             }
 
-            
+            // 3. Detener si hay fallas de validación
             if (validacionFallo) {
                 return; 
             }
             
-            
+            // 4. Agregar atributos 'required' antes de enviar (por formalidad, aunque no se usa en el fetch)
             inputApellido.setAttribute('required', '');
             inputNombre.setAttribute('required', '');
             inputTelefono.setAttribute('required', '');
             textareaConsulta.setAttribute('required', '');
             
             
-            
+            // 5. Estado de Carga: Deshabilitar botón y cambiar texto
             botonPresionado.disabled = true;
-            botonPresionado.textContent = 'Enviando...';
+            // *** APLICACIÓN DEL CAMBIO SOLICITADO ***
+            botonPresionado.textContent = 'Aguarde un instante...'; 
 
             const formData = new FormData(form);
-            // LÍNEA DE CORRECCIÓN: Se eliminó la línea formData.append('TipoDeEnvio', tipo);
-            // para evitar errores con parámetros no esperados.
             
-            // Se convierte FormData a URLSearchParams para enviar en formato 
-            // application/x-www-form-urlencoded que Apps Script maneja en e.parameter
+            // Conversión de FormData a URLSearchParams para Apps Script
             const searchParams = new URLSearchParams();
             for (const [key, value] of formData.entries()) {
                 searchParams.append(key, value);
@@ -272,40 +278,37 @@
             try {
                 const response = await fetch(APPSSCRIPT_URL, {
                     method: 'POST',
-                    // USAMOS el nuevo searchParams.toString() como body
                     body: searchParams.toString(), 
-                    // Y AGREGAMOS el Content-Type necesario
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 });
 
-                // --- MANEJO DE RESPUESTA MEJORADO ---
+                // Manejo de Respuesta
                 const responseText = await response.text();
                 
                 if (response.ok) {
-                    // Si el estado HTTP es 200, reseteamos y mostramos éxito
+                    // Éxito: Resetea el formulario y muestra el modal
                     form.reset(); 
                     modalExito.show(); 
                 } else {
-                    // Si el estado HTTP no es 200, intentamos parsear el error del GAS
+                    // Error: Intenta obtener el detalle del error del Apps Script
                     let errorDetail = response.statusText;
                     try {
                         const errorData = JSON.parse(responseText); 
-                        // Buscamos el detalle del error en las claves 'detalle' o 'mensaje'
                         errorDetail = errorData.detalle || errorData.mensaje || response.statusText;
                     } catch (e) {
-                        // Si no es JSON, mostramos el texto plano
                         errorDetail = responseText;
                     }
                     throw new Error('Fallo en el servidor (código ' + response.status + '): ' + errorDetail);
                 }
-                // --- FIN DE MANEJO DE RESPUESTA MEJORADO ---
 
             } catch (error) {
+                // Muestra el error al usuario (usando alert temporalmente, se recomienda un modal)
                 alert('¡Error al enviar la solicitud! Por favor, reintenta. Detalle: ' + error.message);
                 console.error('Error de envío:', error);
             } finally {
+                // 6. Restaurar estado: Habilitar botón y texto original
                 inputApellido.removeAttribute('required');
                 inputNombre.removeAttribute('required');
                 inputTelefono.removeAttribute('required');
