@@ -178,7 +178,7 @@
 
         const modalAfiliacion = new bootstrap.Modal(document.getElementById('modalAfiliacion'));
         const btnAceptarAfiliacion = document.getElementById('btnAceptarAfiliacion');
-        const URL_AFILIACION = '/stm/afiliacion.html';
+        const URL_AFILIACION = '/afiliacion.html';
 
 
         const inputApellido = document.getElementById('inputApellido');
@@ -187,7 +187,7 @@
         
         const camposObligatorios = [inputApellido, inputNombre, inputTelefono, textareaConsulta];
 
-        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1bnqHmltAi88EtoO8uf1P_uMXidhXBrX9MBFHk1voT8fVTGU2JcNYe12jZhdK2AMrZQ/exec';
+        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyYGbxtmvTnv3jmoMlZIyA8BzwoRqqigewURxBiwUU4wYv1TCQwWwvSZBujkgTXZa-hvw/exec';
 
         form.addEventListener('submit', function(event) {
             manejarEnvio(event, 'Consulta');
@@ -259,27 +259,48 @@
             botonPresionado.textContent = 'Enviando...';
 
             const formData = new FormData(form);
-            formData.append('TipoDeEnvio', tipo); 
+            // LÍNEA DE CORRECCIÓN: Se eliminó la línea formData.append('TipoDeEnvio', tipo);
+            // para evitar errores con parámetros no esperados.
             
+            // Se convierte FormData a URLSearchParams para enviar en formato 
+            // application/x-www-form-urlencoded que Apps Script maneja en e.parameter
+            const searchParams = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                searchParams.append(key, value);
+            }
+
             try {
                 const response = await fetch(APPSSCRIPT_URL, {
                     method: 'POST',
-                    body: formData 
+                    // USAMOS el nuevo searchParams.toString() como body
+                    body: searchParams.toString(), 
+                    // Y AGREGAMOS el Content-Type necesario
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
                 });
 
+                // --- MANEJO DE RESPUESTA MEJORADO ---
+                const responseText = await response.text();
+                
                 if (response.ok) {
+                    // Si el estado HTTP es 200, reseteamos y mostramos éxito
                     form.reset(); 
                     modalExito.show(); 
                 } else {
-                    const errorText = await response.text();
+                    // Si el estado HTTP no es 200, intentamos parsear el error del GAS
                     let errorDetail = response.statusText;
                     try {
-                        const errorData = JSON.parse(errorText); 
+                        const errorData = JSON.parse(responseText); 
+                        // Buscamos el detalle del error en las claves 'detalle' o 'mensaje'
                         errorDetail = errorData.detalle || errorData.mensaje || response.statusText;
                     } catch (e) {
+                        // Si no es JSON, mostramos el texto plano
+                        errorDetail = responseText;
                     }
-                    throw new Error('El servidor devolvió un error: ' + errorDetail);
+                    throw new Error('Fallo en el servidor (código ' + response.status + '): ' + errorDetail);
                 }
+                // --- FIN DE MANEJO DE RESPUESTA MEJORADO ---
 
             } catch (error) {
                 alert('¡Error al enviar la solicitud! Por favor, reintenta. Detalle: ' + error.message);
