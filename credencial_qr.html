@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Credenciales - STM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        /* Estilo para el logo real */
+        .logo-stm-img {
+            height: 60px; /* Tamaño ajustado para la credencial */
+            width: auto;
+        }
+        /* Estilo de la credencial (tamaño fijo para impresión/visualización) */
+        .card-container {
+            width: 340px; /* Ancho similar a una tarjeta */
+            height: 215px; /* Alto */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            /* Para que se vea bien en dispositivos móviles */
+            max-width: 90vw; 
+            margin: 0 auto;
+        }
+        /* Estilos específicos para impresión */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .card-container, .card-container * {
+                visibility: visible;
+            }
+            .card-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                box-shadow: none; /* Quitar sombra para ahorrar tinta */
+                border: 1px solid #ccc; /* Agregar un borde fino para mejor recorte */
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex items-start justify-center">
+
+    <div class="w-full max-w-4xl bg-white rounded-xl shadow-2xl p-6 md:p-10">
+        <header class="flex justify-between items-center mb-6 border-b-2 pb-2">
+            <div class="flex items-center">
+                <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales" class="h-10 w-auto mr-3">
+                <h1 class="text-3xl font-extrabold text-gray-800">Generador de Credenciales</h1>
+            </div>
+            
+            <a href="dashboard.html" 
+               class="bg-[#5A377B] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#492a63] transition duration-150 shadow-md flex items-center whitespace-nowrap">
+                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 6-6m-6 6l3-3 3 3m-6-6h6"/></svg>
+                Tablero de mando
+            </a>
+        </header>
+
+        <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+            <label for="legajo" class="block text-sm font-medium text-gray-700 mb-2">Ingresá el Número de Legajo (Ej: 12345/01)</label>
+            <div class="flex space-x-3">
+                <input type="text" id="legajo" name="legajo" placeholder="Ej: 12345/001" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900" required>
+                <button onclick="generarCredencial()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-150 ease-in-out shadow-md">
+                    Generar Credencial
+                </button>
+            </div>
+            <p id="error-message" class="text-red-600 mt-2 hidden">Error.</p> 
+
+        </div>
+
+        <div id="card-display" class="flex justify-center mt-10">
+            <div id="credencial-card" class="card-container bg-white border border-gray-300 rounded-xl overflow-hidden hidden">
+                
+                <div class="p-3 border-b border-gray-200 flex justify-between items-start bg-gray-50">
+                    <div>
+                        <p class="text-lg font-bold leading-tight text-gray-900">Sindicato de Trabajadores</p>
+                        <p class="text-lg font-bold leading-tight text-gray-900">Municipales</p>
+                        <p class="text-xs text-gray-600">de Gral. Pueyrredón</p>
+                    </div>
+                    <img src="logo_STM.png" alt="Logo STM" class="logo-stm-img">
+                </div>
+
+                <div class="flex p-3 space-x-3 border-b border-gray-300">
+                    <div id="qrcode" class="w-24 h-24 flex-shrink-0 border p-1 rounded-sm">
+                        </div>
+
+                    <div class="flex-grow overflow-hidden">
+                        <p class="text-xs font-semibold text-gray-700 mb-1">Legajo N° <span id="legajo-output" class="text-gray-900 text-sm font-bold"></span></p>
+                        <p id="nombre-output" class="text-base md:text-lg font-extrabold leading-tight text-gray-900 uppercase truncate">NOMBRE APELLIDO</p>
+                        <p class="text-sm font-semibold text-gray-700 mt-1">DNI <span id="dni-output" class="text-gray-900 text-base font-bold"></span></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-2 text-center">
+                    <p class="text-sm font-extrabold text-blue-800 tracking-wide mb-1">CREDENCIAL DE AFILIADO</p>
+                    <p class="text-xs text-gray-700 leading-tight">Moreno 4359 - (223) 4723756 - Mar del Plata - Pcia. Bs. As.</p>
+                    <p class="text-xs italic text-gray-800 leading-tight mt-0.5">Carece de validez si no se exhibe con DNI</p>
+                </div>
+            </div>
+            
+            <p id="initial-message" class="text-gray-500 italic mt-6">Ingresá un legajo para generar la credencial.</p>
+        </div>
+
+        <div id="print-area" class="mt-8 text-center hidden">
+            <button onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-150 ease-in-out shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5 4v3h10V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm0 6h10v3a2 2 0 01-2 2H7a2 2 0 01-2-2v-3zm0 7h10v1a1 1 0 01-1 1H6a1 1 0 01-1-1v-1z" clip-rule="evenodd" />
+                </svg>
+                Imprimir / Guardar como PDF
+            </button>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl flex items-center space-x-3">
+            <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-lg font-semibold text-gray-800">Aguarde un instante...</span>
+        </div>
+    </div>
+
+    <div id="error-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-2xl max-w-sm p-6 transform transition-all">
+            <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Error en la Búsqueda
+            </h3>
+            <p id="modal-error-text" class="text-gray-700 mb-6">Legajo no encontrado o error de conexión. Por favor, verifique el número ingresado.</p>
+            <div class="text-right">
+                <button onclick="document.getElementById('error-modal').classList.add('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        
+        // --- 🚨 CÓDIGO DE VERIFICACIÓN DE SEGURIDAD 🚨 ---
+        // Chequea si la bandera de autenticación existe en el localStorage
+        if (localStorage.getItem('isAuthenticatedSTM') !== 'true') {
+            // Si no está autenticado, redirigir al login
+            window.location.href = 'index.html';
+        }
+        // --- FIN CÓDIGO DE VERIFICACIÓN ---
+        
+        // CONFIGURACIÓN DE LA CONEXIÓN CON GOOGLE APPS SCRIPT (GAS)
+        // ID de la planilla de Google Sheets que proporcionaste:
+        const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo';
+        // Nombre de la hoja dentro de esa planilla:
+        const SHEET_NAME = 'tabla_afiliados_credencial';
+        // ⚠️ REEMPLAZÁ ESTA URL CON LA URL DE DESPLIEGUE DE TU SCRIPT DE GOOGLE APPS SCRIPT ⚠️
+        const PLACEHOLDER_URL = 'https://script.google.com/macros/s/AKfycbx68NgqF6zEwrDCDLxjHRmvCpKGcIanHfluwNKFlGdDQPgydGbew-zkkSuIqq0gdibKIw/exec';
+        let GAS_URL_ENDPOINT = PLACEHOLDER_URL;
+
+        // Mostrar u ocultar la advertencia de configuración inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            const warning = document.getElementById('config-warning');
+            // Muestro la advertencia SOLO si el endpoint sigue siendo el placeholder
+            if (GAS_URL_ENDPOINT === PLACEHOLDER_URL) { 
+                warning.classList.remove('hidden'); 
+            } else {
+                warning.classList.add('hidden'); 
+            }
+        });
+
+        // Objeto para mantener la instancia de QRCode
+        let qrCodeInstance = null;
+
+        /**
+         * Realiza la búsqueda del afiliado en la Google Sheet a través del Apps Script.
+         * @param {string} legajo El número de legajo a buscar.
+         * @returns {Promise<object|null>} Una promesa que resuelve con los datos del afiliado o null si no se encuentra.
+         */
+        async function buscarAfiliadoPorLegajo(legajo) {
+            const legajoNormalizado = legajo.trim().toUpperCase();
+            
+            // Construir la URL con los parámetros para el doGet() de Apps Script
+            const url = `${GAS_URL_ENDPOINT}?sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}&legajo=${legajoNormalizado}`;
+            
+            console.log(`Buscando afiliado con URL: ${url}`);
+
+            try {
+                // Realiza la petición a tu endpoint de Apps Script
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Error en la respuesta del servidor (Status: ${response.status})`);
+                }
+                
+                const data = await response.json();
+                
+                // Si el script devolvió un JSON vacío o con un error, lo manejamos aquí
+                if (data && data.error) {
+                    console.error("Error devuelto por el script:", data.error);
+                    return null;
+                }
+                
+                // Si no hay datos (la búsqueda fue infructuosa), devuelve un objeto vacío para que falle la validación.
+                if (!data || !data.legajo) {
+                    return {};
+                }
+
+                return data; 
+
+            } catch (error) {
+                console.error("Error al realizar la petición de Apps Script:", error);
+                // Devolvemos null para indicar un error de conexión/servidor
+                return null;
+            }
+        }
+
+        /**
+         * Genera la credencial al hacer clic en el botón.
+         */
+        async function generarCredencial() {
+            const legajoInput = document.getElementById('legajo').value;
+            const errorMessage = document.getElementById('error-message');
+            const cardElement = document.getElementById('credencial-card');
+            const initialMessage = document.getElementById('initial-message');
+            const printArea = document.getElementById('print-area');
+            // Elementos para la carga y el error
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const errorModal = document.getElementById('error-modal');
+            const modalErrorText = document.getElementById('modal-error-text'); 
+
+            // Ocultar mensajes/tarjeta/modal previos
+            errorMessage.classList.add('hidden');
+            cardElement.classList.add('hidden');
+            initialMessage.classList.add('hidden');
+            printArea.classList.add('hidden');
+            errorModal.classList.add('hidden'); // Aseguramos que esté oculto al iniciar
+
+            if (!legajoInput) {
+                errorMessage.textContent = "Por favor, ingresá un número de legajo.";
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            
+            // 1. Mostrar el overlay de carga (Aguarde un instante...)
+            loadingOverlay.classList.remove('hidden');
+
+            // Llamada asíncrona a la función que usa Apps Script
+            const afiliado = await buscarAfiliadoPorLegajo(legajoInput);
+            
+            // 2. Ocultar el overlay de carga después de la espera
+            loadingOverlay.classList.add('hidden');
+            
+            // Si el objeto afiliado tiene la propiedad 'legajo' significa que se encontró
+            if (afiliado && afiliado.legajo) { 
+                // 3. Éxito: Actualizar y mostrar la credencial
+                document.getElementById('legajo-output').textContent = afiliado.legajo;
+                document.getElementById('nombre-output').textContent = `${afiliado.nombre} ${afiliado.apellido}`; 
+                document.getElementById('dni-output').textContent = afiliado.dni;
+
+                // Generar el Código QR
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = ''; // Limpiar el contenedor anterior
+
+                // Contenido del QR con Nombre, Apellido, Legajo y Sindicato
+                const qrContent = `SINDICATO DE TRABAJADORES MUNICIPALES MGP
+Legajo: ${afiliado.legajo}
+Afiliado: ${afiliado.nombre} ${afiliado.apellido}
+DNI: ${afiliado.dni}`;
+                
+                if (qrCodeInstance) {
+                    qrCodeInstance = null;
+                }
+                
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: qrContent,
+                    width: 85,
+                    height: 85,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+
+                // Mostrar la credencial y el botón de imprimir
+                cardElement.classList.remove('hidden');
+                printArea.classList.remove('hidden');
+
+            } else {
+                // 3. Error: Mostrar el modal con el mensaje de "Legajo no encontrado"
+                modalErrorText.textContent = `Legajo no encontrado o error de conexión. Por favor, verifique el número ingresado.`;
+                errorModal.classList.remove('hidden');
+                
+                // Limpiamos el mensaje de error normal
+                errorMessage.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
