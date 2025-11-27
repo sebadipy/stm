@@ -8,17 +8,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Estilos generales limpios */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #eef2f7; /* Mismo fondo que el dashboard */
+            background-color: #ffffff; /* Fondo totalmente blanco */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 1rem; /* Padding general para que no toque los bordes en móvil */
+            box-sizing: border-box; /* Asegura que el padding no añada ancho extra */
         }
 
-        /* NUEVOS ESTILOS PARA EL LOGO (Copiados del dashboard.html) */
+        /* Contenedor principal: Ajuste para pantallas pequeñas */
+        .w-full {
+            width: 100%;
+        }
+        .max-w-md {
+            max-width: 28rem; /* El max-width de Tailwind (448px) */
+        }
+
+        /* NUEVOS ESTILOS PARA EL LOGO */
         .logo-container {
             width: 4rem; 
             height: 4rem; 
@@ -47,6 +56,22 @@
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
             outline: none;
+        }
+
+        /* Ajuste específico para móvil si el contenido se desborda */
+        @media (max-width: 640px) {
+            /* Aseguramos que el contenedor del formulario use el 95% del ancho en móviles */
+            .w-full {
+                width: 95%;
+            }
+            /* Reducimos el padding de la caja principal en móviles */
+            .p-8 {
+                padding: 1.5rem; /* Menos agresivo que 8 */
+            }
+            /* Ajuste para el modal en móvil */
+            .max-w-sm {
+                max-width: 90%;
+            }
         }
     </style>
 </head>
@@ -133,22 +158,10 @@
     </div>
     <script>
         // --- CONFIGURACIÓN Y CONSTANTES ---
-
-        // ¡IMPORTANTE! Reemplazá este placeholder con la URL de tu Google Apps Script DESPUÉS de desplegarlo.
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx33wIu0oWlX9dwJwU3AkU54xPjDKji_RLiXar-vNf-FczTGsvABOdZS4bnX1PHlBLLXQ/exec'; 
-        
-        // El SHEET_ID de tu planilla:
         const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
-        
-        // Nombre de la hoja donde están los usuarios y contraseñas.
         const SHEET_NAME_FOR_VALIDATION = 'user'; 
-        
-        // Columna que contiene el Nombre de Usuario (CUIL/DNI).
-        // Columna D en la planilla -> Índice 3 en JavaScript (D-1)
         const USERNAME_COLUMN_INDEX = 3; 
-        
-        // Columna que contiene la Contraseña.
-        // Columna E en la planilla -> Índice 4 en JavaScript (E-1)
         const PASSWORD_COLUMN_INDEX = 4; 
         
         // Elementos de UI
@@ -158,12 +171,11 @@
         const errorMessage = document.getElementById('error-message');
         const loadingMessage = document.getElementById('loading-message');
         
-        // --- NUEVOS ELEMENTOS DE UI PARA EL MODAL ---
+        // NUEVOS ELEMENTOS DE UI PARA EL MODAL
         const welcomeModal = document.getElementById('welcome-modal');
         const modalContent = document.getElementById('modal-content');
         const userFullnameDisplay = document.getElementById('user-fullname');
         const modalContinueBtn = document.getElementById('modal-continue-btn');
-        // ------------------------------------------
 
         /**
          * Limpia el valor del Nombre de Usuario (CUIL/DNI) eliminando guiones, puntos y espacios.
@@ -182,7 +194,7 @@
         function showWelcomeModal(fullName) {
             userFullnameDisplay.textContent = fullName;
             welcomeModal.classList.remove('hidden');
-            welcomeModal.classList.add('flex'); // Lo mostramos
+            welcomeModal.classList.add('flex');
             
             // Animación de entrada
             setTimeout(() => {
@@ -232,8 +244,8 @@
                 const dataToSend = {
                     sheetId: SHEET_ID,
                     sheetName: SHEET_NAME_FOR_VALIDATION,
-                    username: cleanUsername, // Enviamos el usuario limpio
-                    password: rawPassword, // Enviamos la contraseña tal cual
+                    username: cleanUsername, 
+                    password: rawPassword, 
                     usernameColumnIndex: USERNAME_COLUMN_INDEX, 
                     passwordColumnIndex: PASSWORD_COLUMN_INDEX
                 };
@@ -247,16 +259,16 @@
                     try {
                         response = await fetch(APPS_SCRIPT_URL, {
                             method: 'POST',
-                            mode: 'cors', // Necesario para peticiones a Apps Script
+                            mode: 'cors', 
                             headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded' // Formato esperado por doPost
+                                'Content-Type': 'application/x-www-form-urlencoded' 
                             },
                             // Convertimos el objeto dataToSend en formato URLSearchParams
                             body: new URLSearchParams(dataToSend).toString()
                         });
 
                         if (response.ok) {
-                            break; // Salir del bucle si la respuesta es exitosa
+                            break; 
                         } else {
                             // Si la respuesta no es OK pero no es un error de conexión (e.g., 404, 500)
                             throw new Error(`Error en la solicitud al servidor: ${response.statusText}`);
@@ -264,7 +276,7 @@
                     } catch (error) {
                         attempt++;
                         if (attempt >= maxRetries) {
-                            throw error; // Lanzar el último error
+                            throw error; 
                         }
                         // Espera exponencial: 1s, 2s, 4s
                         const delay = Math.pow(2, attempt) * 1000;
@@ -281,12 +293,9 @@
                 // 2. Verificar el resultado devuelto por Apps Script
                 if (result.success) {
                     // ¡USUARIO AUTORIZADO!
-                    
-                    // --- 🔑 AGREGAMOS ESTA LÍNEA PARA GUARDAR LA SESIÓN ---
                     localStorage.setItem('isAuthenticatedSTM', 'true'); 
-                    // ----------------------------------------------------
                     
-                    // 🛑 MOSTRAMOS EL MODAL CON EL NOMBRE Y APELLIDO (que Apps Script debe devolver como 'fullName')
+                    // MOSTRAMOS EL MODAL CON EL NOMBRE Y APELLIDO 
                     const fullName = result.fullName || 'Usuario Desconocido'; 
                     showWelcomeModal(fullName);
                     
