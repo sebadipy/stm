@@ -297,6 +297,10 @@
                     
                     // MOSTRAMOS EL MODAL CON EL NOMBRE Y APELLIDO 
                     const fullName = result.fullName || 'Usuario Desconocido'; 
+                    
+                    // 🇦🇷 ¡MODIFICADO! Guardar el nombre de usuario en localStorage
+                    localStorage.setItem('stm_username', fullName); 
+
                     showWelcomeModal(fullName);
                     
                     // NO redirigimos aquí. La redirección pasa en el botón del modal.
