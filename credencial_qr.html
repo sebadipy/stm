@@ -13,25 +13,17 @@
             background-color: #f7fafc;
         }
 
-        /* Estilo para el logo real */
         .logo-stm-img {
             height: 60px;
-            /* Tamaño ajustado para la credencial */
             width: auto;
         }
 
-        /* Estilo de la credencial (tamaño fijo para impresión/visualización) */
         .card-container {
             width: 340px;
-            /* Ancho similar a una tarjeta */
             height: 215px;
-            /* Alto */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            /* Importante: Mantenemos el tamaño fijo para el aspecto de tarjeta,
-               pero se centra y el contenedor principal se adapta. */
         }
 
-        /* Estilos específicos para impresión */
         @media print {
             body * {
                 visibility: hidden;
@@ -40,7 +32,6 @@
             .card-container,
             .card-container * {
                 visibility: visible;
-                /* El cuerpo principal de la tarjeta siempre tiene que ser visible */
             }
 
             .card-container {
@@ -48,12 +39,9 @@
                 left: 0;
                 top: 0;
                 box-shadow: none;
-                /* Quitar sombra para ahorrar tinta */
                 border: 1px solid #ccc;
-                /* Agregar un borde fino para mejor recorte */
             }
 
-            /* Ocultar el mensaje inicial en la impresión */
             #initial-message {
                 display: none !important;
             }
@@ -78,14 +66,27 @@
 
             </div>
 
-            <a href="dashboard.html"
-                class="bg-[#5A377B] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#492a63] transition duration-150 shadow-md flex items-center w-full sm:w-auto justify-center">
-                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 6-6m-6 6l3-3 3 3m-6-6h6" />
-                </svg>
-                Tablero de mando
-            </a>
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                <button onclick="openAddAfiliadoModal()"
+                    class="bg-green-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-700 transition duration-150 shadow-md flex items-center justify-center">
+                    <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-3-12h12A2.25 2.25 0 0121 4.5v15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 19.5v-15A2.25 2.25 0 015.25 2.25h12z" />
+                    </svg>
+                    Agregar Afiliado
+                </button>
+
+                <a href="dashboard.html"
+                    class="bg-[#5A377B] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#492a63] transition duration-150 shadow-md flex items-center w-full sm:w-auto justify-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M7 12l3-3 3 3 6-6m-6 6l3-3 3 3m-6-6h6" />
+                    </svg>
+                    Tablero de mando
+                </a>
+            </div>
         </header>
 
         <div class="mb-8 p-4 bg-gray-50 rounded-lg">
@@ -171,6 +172,100 @@
         </div>
     </div>
 
+    <div id="add-afiliado-modal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg p-6 transform transition-all">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <svg class="h-6 w-6 mr-2 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-3-12h12A2.25 2.25 0 0121 4.5v15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 19.5v-15A2.25 2.25 0 015.25 2.25h12z" />
+                </svg>
+                Agregar Nuevo Afiliado
+            </h3>
+
+            <form id="add-afiliado-form" onsubmit="handleAfiliadoSubmit(event)">
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label for="new-legajo" class="block text-sm font-medium text-gray-700">Legajo (Ej: 12345/01)
+                            <span class="text-red-500">*</span></label>
+                        <input type="text" id="new-legajo" name="Legajo" placeholder="Ej: 12345/01" required
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-gray-900">
+                    </div>
+                    <div>
+                        <label for="new-nombre" class="block text-sm font-medium text-gray-700">Nombre <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="new-nombre" name="Nombre" required
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-gray-900">
+                    </div>
+                    <div>
+                        <label for="new-apellido" class="block text-sm font-medium text-gray-700">Apellido <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="new-apellido" name="Apellido" required
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-gray-900">
+                    </div>
+                    <div>
+                        <label for="new-dni" class="block text-sm font-medium text-gray-700">DNI <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="new-dni" name="DNI" required
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-gray-900">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeAddAfiliadoModal()"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="add-afiliado-submit"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out flex items-center">
+                        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Agregar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="add-loading-overlay"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl flex items-center space-x-3">
+            <svg class="animate-spin h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+            </svg>
+            <span class="text-lg font-semibold text-gray-800">Aguarde un instante...</span>
+        </div>
+    </div>
+
+    <div id="success-modal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 transform transition-all text-center">
+            <svg class="h-16 w-16 text-green-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-2">¡Afiliado Agregado con Éxito!</h3>
+            <p class="text-gray-600 mb-6">El afiliado ha sido registrado correctamente.</p>
+
+            <div class="flex flex-col space-y-3">
+                <button onclick="closeSuccessModal()"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <div id="error-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-2xl max-w-sm p-6 transform transition-all">
             <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center">
@@ -179,10 +274,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                Error en la Búsqueda
+                Error en la Operación
             </h3>
-            <p id="modal-error-text" class="text-gray-700 mb-6">Legajo no encontrado o error de conexión. Por favor,
-                verifique el número ingresado.</p>
+            <p id="modal-error-text" class="text-gray-700 mb-6">Error.</p>
             <div class="text-right">
                 <button onclick="document.getElementById('error-modal').classList.add('hidden')"
                     class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
@@ -195,47 +289,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
-
-        // --- 🚨 CÓDIGO DE VERIFICACIÓN DE SEGURIDAD 🚨 ---
-        // Chequea si la bandera de autenticación existe en el localStorage
         if (localStorage.getItem('isAuthenticatedSTM') !== 'true') {
-            // Si no está autenticado, redirigir al login
             window.location.href = 'index.html';
         }
-        // --- FIN CÓDIGO DE VERIFICACIÓN ---
 
-        // CONFIGURACIÓN DE LA CONEXIÓN CON GOOGLE APPS SCRIPT (GAS)
-        // ID de la planilla de Google Sheets que proporcionaste:
         const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo';
-        // Nombre de la hoja dentro de esa planilla:
         const SHEET_NAME = 'tabla_afiliados_credencial';
-        // ⚠️ REEMPLAZÁ ESTA URL CON LA URL DE DESPLIEGUE DE TU SCRIPT DE GOOGLE APPS SCRIPT ⚠️
-        const PLACEHOLDER_URL = 'https://script.google.com/macros/s/AKfycbx68NgqF6zEwrDCDLxjHRmvCpKGcIanHfluwNKFlGdDQPgydGbew-zkkSuIqq0gdibKIw/exec';
+        const PLACEHOLDER_URL = 'https://script.google.com/macros/s/AKfycbzz6ciZTVboEUB8Ct3h-lWDIJNRwnb8ysMsobIy1zYIYcz8lGzGQPMuiJqtda9HASh2jg/exec';
         let GAS_URL_ENDPOINT = PLACEHOLDER_URL;
 
-        // Mostrar u ocultar la advertencia de configuración inicial
         document.addEventListener('DOMContentLoaded', () => {
             const warning = document.getElementById('config-warning');
-            // Muestro la advertencia SOLO si el endpoint sigue siendo el placeholder
-            // Nota: Aquí se asume que existe un elemento con ID 'config-warning' en el HTML original.
-            // Como no está, dejo el código, pero es posible que falle si no lo agregás.
-            // if (GAS_URL_ENDPOINT === PLACEHOLDER_URL) { 
-            //     warning.classList.remove('hidden'); 
-            // } else {
-            //     warning.classList.add('hidden'); 
-            // }
         });
 
-        // Objeto para mantener la instancia de QRCode
         let qrCodeInstance = null;
+        let lastAddedLegajo = null;
 
-        /**
-         * Realiza la búsqueda del afiliado en la Google Sheet a través del Apps Script.
-         * @param {string} legajo El número de legajo a buscar.
-         * @returns {Promise<object|null>} Una promesa que resuelve con los datos del afiliado o null si no se encuentra.
-         */
         async function buscarAfiliadoPorLegajo(legajo) {
-            // Implementación de retardo exponencial para el API (mejora la robustez)
             const MAX_RETRIES = 3;
             const BASE_DELAY = 1000;
             const legajoNormalizado = legajo.trim().toUpperCase();
@@ -248,11 +318,9 @@
                     const response = await fetch(url);
 
                     if (!response.ok) {
-                        // Si el error es 404 o 500, se reintenta
-                        if (response.status >= 500 || response.status === 429) { // 429 Too Many Requests
+                        if (response.status >= 500 || response.status === 429) {
                             throw new Error(`Error de servidor o throttling. Estado: ${response.status}`);
                         }
-                        // Para otros errores (ej. 400 Bad Request), no reintenta.
                         throw new Error(`Error en la respuesta del servidor (Status: ${response.status})`);
                     }
 
@@ -260,33 +328,26 @@
 
                     if (data && data.error) {
                         console.error("Error devuelto por el script:", data.error);
-                        return null; // El script devolvió un error de lógica
+                        return null;
                     }
 
                     if (!data || !data.legajo) {
-                        return {}; // Legajo no encontrado
+                        return {};
                     }
 
-                    return data; // Éxito
+                    return data;
 
                 } catch (error) {
                     console.error("Error al realizar la petición de Apps Script:", error.message);
                     if (i === MAX_RETRIES - 1) {
-                        // Último intento fallido, devolvemos null para indicar error de conexión/servidor
                         return null;
                     }
-                    // Esperar antes de reintentar
-                    const delay = BASE_DELAY * Math.pow(2, i) + Math.floor(Math.random() * 500); // Retardo exponencial con jitter
-                    // console.log(`Reintentando en ${delay / 1000} segundos...`);
+                    const delay = BASE_DELAY * Math.pow(2, i) + Math.floor(Math.random() * 500);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
-
-        /**
-         * Genera la credencial al hacer clic en el botón.
-         */
         async function generarCredencial() {
             const legajoInput = document.getElementById('legajo').value;
             const errorMessage = document.getElementById('error-message');
@@ -297,7 +358,6 @@
             const errorModal = document.getElementById('error-modal');
             const modalErrorText = document.getElementById('modal-error-text');
 
-            // Ocultar mensajes/tarjeta/modal previos
             errorMessage.classList.add('hidden');
             cardElement.classList.add('hidden');
             initialMessage.classList.add('hidden');
@@ -310,34 +370,26 @@
                 return;
             }
 
-            // 1. Mostrar el overlay de carga
             loadingOverlay.classList.remove('hidden');
 
-            // Llamada asíncrona a la función que usa Apps Script
             const afiliado = await buscarAfiliadoPorLegajo(legajoInput);
 
-            // 2. Ocultar el overlay de carga después de la espera
             loadingOverlay.classList.add('hidden');
 
-            // Si el objeto afiliado tiene la propiedad 'legajo' significa que se encontró
             if (afiliado && afiliado.legajo) {
-                // 3. Éxito: Actualizar y mostrar la credencial
                 document.getElementById('legajo-output').textContent = afiliado.legajo;
                 document.getElementById('nombre-output').textContent = `${afiliado.nombre} ${afiliado.apellido}`;
                 document.getElementById('dni-output').textContent = afiliado.dni;
 
-                // Generar el Código QR
                 const qrContainer = document.getElementById('qrcode');
-                qrContainer.innerHTML = ''; // Limpiar el contenedor anterior
+                qrContainer.innerHTML = '';
 
-                // Contenido del QR con Nombre, Apellido, Legajo y Sindicato
                 const qrContent = `SINDICATO DE TRABAJADORES MUNICIPALES MGP
 Legajo: ${afiliado.legajo}
 Afiliado: ${afiliado.nombre} ${afiliado.apellido}
 DNI: ${afiliado.dni}`;
 
                 if (qrCodeInstance) {
-                    // No es necesario reasignar a null si lo limpiamos arriba, pero se mantiene la lógica
                     qrCodeInstance = null;
                 }
 
@@ -350,15 +402,12 @@ DNI: ${afiliado.dni}`;
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                // Mostrar la credencial y el botón de imprimir
                 cardElement.classList.remove('hidden');
                 printArea.classList.remove('hidden');
 
             } else {
-                // 3. Error: Mostrar el modal
                 let mensaje = "Legajo no encontrado. Por favor, verifique el número ingresado.";
 
-                // Si 'afiliado' es null, significa un error de conexión/servidor (el Apps Script falló o no respondió)
                 if (afiliado === null) {
                     mensaje = "Error de conexión con el servidor. Por favor, intentá nuevamente o verificá tu configuración.";
                 }
@@ -366,8 +415,79 @@ DNI: ${afiliado.dni}`;
                 modalErrorText.textContent = mensaje;
                 errorModal.classList.remove('hidden');
 
-                // Limpiamos el mensaje de error normal
                 errorMessage.classList.add('hidden');
+            }
+        }
+
+        function openAddAfiliadoModal() {
+            document.getElementById('add-afiliado-form').reset();
+            document.getElementById('add-afiliado-modal').classList.remove('hidden');
+        }
+
+        function closeAddAfiliadoModal() {
+            document.getElementById('add-afiliado-modal').classList.add('hidden');
+            document.getElementById('add-loading-overlay').classList.add('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            lastAddedLegajo = null;
+            document.getElementById('legajo').value = '';
+            document.getElementById('credencial-card').classList.add('hidden');
+            document.getElementById('print-area').classList.add('hidden');
+            document.getElementById('initial-message').classList.remove('hidden');
+        }
+
+        async function handleAfiliadoSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = {};
+
+            formData.forEach((value, key) => {
+                data[key] = value.trim().toUpperCase();
+            });
+
+            document.getElementById('add-afiliado-modal').classList.add('hidden');
+            document.getElementById('add-loading-overlay').classList.remove('hidden');
+
+            try {
+                const url = `${GAS_URL_ENDPOINT}?action=addAfiliado&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`;
+
+                console.log(`Enviando datos para agregar: ${JSON.stringify(data)}`);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(data).toString()
+                });
+
+                const result = await response.json();
+
+                document.getElementById('add-loading-overlay').classList.add('hidden');
+
+                if (result.status === 'SUCCESS') {
+                    lastAddedLegajo = result.legajo || data.LEGAJO;
+
+                    document.getElementById('success-modal').classList.remove('hidden');
+                    console.log(`[DEBUG] Afiliado agregado. Legajo guardado: ${lastAddedLegajo}`);
+
+                } else {
+                    document.getElementById('modal-error-text').textContent = result.message || "Error desconocido al intentar agregar el afiliado.";
+                    document.getElementById('error-modal').classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error("Error en la operación de agregar afiliado:", error);
+
+                document.getElementById('add-loading-overlay').classList.add('hidden');
+
+                document.getElementById('modal-error-text').textContent = "Error de conexión con el servidor. No se pudo agregar el afiliado. Por favor, revisá el Apps Script o la URL del endpoint.";
+                document.getElementById('error-modal').classList.remove('hidden');
             }
         }
     </script>
