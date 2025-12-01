@@ -4,10 +4,9 @@
     <base target="_top"> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Afiliación - STM 2025</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght%40400;700&display=swap" rel="stylesheet">
-    <!-- Carga de Bootstrap 5.3.3 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <title>Formulario de Afiliación - STM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         :root {
             --stm-purple: #5A377B;
@@ -60,31 +59,29 @@
         <div class="form-container">
             
             <div class="logo-container">
-                <!-- Mantengo la referencia a la imagen original que subiste -->
                 <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
             </div>
 
-            <h2 class="text-center mb-4">📝 Solicitud de Afiliación Sindical ON LINE</h2>
+            <h2 class="text-center mb-4">📝 Solicitud de Afiliación Sindical</h2>
             
             <form id="formularioAfiliacion" novalidate> 
                 
-                <h4 class="section-separator">Datos Personales</h4>
+                <h4 class="section-separator">Datos Personales y de Contacto</h4>
                 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label for="inputNombreCompleto" class="form-label">
-                            Nombre y Apellido: <span class="text-danger">*</span>
+                            Nombre Completo: <span class="text-danger">*</span>
                         </label>
-                        <input type="text" class="form-control" id="inputNombreCompleto" name="Nom_Ap" required>
+                        <input type="text" class="form-control" id="inputNombreCompleto" name="NombreCompleto" required>
                     </div>
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label for="inputDNI" class="form-label">
-                            L.E./L.C./DNI: <span class="text-danger">*</span>
+                            DNI: <span class="text-danger">*</span>
                         </label>
-                        <!-- Se corresponde con el campo 'dni' de la tabla -->
-                        <input type="text" class="form-control" id="inputDNI" name="DNI" required>
+                        <input type="number" class="form-control" id="inputDNI" name="DNI" required>
                     </div>
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label for="inputLegajo" class="form-label">
                             Legajo: <span class="text-danger">*</span>
                         </label>
@@ -93,114 +90,107 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="inputFechaNacimiento" class="form-label">
-                            Fecha de Nacimiento: <span class="text-danger">*</span>
+                    <div class="col-md-6 mb-3">
+                        <label for="inputCUILCUIT" class="form-label">
+                            CUIL/CUIT: <span class="text-danger">*</span>
                         </label>
-                        <input type="date" class="form-control" id="inputFechaNacimiento" name="f_nac" required>
+                        <input type="text" class="form-control" id="inputCUILCUIT" name="CUIL/CUIT" required>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="selectEstadoCivil" class="form-label">
-                            Estado Civil: <span class="text-danger">*</span>
+                    <div class="col-md-6 mb-3">
+                        <label for="inputTelefono" class="form-label">
+                            Teléfono / Celular Principal: <span class="text-danger">*</span>
                         </label>
-                        <select class="form-select" id="selectEstadoCivil" name="est_civil" required>
-                            <option value="">Seleccione...</option>
-                            <option value="Soltero">Soltero/a</option>
-                            <option value="Casado">Casado/a</option>
-                            <option value="Viudo">Viudo/a</option>
-                            <option value="Divorciado">Divorciado/a</option>
-                            <option value="UnionConcubinato">Unión/Concubinato</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="inputNacionalidad" class="form-label">
-                            Nacionalidad: <span class="text-danger">*</span>
-                        </label>
-                        <input type="text" class="form-control" id="inputNacionalidad" name="nacionalidad" value="Argentina" required>
+                        <input type="tel" class="form-control" id="inputTelefono" name="TelefonoPrincipal" placeholder="Para contactarte rápido." required>
                     </div>
                 </div>
-
-                <!-- Domicilio y Contacto -->
-                <h4 class="section-separator">Datos de Contacto</h4>
                 
-                <div class="mb-3">
-                    <label for="inputDomicilio" class="form-label">
-                        Domicilio Completo: <span class="text-danger">*</span>
-                    </label>
-                    <!-- Consolidado en un solo campo para alinearlo con la tabla 'domicilio' -->
-                    <input type="text" class="form-control" id="inputDomicilio" name="domicilio" placeholder="Ej: Calle 1234, Localidad, Provincia" required>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="inputTelefonoAlternativo" class="form-label">
+                            Teléfono Alternativo:
+                        </label>
+                        <input type="tel" class="form-control" id="inputTelefonoAlternativo" name="TelefonoAlternativo">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="inputEmail" class="form-label">
+                            Correo Electrónico: <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" class="form-control" id="inputEmail" name="Email" placeholder="ejemplo@correo.com" required>
+                    </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="inputTelefono" class="form-label">
-                            Teléfono / Celular: <span class="text-danger">*</span>
+                        <label for="inputCalle" class="form-label">
+                            Calle y N°: <span class="text-danger">*</span>
                         </label>
-                        <input type="tel" class="form-control" id="inputTelefono" name="telefono" placeholder="Cód. Área y Número" required>
+                        <input type="text" class="form-control" id="inputCalle" name="Domicilio_Calle" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="inputEmail" class="form-label">
-                            Correo Electrónico (Mail): <span class="text-danger">*</span>
+                        <label for="inputLocalidad" class="form-label">
+                            Localidad: <span class="text-danger">*</span>
                         </label>
-                        <input type="email" class="form-control" id="inputEmail" name="email" placeholder="ejemplo@correo.com" required>
+                        <input type="text" class="form-control" id="inputLocalidad" name="Domicilio_Localidad" required>
                     </div>
                 </div>
                 
+                <div class="mb-3">
+                    <label for="inputProvincia" class="form-label">
+                        Provincia: <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="inputProvincia" name="Domicilio_Provincia" required>
+                </div>
+
                 
                 <h4 class="section-separator">Datos Laborales</h4>
                 
                 <div class="mb-3">
-                    <label for="inputEnteSecretaria" class="form-label">
-                        Ente / Secretaría: <span class="text-danger">*</span>
+                    <label for="inputEstablecimiento" class="form-label">
+                        Establecimiento / Dependencia (Organismo Municipal): <span class="text-danger">*</span>
                     </label>
-                    <input type="text" class="form-control" id="inputEnteSecretaria" name="ente_sec" required>
+                    <input type="text" class="form-control" id="inputEstablecimiento" name="Establecimiento" required>
                 </div>
                 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="inputDependencia" class="form-label">
-                            Dependencia / Área: <span class="text-danger">*</span>
+                        <label for="inputSector" class="form-label">
+                            Sector o Área de Trabajo: <span class="text-danger">*</span>
                         </label>
-                        <input type="text" class="form-control" id="inputDependencia" name="dependencia" required>
+                        <input type="text" class="form-control" id="inputSector" name="Sector" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="inputCargo" class="form-label">
-                            Cargo: <span class="text-danger">*</span>
+                        <label for="inputPuesto" class="form-label">
+                            Puesto de Trabajo: <span class="text-danger">*</span>
                         </label>
-                        <input type="text" class="form-control" id="inputCargo" name="cargo" required>
+                        <input type="text" class="form-control" id="inputPuesto" name="Puesto" required>
                     </div>
                 </div>
                 
                 <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label for="selectPlanta" class="form-label">
-                            Planta: <span class="text-danger">*</span>
+                    <div class="col-md-6 mb-3">
+                        <label for="inputFechaIngreso" class="form-label">
+                            Fecha de Ingreso: <span class="text-danger">*</span>
                         </label>
-                        <!-- Campo 'planta' de la tabla -->
-                        <select class="form-select" id="selectPlanta" name="planta" required>
-                            <option value="">Seleccione...</option>
-                            <option value="permanente">Permanente</option>
-                            <option value="temporaria">Temporaria / Contratado</option>
-                            <option value="becario">Becario</option>
-                            <option value="otro">Otro</option>
-                        </select>
+                        <input type="date" class="form-control" id="inputFechaIngreso" name="FechaIngreso" required>
                     </div>
-                    <!-- Eliminada la 'Fecha de Ingreso' a pedido del usuario -->
+                    <div class="col-md-6 mb-3">
+                        <label for="inputAntiguedad" class="form-label">
+                            Antigüedad en el Puesto (ej: 5 años y 3 meses):
+                        </label>
+                        <input type="text" class="form-control" id="inputAntiguedad" name="Antiguedad" placeholder="Opcional: Si no sabés exacto, dejalo vacío.">
+                    </div>
                 </div>
 
-                <!-- Sección de 'Datos del Afiliador' ELIMINADA a pedido del usuario -->
-
-                <h4 class="section-separator">Declaración y Envío</h4>
+                <h4 class="section-separator">Certificación de datos</h4>
 
                 <div class="mb-3 form-check">
-                    <!-- Tilde de certificación de datos reales, obligatorio para enviar -->
-                    <input type="checkbox" class="form-check-input" id="checkCertificacion" name="CertificacionDatos" value="SI" required>
-                    <label class="form-check-label" for="checkCertificacion">
-                        <span class="text-danger">*</span> **Certifico que todos los datos ingresados en este formulario son reales y completos.**
+                    <input type="checkbox" class="form-check-input" id="checkAutorizacion" name="AutorizacionDescuento" value="SI" required>
+                    <label class="form-check-label" for="checkAutorizacion">
+                        <span class="text-danger">*</span> Certifico que los datos ingresados en este formulario son reales.
                     </label>
-                    <div class="form-text">Esta certificación es obligatoria para procesar la solicitud de afiliación.</div>
+                    <div class="form-text">Esta certificación es obligatoria para completar la afiliación.</div>
                 </div>
-
+                
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="inputFechaSolicitud" class="form-label">
@@ -213,17 +203,16 @@
                         <label for="inputEmailPDF" class="form-label">
                             Correo Electrónico para recibir copia PDF: <span class="text-danger">*</span>
                         </label>
-                        <!-- Campo para recibir el PDF, igual que antes -->
                         <input type="email" class="form-control" id="inputEmailPDF" name="EmailCopiaPDF" placeholder="ejemplo@correo.com" required>
-                        <div class="form-text">Aquí recibirá el formulario completo en formato PDF y la notificación de envío.</div>
+                        <div class="form-text">Aquí recibirá el formulario completo en formato PDF.</div>
                     </div>
-                </div>
+                    </div>
                 
                 <hr>
                 
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-lg mt-3 btn-stm-send" id="btnEnviarDatos">
-                        Enviar Solicitud de Afiliación
+                        Enviar Datos de Afiliación
                     </button>
                 </div>
 
@@ -231,7 +220,6 @@
         </div>
     </div>
     
-    <!-- Modales de información y feedback (se mantienen del original) -->
     <div class="modal fade" id="modalImportante" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalImportanteLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -240,7 +228,7 @@
                 </div>
                 <div class="modal-body">
                     <p style="font-size: 16px;">
-                        El trámite de afiliación requiere la presentación del **Decreto de Designación** (si no es planta permanente) junto con este formulario online de solicitud debidamente cumplimentado.
+                        El trámite de afiliación requiere la presentación del **Decreto de Designación** junto con este formulario online de solicitud debidamente cumplimentado, impreso y firmado.
                     </p>
                     <p style="font-size: 16px; margin-top: 15px;">
                         La Comisión Directiva evaluará y tendrá a su cargo la aprobación final de dicha solicitud.
@@ -271,7 +259,7 @@
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script>
         (function () {
@@ -286,14 +274,12 @@
             const feedbackTitle = document.getElementById('modalFeedbackLabel');
             const feedbackMsg = document.getElementById('feedbackMessage');
             
-            // ATENCIÓN: MANTENER LA URL DE GOOGLE APPS SCRIPT ORIGINAL
-            const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8zRc3VUeJUjWn8NcXPGzc316s8DIDh3IiPS3aEs-K-rCizfUfcTZcXeOPZSJ8j7HLvA/exec'; 
-            const DESTINATARIO_STM = 'sebadipy@hotmail.com'; // Destinatario original para STM
+            const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx2hXW4IdpUQaGukqzFZZfhWULtG0r0qN0W9hGj81PBWwRp6OpZU1o9HGdmjnRXc7miyA/exec'; 
+            const DESTINATARIO_STM = 'sebadipy@hotmail.com';
 
 
             modalImportante.show(); 
 
-            // Rellena la fecha de solicitud automáticamente al cargar
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -327,69 +313,49 @@
 
                 formData.append('EmailDestino', DESTINATARIO_STM); 
                 
-                // Implementación de Backoff para la llamada a la API
-                const maxRetries = 3;
-                let lastError = null;
+                
+                try {
+                    const response = await fetch(APPSSCRIPT_URL, {
+                        method: 'POST',
+                        body: formData 
+                    });
 
-                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    const responseText = await response.text();
+                    let responseData;
                     try {
-                        const response = await fetch(APPSSCRIPT_URL, {
-                            method: 'POST',
-                            body: formData 
-                        });
-
-                        const responseText = await response.text();
-                        let responseData;
-                        try {
-                            responseData = JSON.parse(responseText);
-                        } catch (e) {
-                            responseData = { detalle: responseText };
-                        }
-
-                        // Asumiendo que el script de Apps Script procesa y envía el PDF
-                        
-                        form.reset(); 
-                        form.classList.remove('was-validated');
-
-                        feedbackTitle.textContent = '✅ ¡Afiliación Enviada!'; 
-                        feedbackMsg.innerHTML = `
-                            Su solicitud ha sido enviada con éxito. Revise su casilla de correo donde encontrará el formulario de solicitud de afiliación adjunto.
-                            <br><br>
-                            Se envió una copia al email: <strong>${emailCopia}</strong>.
-                        `; 
-                        
-                        // Salir del bucle si es exitoso
-                        lastError = null;
-                        break; 
-
-                    } catch (error) {
-                        lastError = error;
-                        console.error(`Error en el intento ${attempt + 1}:`, error);
-                        if (attempt < maxRetries - 1) {
-                            // Espera exponencial (1s, 2s, 4s) antes de reintentar
-                            const delay = Math.pow(2, attempt) * 1000;
-                            await new Promise(resolve => setTimeout(resolve, delay));
-                        }
+                        responseData = JSON.parse(responseText);
+                    } catch (e) {
+                        responseData = { detalle: responseText };
                     }
-                }
 
-                if (lastError) {
-                    // Mensaje de éxito si la llamada falla, basándonos en el comportamiento original
-                    // ya que el error se maneja como éxito en el código original.
+
+                    
                     form.reset(); 
                     form.classList.remove('was-validated');
 
-                    feedbackTitle.textContent = '✅ Solicitud en Proceso'; 
+                    feedbackTitle.textContent = '✅ ¡Afiliación Enviada!'; 
                     feedbackMsg.innerHTML = `
-                        La solicitud se está procesando. Revise su casilla de correo donde debería encontrar el formulario de afiliación adjunto.
+                        Revise su casilla de correo donde encontrará el formulario de solicitud de afiliación adjunto.
                         <br><br>
-                        El email para copia es: <strong>${emailCopia}</strong>.
+                        Se envió una copia al email: <strong>${emailCopia}</strong>.
                     `; 
+
+                } catch (error) {
+                    
+                    form.reset(); 
+                    form.classList.remove('was-validated');
+
+                    feedbackTitle.textContent = '✅ Datos enviados'; 
+                    feedbackMsg.innerHTML = `
+                        Revise su casilla de correo donde encontrará el formulario de solicitud de afiliación adjunto.
+                        <br><br>
+                        Se envió una copia al email: <strong>${emailCopia}</strong>.
+                    `; 
+
+                } finally {
+                    btnEnviarDatos.disabled = false; 
+                    btnEnviarDatos.textContent = 'Enviar Datos de Afiliación'; 
                 }
-                
-                btnEnviarDatos.disabled = false; 
-                btnEnviarDatos.textContent = 'Enviar Solicitud de Afiliación'; 
-                
             }
         })()
     </script>
