@@ -128,10 +128,10 @@
                 Consultas
             </button>
             <button 
-                data-sheet="afiliacion"
+                data-sheet="gestor_afiliaciones_external"
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
             >
-                Afiliaciones
+                Gestor Afiliaciones
             </button>
             <button 
                 data-sheet="gestor_novedades_external"
@@ -168,7 +168,7 @@
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 id="modal-title" class="text-xl font-bold text-indigo-700">Detalles de la Fila</h3> 
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/24/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
@@ -204,11 +204,13 @@
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfNlhTU4hO8linQddyhVvd5rTrsAQxx1XvlsJO5tbBvUeyzczi1q-LbwU6-dSsLPvt9w/exec'; 
         
         const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
+        
+        // Solo queda el GID para tabla_consulta
         const sheetGids = {
             'tabla_consulta': '0',
-            'afiliacion': '1038720919',
             'gestor_novedades_external': null,
-            // No se necesita GID para credencial_qr ya que es una redirección.
+            'gestor_afiliaciones_external': null, // AGREGADO
+            'credencial_qr': null,
         };
 
         // Elementos de UI
@@ -222,20 +224,20 @@
         const modalDetails = document.getElementById('modal-details'); 
 
         // Almacena los encabezados completos para usar en el modal de Afiliación
-        let currentFullHeaders = [];
+        let currentFullHeaders = []; 
         
         let lastActiveSheet = 'tabla_consulta'; // Para recordar qué vista estaba activa
 
         // --- FUNCIONES DEL MODAL ---
 
         /**
-         * Muestra el modal con el contenido apropiado (texto de consulta o detalles de afiliación).
+         * Muestra el modal con el contenido apropiado (texto de consulta).
          * @param {HTMLElement} rowElement La fila (tr) que fue clickeada.
          */
         window.showModal = function(rowElement) {
             
-            // Solo abrimos el modal si estamos en las vistas 'tabla_consulta' o 'afiliacion'
-            if (lastActiveSheet !== 'tabla_consulta' && lastActiveSheet !== 'afiliacion') {
+            // Solo se permite el modal para 'tabla_consulta'
+            if (lastActiveSheet !== 'tabla_consulta') { 
                 return; 
             }
 
@@ -262,80 +264,7 @@
                     console.error("Error: No se encontró el atributo 'data-consulta' en la fila. El modal no puede cargar el contenido.");
                 }
 
-            } else if (lastActiveSheet === 'afiliacion') {
-                // --- LÓGICA PARA AFILIACIÓN (Datos estructurados - Ahora incluye TODOS los campos de B a Q) ---
-                const encodedFullData = rowElement.getAttribute('data-full-data');
-
-                if (encodedFullData) {
-                    try {
-                        const jsonString = decodeURIComponent(encodedFullData);
-                        const fullData = JSON.parse(jsonString);
-
-                        // Usamos el campo 'NOMBRE Y APELLIDO' como título del modal
-                        const affiliationName = fullData['Nombre y Apellido'] || 'Afiliado/a';
-                        modalTitle.textContent = `Detalles de Afiliación: ${affiliationName}`;
-
-                        let detailsHtml = '';
-                        
-                        // Lista de los campos que queremos mostrar y cómo llamarlos
-                        const fieldsToShow = [
-                            { key: 'Nombre y Apellido', label: 'NOMBRE Y APELLIDO' },
-                            { key: 'DNI', label: 'DNI' },
-                            { key: 'Legajo', label: 'LEGAJO' },
-                            { key: 'CUIL', label: 'CUIL' },
-                            { key: 'Teléfono Celular', label: 'TELÉFONO CELULAR' },
-                            { key: 'Teléfono Alternativo', label: 'TELÉFONO ALTERNATIVO' },
-                            { key: 'Email', label: 'EMAIL' },
-                            { key: 'Dirección', label: 'DIRECCIÓN' },
-                            { key: 'Localidad', label: 'LOCALIDAD' },
-                            { key: 'Provincia', label: 'PROVINCIA' },
-                            { key: 'Dependencia', label: 'DEPENDENCIA' },
-                            { key: 'Área', label: 'ÁREA/SECTOR' },
-                            { key: 'Puesto', label: 'PUESTO' },
-                            { key: 'Fecha de Ingreso', label: 'FECHA DE INGRESO' },
-                            { key: 'Antigüedad', label: 'ANTIGÜEDAD' },
-                            { key: 'Fecha de Solicitud', label: 'FECHA DE SOLICITUD' },
-                            // Quitamos TIMESTAMP si existiera, ya que no es relevante para el usuario final
-                        ];
-
-
-                        // Usamos una lista de descripción (key-value) para mostrar los datos
-                        detailsHtml += '<dl class="divide-y divide-gray-200">';
-                        
-                        // Recorrer la lista definida
-                        fieldsToShow.forEach(field => {
-                            const value = fullData[field.key] || 'N/A'; // Usar 'N/A' si el valor es nulo o indefinido
-                            const displayLabel = field.label;
-
-                            // Mostrar solo si el campo no está completamente vacío (solo espacios o N/A)
-                            if (value.trim() && value.toUpperCase() !== 'N/A') { 
-                                detailsHtml += `
-                                    <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-indigo-50 transition duration-100 rounded-lg">
-                                        <dt class="text-sm font-medium text-gray-500">${displayLabel}</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 whitespace-pre-wrap">${value}</dd>
-                                    </div>
-                                `;
-                            }
-                        });
-                        
-                        detailsHtml += '</dl>';
-
-                        // Si no hay detalles para mostrar, indicarlo.
-                        if (detailsHtml === '<dl class="divide-y divide-gray-200"></dl>') {
-                            modalDetails.innerHTML = `<p class="text-center py-4 text-gray-500">No se encontraron detalles adicionales para este registro.</p>`;
-                        } else {
-                            modalDetails.innerHTML = detailsHtml;
-                        }
-                        
-                        dataModalOverlay.style.display = 'flex';
-
-                    } catch (e) {
-                        console.error("Error al parsear datos de afiliación:", e);
-                    }
-                } else {
-                    console.error("Error: No se encontró el atributo 'data-full-data' en la fila. El modal no puede cargar el contenido.");
-                }
-            }
+            } 
         }
 
         /**
@@ -355,7 +284,15 @@
         // --- FUNCIONES ESPECÍFICAS ---
 
         /**
-         * 🚨 CAMBIO AQUÍ: Ahora redirige en la misma ventana 🚨
+         * Nueva función: Ahora redirige a Gestor Afiliaciones en la misma ventana 
+         */
+        function openGestorAfiliaciones() {
+            // Utilizamos window.location.href para abrir en la misma pestaña
+            window.location.href = 'gestor_afiliaciones.html';
+        }
+        
+        /**
+         * Función para abrir el Gestor Novedades en la misma ventana.
          */
         function openGestorNovedades() {
             // Utilizamos window.location.href para abrir en la misma pestaña
@@ -376,31 +313,16 @@
 
         /**
          * Crea la URL de Google Visualization con orden descendente por fecha (columna A).
-         * @param {string} gid El GID (identificador de hoja) de la hoja de cálculo.
-         * @param {string} sheetName El nombre de la hoja (clave del objeto sheetGids).
-         * @returns {string} La URL de consulta GViz.
          */
         function createGvizUrl(gid, sheetName) {
             let baseUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}`;
             
             let selectQuery = '';
-
-            if (sheetName === 'afiliacion') {
-                // Afiliación: Seleccionamos A (Timestamp) y de B a Q (Todos los campos de datos de la tabla)
-                // Se agrega 'order by A desc' para ordenar del más nuevo al más viejo
-                selectQuery = 'select A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q order by A desc'; 
-            } else if (sheetName === 'tabla_consulta') {
-                // Para la tabla consulta, seleccionamos B, C, D, E (visibles) y F (CONSULTA - para el modal).
-                // Se agrega 'order by A desc' para ordenar del más nuevo al más viejo (Columna A es el Timestamp)
-                selectQuery = 'select A, B, C, D, E, F order by A desc'; 
-            }
             
-            // Si la consulta es para tabla_consulta, debemos seleccionar A también para el sort, aunque no se use en el modal/vista
             if (sheetName === 'tabla_consulta') {
-                 // La columna A (Timestamp) DEBE estar en la consulta SELECT si se usa en ORDER BY
+                // La columna A (Timestamp) DEBE estar en la consulta SELECT si se usa en ORDER BY
                 selectQuery = 'select A, B, C, D, E, F order by A desc'; 
             }
-
 
             if (selectQuery) {
                 baseUrl += `&tq=${encodeURIComponent(selectQuery)}`;
@@ -422,36 +344,10 @@
                     return { headers: [], data: [], originalData: [], fullHeaders: [] };
                 }
                 
-                // Mapeo de nombres de columna para las vistas (usando la estructura de la imagen)
+                // Mapeo de nombres de columna para las vistas
                 let headersMap = {}; 
-                let visibleColumnsIndices = []; 
                 
-                if (sheetName === 'afiliacion') {
-                    // Mapeo para Afiliación (Columnas A-Q)
-                    headersMap = {
-                        'A': 'TIMESTAMP', 
-                        'B': 'Nombre y Apellido', // Visible
-                        'C': 'DNI', 
-                        'D': 'Legajo', // Visible
-                        'E': 'CUIL', // Usamos CUIL aunque en la tabla decía CUIL/DNI
-                        'F': 'Teléfono Celular', 
-                        'G': 'Teléfono Alternativo',
-                        'H': 'Email', // Visible
-                        'I': 'Dirección',
-                        'J': 'Localidad',
-                        'K': 'Provincia',
-                        'L': 'Dependencia',
-                        'M': 'Área',
-                        'N': 'Puesto',
-                        'O': 'Fecha de Ingreso',
-                        'P': 'Antigüedad',
-                        'Q': 'Fecha de Solicitud',
-                    };
-                    // Índices de las columnas VISIBLES (B, D, E, H) en el array de A-Q.
-                    // B=1, D=3, E=4, H=7
-                    visibleColumnsIndices = [1, 3, 4, 7]; 
-
-                } else if (sheetName === 'tabla_consulta') {
+                if (sheetName === 'tabla_consulta') {
                     // Mapeo para Tabla Consulta. (A, B, C, D, E, F)
                     headersMap = {
                         'A': 'TIMESTAMP', 
@@ -461,8 +357,6 @@
                         'E': 'EMAIL', 
                         'F': 'CONSULTA', 
                     };
-                    // B=1, C=2, D=3, E=4
-                    visibleColumnsIndices = [1, 2, 3, 4]; // Solo las primeras 4 son visibles (B, C, D, E)
                 }
 
                 // Generar encabezados usando el mapeo (usa TODAS las columnas pedidas)
@@ -470,7 +364,7 @@
                     return headersMap[col.id] || col.label || col.id;
                 });
 
-                // Generar data original (todas las columnas pedidas: A-Q para afiliación, A-F para consulta)
+                // Generar data original (todas las columnas pedidas: A-F para consulta)
                 const originalData = table.rows.map(row => {
                     return row.c.map(cell => {
                         return cell ? (cell.f || (cell.v !== undefined ? cell.v : '')) : '';
@@ -481,26 +375,10 @@
                 let headers;
                 let finalData;
 
-                if (sheetName === 'afiliacion') {
-                    // 1. Encabezados visibles (B, D, E, H)
-                    headers = visibleColumnsIndices.map(index => fullHeaders[index]);
-
-                    // 2. Datos visibles
-                    finalData = originalData.map(row => {
-                        return visibleColumnsIndices.map(index => row[index]);
-                    });
-                    
-                    // Eliminamos el TIMESTAMP del fullHeaders para el modal, ya que no es un dato de afiliación
-                    const timestampIndex = fullHeaders.findIndex(h => h === 'TIMESTAMP');
-                    if (timestampIndex !== -1) {
-                        fullHeaders.splice(timestampIndex, 1);
-                    }
-
-                } else if (sheetName === 'tabla_consulta') {
+                if (sheetName === 'tabla_consulta') {
                     // Lógica para tabla_consulta (ocultar la columna 'TIMESTAMP' (A) y 'CONSULTA' (F))
                     
                     // 1. Quitar los encabezados no visibles ('TIMESTAMP' y 'CONSULTA')
-                    // El índice 0 es TIMESTAMP, el índice 5 es CONSULTA
                     const consultaIndex = fullHeaders.findIndex(h => h === 'CONSULTA');
                     if (consultaIndex !== -1) {
                         fullHeaders.splice(consultaIndex, 1); // Quitar CONSULTA (F)
@@ -518,7 +396,6 @@
                          // Quitamos A (índice 0) y F (índice 5), quedando B, C, D, E (índices 1, 2, 3, 4)
                         return row.slice(1, 5); 
                     });
-                    // originalData sigue teniendo 6 columnas (A, B, C, D, E, F) para el modal de consulta
 
                 } else {
                     // Otros casos 
@@ -526,14 +403,13 @@
                     finalData = originalData;
                 }
                 
-                // Guardamos los encabezados COMPLETOS (B-F para consulta, B-Q para afiliación)
                 currentFullHeaders = fullHeaders;
 
                 return { 
                     headers: headers, // Encabezados visibles
                     data: finalData, // Data visible
-                    originalData: originalData, // Data completa
-                    fullHeaders: currentFullHeaders // Todos los encabezados de datos (sin TIMESTAMP)
+                    originalData: originalData, // Data completa (incluye A y F para Consulta)
+                    fullHeaders: currentFullHeaders // Todos los encabezados de datos
                 };
 
             } catch (error) {
@@ -553,8 +429,8 @@
 
             const sheetName = lastActiveSheet;
             
-            // Si es 'tabla_consulta' o 'afiliacion', las filas son cliqueables.
-            const isClickable = sheetName === 'tabla_consulta' || sheetName === 'afiliacion';
+            // Las filas de consulta son cliqueables.
+            const isClickable = sheetName === 'tabla_consulta'; 
             const clickHandler = isClickable ? 'onclick="showModal(this)"' : '';
             const rowCursor = isClickable ? 'cursor-pointer' : '';
 
@@ -570,7 +446,7 @@
                             <tbody class="bg-white divide-y divide-gray-200">
             `;
 
-            // originalData siempre incluye el TIMESTAMP (columna A) en el índice 0.
+            // originalData siempre incluye la primera columna de la consulta GViz (A o B) en el índice 0.
             originalData.forEach((originalRow, index) => {
                 const row = data[index]; // Solo las columnas visibles
 
@@ -582,20 +458,7 @@
                     const consultaContent = originalRow.length > 5 ? originalRow[5] : 'N/A';
                     // Codificamos el contenido de la consulta
                     dataAttribute = `data-consulta="${encodeURIComponent(consultaContent)}"`;
-                } else if (sheetName === 'afiliacion') {
-                    // originalRow tiene TODAS las columnas (A-Q, 17 columnas). 
-                    // fullHeaders tiene TODAS las columnas de datos (B-Q, 16 columnas).
-                    
-                    const rowObject = {};
-                    
-                    // Recorremos los fullHeaders (B-Q)
-                    for (let i = 0; i < fullHeaders.length; i++) {
-                        // El dato en originalRow está en el índice i + 1 (porque el índice 0 es A=TIMESTAMP)
-                        rowObject[fullHeaders[i]] = originalRow[i + 1];
-                    }
-                    
-                    dataAttribute = `data-full-data="${encodeURIComponent(JSON.stringify(rowObject))}"`;
-                }
+                } 
                 
                 const rowClass = index % 2 === 0 ? 'bg-white hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-100';
                 
@@ -619,19 +482,15 @@
             const gid = sheetGids[sheetName];
             if (!gid) return; 
             
-            // --- CÓDIGO MODIFICADO AQUÍ PARA CAMBIAR EL TÍTULO ---
             let displayTitle = '';
             if (sheetName === 'tabla_consulta') {
                 displayTitle = 'Consultas realizadas';
-            } else if (sheetName === 'afiliacion') {
-                displayTitle = 'Afiliaciones solicitadas';
             } else {
                 // Título por defecto si hay otro caso
                 displayTitle = sheetName.charAt(0).toUpperCase() + sheetName.slice(1).replace('_', ' '); 
             }
             
             currentSheetTitle.textContent = displayTitle;
-            // ----------------------------------------------------
             
             dataLoadingMessage.style.display = 'block';
             tableContainer.innerHTML = ''; 
@@ -661,28 +520,37 @@
          */
         function loadView(sheetName) {
             
-            // 1. Manejo especial para el gestor de novedades (AHORA ABRE EN LA MISMA PESTAÑA)
+            // 1. Manejo especial para el gestor de afiliaciones (AHORA ABRE EN LA MISMA PESTAÑA)
+            if (sheetName === 'gestor_afiliaciones_external') {
+                openGestorAfiliaciones();
+                // REDIRECCIÓN COMPLETA: Salimos de la función
+                return; 
+            }
+            
+            // 2. Manejo especial para el gestor de novedades (AHORA ABRE EN LA MISMA PESTAÑA)
             if (sheetName === 'gestor_novedades_external') {
                 openGestorNovedades();
                 // REDIRECCIÓN COMPLETA: Salimos de la función
                 return; 
             }
 
-            // 2. REDIRECCIÓN PARA CREDENCIAL_QR (AHORA ABRE EN LA MISMA PESTAÑA)
+            // 3. REDIRECCIÓN PARA CREDENCIAL_QR (AHORA ABRE EN LA MISMA PESTAÑA)
             if (sheetName === 'credencial_qr') {
                 window.location.href = 'credencial_qr.html'; // Abre en la misma pestaña
                 // REDIRECCIÓN COMPLETA: Salimos de la función
                 return;
             }
-            // ------------------------------------------------
             
-            // 3. Cargar datos
-            loadSheetData(sheetName);
-            
-            // 4. Actualizar el estado del último botón activo
+            // 4. Cargar datos
+            const gid = sheetGids[sheetName];
+            if (gid) { // Solo cargamos data si es una vista de tabla con GID (tabla_consulta)
+                 loadSheetData(sheetName);
+            }
+           
+            // 5. Actualizar el estado del último botón activo
             lastActiveSheet = sheetName;
 
-            // 5. Actualizar botones activos (solo los de las vistas de tabla)
+            // 6. Actualizar botones activos (solo los de las vistas de tabla)
             buttons.forEach(btn => {
                 const btnSheet = btn.getAttribute('data-sheet');
                 
@@ -690,7 +558,7 @@
                 btn.classList.remove('active-indigo');
 
                 // Si es un botón de vista de tabla y es el seleccionado, lo activa.
-                if (btnSheet !== 'gestor_novedades_external' && btnSheet !== 'credencial_qr' && btnSheet === sheetName) {
+                if (btnSheet !== 'gestor_novedades_external' && btnSheet !== 'gestor_afiliaciones_external' && btnSheet !== 'credencial_qr' && btnSheet === sheetName) {
                     btn.classList.add('active-indigo');
                 }
             });
