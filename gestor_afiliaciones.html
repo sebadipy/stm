@@ -227,7 +227,8 @@
         /* ------------------------------------------------------------------- */
 
 
-        /* --- ESTILOS DE LA CREDENCIAL QR (sin cambios) --- */
+        /* --- ESTILOS DE LA CREDENCIAL QR --- */
+        /* Estos estilos son de credencial_qr.html para asegurar el look&feel */
         .logo-stm-img { height: 60px; width: auto; }
         .card-container {
             font-family: 'Inter', sans-serif; 
@@ -264,7 +265,7 @@
         <div class="header-main-flex">
             
             <div class="header-logo-title">
-                <img src="https://placehold.co/50x50/5A377B/ffffff?text=STM" onerror="this.onerror=null; this.src='https://placehold.co/50x50/5A377B/ffffff?text=STM';" alt="Logo Sindicato de Trabajadores Municipales">
+                <img src="/logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
                 
                 <div class="header-title-text">
                     <p class="subtitle">Gestor de</p>
@@ -281,7 +282,18 @@
         <p class="text-gray-600 mb-6 sm:mb-8 border-b pb-4">
             Datos del afiliado. Hacé click en cualquier fila para ver los detalles.
         </p>
-
+        
+        <div class="mb-6">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Buscar por Nombre, Legajo o Teléfono..." 
+                       class="form-control ps-10 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out" 
+                       style="padding-left: 2.5rem;"
+                       onkeyup="filterTable()">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+            </div>
+        </div>
         <div id="messages" class="mt-6 p-4 bg-yellow-100 text-yellow-800 rounded-lg hidden">
             </div>
 
@@ -377,6 +389,13 @@
             .slice(0, -1) // Excluir 'Acciones'
             .map(name => ALL_COLUMN_HEADINGS.indexOf(name));
 
+        // Columnas que se usarán para la búsqueda (Nombre, Legajo, Teléfono)
+        const SEARCH_COLUMN_INDICES = [
+            ALL_COLUMN_HEADINGS.indexOf('Nombre y Apellido'), 
+            ALL_COLUMN_HEADINGS.indexOf('Legajo'),
+            ALL_COLUMN_HEADINGS.indexOf('Teléfono')
+        ];
+
         // --- ETIQUETAS PERSONALIZADAS PARA EL DETALLE SOLICITADAS PREVIAMENTE ---
         const DETAIL_LABELS_MAP = {
             'DNI': 'DNI',
@@ -430,12 +449,9 @@
         // =========================================================================
         
         document.addEventListener('DOMContentLoaded', () => {
-             // 🚨 Listener para el botón de ACEPTAR en el modal de confirmación 🚨
+             // Listener para el botón de ACEPTAR en el modal de confirmación 
             btnAceptarEliminar.addEventListener('click', async function() {
                 if (affiliateIdToDelete) {
-                    // La función 'setLoadingState' no existe acá, pero la replicamos de gestor_novedades
-                    // O, por simplicidad, hacemos el proceso de borrado directamente.
-                    // Vamos a llamarlo 'manejarBorradoFinal' para separarlo.
                     await manejarBorradoFinal(affiliateIdToDelete);
                     affiliateIdToDelete = null; // Limpiamos la variable
                 }
@@ -554,7 +570,9 @@
                 console.error('Error al intentar borrar:', error);
                 displayMessage(`¡No pudimos comunicarnos con el servidor (GAS)! Detalle: ${error.message}`, 'error'); 
             } finally {
-                setLoadingState(false);
+                // Al salir del modal, ya no necesitamos el estado de carga del botón,
+                // ya que la tabla se recarga y resetea el botón de forma natural.
+                // setLoadingState(false); 
             }
         }
 
@@ -579,7 +597,7 @@
                 return;
             }
 
-            // 🚨 Reemplazamos el confirm() nativo por la llamada al modal de Bootstrap 🚨
+            // Llamada al modal de Bootstrap 
             showDeleteConfirm(affiliateId, name);
         }
 
@@ -596,8 +614,8 @@
             const legajo = affiliate['Legajo'] || 'N/A';
             const dni = affiliate['DNI'] || 'N/A';
             
-            // Usar placeholder si no existe la imagen
-            const logoSrc = "https://placehold.co/50x50/5A377B/ffffff?text=STM"; 
+            // ✅ Logo STM real o placeholder
+            const logoSrc = "/logo_STM.png"; 
 
             // 2. Generar el contenido del QR (Copiado de credencial_qr.html)
             const qrContent = `SINDICATO DE TRABAJADORES MUNICIPALES MGP
@@ -605,7 +623,7 @@ Legajo: ${legajo}
 Afiliado: ${nombreCompleto.toUpperCase()}
 DNI: ${dni}`; 
 
-            // 3. Crear el HTML de la credencial (Copiado de credencial_qr.html y adaptado para inyección de datos)
+            // 3. Crear el HTML de la credencial (✅ Copia exacta de credencial_qr.html)
             const cardHtml = `
                 <div class="card-container">
 
@@ -674,7 +692,7 @@ DNI: ${dni}`;
         }
         
         /**
-         * Muestra el card de detalles del afiliado. (Restaurada la versión sin el botón 'X' en el header)
+         * Muestra el card de detalles del afiliado. 
          */
         function showDetailCard(rowIndex) {
             const affiliate = allAffiliateData[rowIndex];
@@ -727,7 +745,7 @@ DNI: ${dni}`;
                 `;
             });
 
-            // Pie de la tarjeta con los botones de acción (Mantengo el botón de eliminar fuera del footer, siguiendo el último feedback)
+            // Pie de la tarjeta con los botones de acción 
             cardContent += `
                     </div>
                     <div class="mt-6 flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4 justify-center">
@@ -763,11 +781,7 @@ DNI: ${dni}`;
         function renderTable(dataJson) {
             try {
                 const table = dataJson.table;
-                if (!table || !table.rows || table.rows.length === 0) {
-                    displayMessage('¡No se encontraron datos, che! Revisá si el ID y el GID están bien o si la planilla tiene contenido.', 'warning');
-                    return;
-                }
-
+                
                 const thead = dataTable.querySelector('thead');
                 const tbody = dataTable.querySelector('tbody');
                 thead.innerHTML = '';
@@ -775,7 +789,7 @@ DNI: ${dni}`;
                 
                 allAffiliateData = [];
 
-                // 1. Crear encabezados (<thead>) con todas las columnas visibles (incluyendo 'Acciones')
+                // 1. Crear encabezados (<thead>) SIEMPRE (✅ Soluciona el problema de borrado total)
                 let headerRow = '<tr>';
                 VISIBLE_COLUMN_HEADINGS.forEach(header => {
                     headerRow += `<th scope="col" class="px-6 py-3 text-left">${header}</th>`;
@@ -783,7 +797,15 @@ DNI: ${dni}`;
                 headerRow += '</tr>';
                 thead.innerHTML = headerRow;
 
-                // 2. Llenar filas (<tbody>)
+                // 2. Verificar si hay filas después de crear los encabezados
+                if (!table || !table.rows || table.rows.length === 0) {
+                    displayMessage('¡No se encontraron datos, che! La tabla está vacía. Si querés, podés crear un nuevo afiliado.', 'warning');
+                    loadingDiv.classList.add('hidden');
+                    tableContainerDiv.classList.remove('hidden');
+                    return;
+                }
+
+                // 3. Llenar filas (<tbody>)
                 table.rows.forEach((row, rowIndex) => {
                     
                     let rowData = {};
@@ -808,7 +830,6 @@ DNI: ${dni}`;
                     allAffiliateData.push(rowData);
 
                     // Agregar la celda de ACCIONES (el botón de eliminar)
-                    // Este es el ícono de "X" o "eliminar" que pediste en la tabla.
                     rowHtml += `
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button onclick="handleDeleteAffiliate(${rowIndex}, event)" class="focus:outline-none p-1" title="Eliminar Afiliado">
@@ -819,6 +840,8 @@ DNI: ${dni}`;
 
 
                     const rowElement = document.createElement('tr');
+                    // Almacenar el índice original para referenciar en allAffiliateData
+                    rowElement.dataset.rowIndex = rowIndex; 
                     // Agregamos la clase para el hover y el cursor. El click abrirá el detalle.
                     rowElement.className = 'cursor-pointer transition duration-150 ease-in-out';
                     rowElement.innerHTML = rowHtml;
@@ -830,12 +853,51 @@ DNI: ${dni}`;
 
                 loadingDiv.classList.add('hidden');
                 tableContainerDiv.classList.remove('hidden');
+                
+                // Limpiamos el campo de búsqueda al cargar la tabla
+                document.getElementById('search-input').value = '';
 
             } catch (error) {
                 console.error('Error al renderizar la tabla:', error);
                 displayMessage('¡Uy! Hubo un quilombo al procesar los datos. Revisá la consola para más detalles.', 'error');
             }
         }
+        
+        /**
+         * Función para filtrar la tabla de afiliados basándose en el input de búsqueda.
+         */
+        function filterTable() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toUpperCase().trim();
+            const rows = dataTable.querySelector('tbody').getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                let shouldShow = false;
+                
+                // Usamos el índice original guardado en el dataset para buscar en allAffiliateData
+                const originalIndex = row.dataset.rowIndex;
+                const affiliate = allAffiliateData[originalIndex];
+                
+                if (affiliate) {
+                    // Recorremos solo las columnas de búsqueda (Nombre, Legajo, Teléfono)
+                    for (let j = 0; j < SEARCH_COLUMN_INDICES.length; j++) {
+                        const colIndex = SEARCH_COLUMN_INDICES[j];
+                        const header = ALL_COLUMN_HEADINGS[colIndex];
+                        const cellValue = String(affiliate[header] || '').toUpperCase();
+                        
+                        if (cellValue.includes(filter)) {
+                            shouldShow = true;
+                            break; 
+                        }
+                    }
+                }
+                
+                // Mostrar u ocultar la fila
+                row.style.display = shouldShow ? '' : 'none';
+            }
+        }
+
 
         /**
          * Inicializa la aplicación: obtiene los datos de la hoja de cálculo.
@@ -845,6 +907,12 @@ DNI: ${dni}`;
                 return; 
             }
             
+            // ✅ Aseguramos que el estado de carga se oculte incluso si hay un error de conexión
+            loadingDiv.classList.remove('hidden'); 
+            tableContainerDiv.classList.add('hidden');
+            hideDetailCard(); // Asegurar que el detalle esté oculto al recargar
+            document.getElementById('search-input').value = ''; // Limpiar el filtro al recargar
+
             try {
                 const response = await fetch(GOOGLE_SHEET_URL);
                 const text = await response.text();
@@ -861,15 +929,18 @@ DNI: ${dni}`;
                 } else {
                     console.error('Error de la API de Google Sheets:', data.errors);
                     displayMessage(`¡Falló la carga! Puede ser un problema de permisos. Asegurate que la hoja es PÚBLICA. Detalle: ${data.errors[0].message}`, 'error');
+                    // Renderizar tabla (solo encabezados) incluso en error para mostrar el error.
+                    renderTable({}); 
                 }
 
             } catch (error) {
                 console.error('Error al obtener los datos:', error);
                 displayMessage(`¡No pudimos conectar con la planilla, che! Revisá si el ID (${SPREADSHEET_ID}) y el GID (${GID}) están bien y si la hoja está compartida como PÚBLICA. Detalles técnicos: ${error.message}`, 'error');
+                // Aseguramos que se intente renderizar encabezados
+                renderTable({}); 
             } finally {
-                if (loadingDiv && !tableContainerDiv.classList.contains('hidden')) {
-                    loadingDiv.classList.add('hidden');
-                }
+                loadingDiv.classList.add('hidden');
+                tableContainerDiv.classList.remove('hidden');
             }
         }
         
