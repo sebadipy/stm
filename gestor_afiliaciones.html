@@ -80,8 +80,16 @@
             white-space: nowrap; 
         }
         
+        .header-actions {
+            display: flex;
+            gap: 10px; /* Espacio entre los botones */
+            flex-shrink: 0;
+            flex-wrap: wrap; 
+            justify-content: flex-end; 
+        }
         .header-main-flex > .btn-dashboard {
-            flex-shrink: 0; 
+             /* Eliminamos el estilo obsoleto para que se gestione por header-actions */
+            display: none; 
         }
 
         /* BOTÓN 'Tablero de mando' (Púrpura) */
@@ -108,19 +116,28 @@
         /* Ajuste en móvil */
         @media (max-width: 767.98px) {
             .header-main-flex {
-                flex-direction: row; 
-                justify-content: space-between;
-                align-items: flex-start;
+                flex-direction: column; 
+                justify-content: center;
+                align-items: center;
+                text-align: center; 
             }
             .header-logo-title {
                 max-width: 100%;
                 flex-grow: 1;
+                margin-bottom: 10px; /* Espacio antes de los botones */
+            }
+            .header-title-text {
+                align-items: center; /* Centrar texto en móvil */
             }
             .header-title-text .subtitle {
                 font-size: 0.9rem;
             }
             .header-title-text .title {
                 font-size: 1.3rem; 
+            }
+            .header-actions {
+                justify-content: center; /* Centrar botones en móvil */
+                width: 100%;
             }
         }
         /* ------------------------------------------------------------------- */
@@ -155,9 +172,11 @@
                 </div>
             </div>
 
-            <a href="dashboard.html" class="btn-dashboard">
-                <i class="fas fa-chart-line me-2"></i> Tablero de mando
-            </a>
+            <div class="header-actions">
+                <a href="dashboard.html" class="btn-dashboard">
+                    <i class="fas fa-chart-line me-2"></i> Tablero de mando
+                </a>
+            </div>
         </div>
         
         <p class="text-gray-600 mb-6 sm:mb-8 border-b pb-4">
@@ -238,6 +257,32 @@
         
         // Variable global para guardar todos los datos por fila
         let allAffiliateData = [];
+        
+        
+        // =========================================================================
+        // === FUNCIONES DE AUTENTICACIÓN Y SEGURIDAD ==============================
+        // =========================================================================
+        
+        /**
+         * 🚨 VERIFICA LA SESIÓN: Si no está logueado (isAuthenticatedSTM no es 'true'), 
+         * redirige al index.html para que inicie sesión.
+         */
+        function checkAuthentication() {
+            const isAuthenticated = localStorage.getItem('isAuthenticatedSTM') === 'true';
+            if (!isAuthenticated) {
+                // Redirigir al login si no está autenticado
+                window.location.href = 'index.html';
+                return false; 
+            }
+            return true;
+        }
+
+        // Se eliminó la función 'logout()' a pedido del usuario.
+        
+        // =========================================================================
+        // === FIN FUNCIONES DE AUTENTICACIÓN Y SEGURIDAD ==========================
+        // =========================================================================
+        
 
         /**
          * Muestra un mensaje de error en la interfaz.
@@ -425,6 +470,13 @@
          * Inicializa la aplicación: obtiene los datos de la hoja de cálculo.
          */
         async function initializeApp() {
+            // 🚨 1. PRIMERO CHEQUEAMOS LA AUTENTICACIÓN
+            // Si checkAuthentication devuelve false, la función ya redirigió y no seguimos.
+            if (!checkAuthentication()) {
+                return; 
+            }
+            
+            // 2. Si está autenticado, cargamos los datos
             try {
                 // Hacemos el fetch al URL de Google Sheets
                 const response = await fetch(GOOGLE_SHEET_URL);
@@ -457,7 +509,7 @@
                 }
             }
         }
-
+        
         // Ejecutar la función de inicialización cuando el script se carga
         initializeApp();
     </script>
