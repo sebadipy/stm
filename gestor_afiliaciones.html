@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <base target="_top"> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabla de Afiliados - Gestor Simplificado</title>
@@ -10,14 +11,16 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
     <style>
         /* CONSTANTES DE COLOR */
         :root {
-            --stm-purple: #5A377B; 
+            --stm-purple: #5A377B; /* Púrpura principal (Fondo/Botones) */
             --stm-teal: #34B3C5;   
             --stm-red: #dc3545;    
-            --stm-indigo: #4f46e5; 
+            --stm-indigo: #4f46e5; /* Azul/Índigo para enlaces */
             --stm-dark-purple: #492a63;
         }
 
@@ -39,6 +42,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
+        /* Estilos de encabezado y botones (sin cambios) */
         .header-main-flex {
             display: flex; 
             align-items: center; 
@@ -129,12 +133,17 @@
                 font-size: 1.3rem; 
             }
         }
-
+        
+        /* ------------------------------------------------------------------- */
+        /* ESTILOS DE LA TABLA (AHORA COPIANDO A gestor_novedades.html) */
+        /* ------------------------------------------------------------------- */
+        
         .table-container {
             border-radius: 8px;
             overflow: hidden; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             overflow-x: auto; 
+            border: 1px solid #dee2e6; /* Borde general de la tabla */
         }
         
         .table-container::-webkit-scrollbar {
@@ -145,24 +154,81 @@
             border-radius: 10px;
         }
         
-        tr.cursor-pointer:hover {
-            background-color: #eef2ff !important; 
-        }
-        
+        /* Encabezado de tabla: Estilo Bootstrap/Novedades */
         #data-table thead {
             position: sticky;
             top: 0;
             z-index: 10;
+            background-color: var(--stm-purple) !important; /* Púrpura oscuro como en novedades */
+        }
+
+        #data-table th {
+             /* Esto anula el color de la clase Tailwind 'text-white' */
+            color: #fff !important; 
+            border-bottom: 2px solid #5A377B;
+            /* Padding ajustado para ser más Bootstrap-like */
+            padding: 0.75rem 1.5rem; 
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Cuerpo de la tabla */
+        #data-table tbody tr {
+            border-bottom: 1px solid #dee2e6; /* Separador de filas */
+        }
+        
+        #data-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Color zebra claro */
+        }
+        
+        /* Hover en filas */
+        tr.cursor-pointer:hover {
+            background-color: #e9ecef !important; /* Gris claro al pasar el mouse */
+        }
+
+        /* Celdas de datos */
+        #data-table td {
+            padding: 0.75rem 1.5rem; 
+            font-size: 0.95rem;
+            color: #212529; /* Gris oscuro para el texto */
+        }
+
+        /* Estilo del botón de ELIMINAR en la tabla */
+        .btn-delete-icon {
+            color: var(--stm-red); /* Rojo de la variable --stm-red */
+            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .btn-delete-icon:hover {
+            color: #8c1a26; /* Un rojo más oscuro al pasar el mouse */
+            transform: scale(1.1);
+        }
+        
+        /* BOTÓN ELIMINAR (Rojo - stm-red) - Replicado de gestor_novedades.html */
+        .btn-stm-delete {
+            background-color: var(--stm-red); 
+            border-color: var(--stm-red); 
+            color: #ffffff; 
+            border-radius: 8px; 
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-stm-delete:hover, 
+        .btn-stm-delete:focus {
+            background-color: #b02a37;
+            border-color: #b02a37;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
         
         /* ------------------------------------------------------------------- */
-        /* ESTILOS DE LA CREDENCIAL QR (Copiados EXACTAMENTE de credencial_qr.html) */
+        /* FIN ESTILOS DE LA TABLA */
         /* ------------------------------------------------------------------- */
-        .logo-stm-img {
-            height: 60px;
-            width: auto;
-        }
 
+
+        /* --- ESTILOS DE LA CREDENCIAL QR (sin cambios) --- */
+        .logo-stm-img { height: 60px; width: auto; }
         .card-container {
             font-family: 'Inter', sans-serif; 
             width: 340px; 
@@ -175,48 +241,20 @@
         }
         
         @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            #credential-modal,
-            #credential-modal * {
-                visibility: visible;
-            }
-
+            body * { visibility: hidden; }
+            #credential-modal, #credential-modal * { visibility: visible; }
             #credential-modal {
-                position: absolute;
-                left: 0;
-                top: 0;
-                display: block !important;
-                background: none;
-                padding: 0;
+                position: absolute; left: 0; top: 0; display: block !important;
+                background: none; padding: 0;
             }
-
-            #credential-modal .bg-white {
-                background-color: transparent !important;
-                box-shadow: none;
-                padding: 0;
-            }
-
+            #credential-modal .bg-white { background-color: transparent !important; box-shadow: none; padding: 0; }
             #credential-modal .card-container {
-                position: absolute;
-                left: 0;
-                top: 0;
-                box-shadow: none;
-                border: 1px solid #ccc; 
-                margin: 0;
+                position: absolute; left: 0; top: 0; box-shadow: none;
+                border: 1px solid #ccc; margin: 0;
             }
-            
-            .print-btn-container,
-            .close-btn,
-            .modal-title {
-                display: none !important;
-            }
+            .print-btn-container, .close-btn, .modal-title { display: none !important; }
         }
-        /* ------------------------------------------------------------------- */
-        /* FIN ESTILOS DE LA CREDENCIAL QR */
-        /* ------------------------------------------------------------------- */
+        /* --- FIN ESTILOS DE LA CREDENCIAL QR --- */
     </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -226,7 +264,7 @@
         <div class="header-main-flex">
             
             <div class="header-logo-title">
-                <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
+                <img src="https://placehold.co/50x50/5A377B/ffffff?text=STM" onerror="this.onerror=null; this.src='https://placehold.co/50x50/5A377B/ffffff?text=STM';" alt="Logo Sindicato de Trabajadores Municipales">
                 
                 <div class="header-title-text">
                     <p class="subtitle">Gestor de</p>
@@ -241,7 +279,7 @@
         </div>
         
         <p class="text-gray-600 mb-6 sm:mb-8 border-b pb-4">
-            Datos del afiliado.
+            Datos del afiliado. Hacé click en cualquier fila para ver los detalles.
         </p>
 
         <div id="messages" class="mt-6 p-4 bg-yellow-100 text-yellow-800 rounded-lg hidden">
@@ -282,6 +320,30 @@
             </div>
         </div>
     </div>
+    
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">⚠️ Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro/a que querés eliminar al afiliado: <strong id="deleteAffiliateName" class="text-danger"></strong> (ID: <strong id="deleteAffiliateId" class="text-danger"></strong>)?</p>
+                    <p class="text-danger">¡Esta acción no se puede deshacer!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-stm-delete" id="btnAceptarEliminar">
+                        <i class="fas fa-trash-alt me-2"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
     <script>
         // --- INSTRUCCIONES IMPORTANTES PARA EL USUARIO ARGENTINO ---
         // 1. Reemplazá 'TU_SPREADSHEET_ID' con el ID real de tu planilla (lo sacás de la URL).
@@ -293,6 +355,10 @@
         const SPREADSHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
         const GID = '1600259031'; 
         
+        // --- ¡ACÁ VA LA URL DE TU SCRIPT DE GOOGLE APPS DESPLEGADO PARA BORRAR! ---
+        // 🚨 ¡CAMBIÁ ESTO CON TU URL REAL! 🚨
+        const DELETE_GAS_URL = 'https://script.google.com/macros/s/AKfycbzGsvPwEtcsy59zwUfbm-WeAhQ_y3-wQW9o1qmwUZ3UOCmahTyFoHMIDQI6cy0tRK8-LQ/exec'; 
+
         // URL para la API de Google Visualization que devuelve JSON
         const GOOGLE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
@@ -303,13 +369,13 @@
             'Ente Sec.', 'Dependencia', 'Cargo', 'Planta', 'Email PDF', 'Enviado'
         ];
         
-        // Columnas a mostrar en la tabla (solo las claves)
-        const VISIBLE_COLUMN_HEADINGS = ['Nombre y Apellido', 'Legajo', 'Teléfono'];
+        // Columnas a mostrar en la tabla. Agregamos 'Acciones' para el botón de Eliminar
+        const VISIBLE_COLUMN_HEADINGS = ['Nombre y Apellido', 'Legajo', 'Teléfono', 'Acciones'];
         
-        // Índices de las columnas visibles en la tabla
-        const VISIBLE_COLUMN_INDICES = VISIBLE_COLUMN_HEADINGS.map(
-            name => ALL_COLUMN_HEADINGS.indexOf(name)
-        );
+        // Índices de las columnas visibles en la tabla (no incluye 'Acciones' porque es generada)
+        const DISPLAY_COLUMN_INDICES = VISIBLE_COLUMN_HEADINGS
+            .slice(0, -1) // Excluir 'Acciones'
+            .map(name => ALL_COLUMN_HEADINGS.indexOf(name));
 
         // --- ETIQUETAS PERSONALIZADAS PARA EL DETALLE SOLICITADAS PREVIAMENTE ---
         const DETAIL_LABELS_MAP = {
@@ -318,6 +384,7 @@
             'Nacionalidad': 'Nacionalidad',
             'Est. Civil': 'Estado Civil',
             'Domicilio': 'Domicilio',
+            'Teléfono': 'Teléfono', // Se agrega para que esté en el detalle
             'Email': 'Correo elecrónico', 
             'Ente Sec.': 'Ente/Secretaria',
             'Dependencia': 'Dependencia',
@@ -335,8 +402,15 @@
         const messagesDiv = document.getElementById('messages');
         const detailCardDiv = document.getElementById('detail-card');
         
-        let allAffiliateData = [];
+        // 🚨 Nuevas referencias al modal de confirmación 🚨
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const btnAceptarEliminar = document.getElementById('btnAceptarEliminar');
         
+        let allAffiliateData = [];
+        // Se añade una variable para guardar el ID a borrar
+        let affiliateIdToDelete = null; 
+        let originalAceptarEliminarText = ' Eliminar'; // Texto del botón
+
         
         // =========================================================================
         // === FUNCIONES DE AUTENTICACIÓN Y SEGURIDAD ==============================
@@ -355,16 +429,69 @@
         // === FIN FUNCIONES DE AUTENTICACIÓN Y SEGURIDAD ==========================
         // =========================================================================
         
+        document.addEventListener('DOMContentLoaded', () => {
+             // 🚨 Listener para el botón de ACEPTAR en el modal de confirmación 🚨
+            btnAceptarEliminar.addEventListener('click', async function() {
+                if (affiliateIdToDelete) {
+                    // La función 'setLoadingState' no existe acá, pero la replicamos de gestor_novedades
+                    // O, por simplicidad, hacemos el proceso de borrado directamente.
+                    // Vamos a llamarlo 'manejarBorradoFinal' para separarlo.
+                    await manejarBorradoFinal(affiliateIdToDelete);
+                    affiliateIdToDelete = null; // Limpiamos la variable
+                }
+            });
+            // Guardamos el texto original para el estado de carga (si no existe, lo definimos)
+            if (btnAceptarEliminar.textContent.trim() !== 'Eliminar') {
+                 originalAceptarEliminarText = btnAceptarEliminar.innerHTML;
+                 btnAceptarEliminar.innerHTML = `<i class="fas fa-trash-alt me-2"></i> Eliminar`; // Aseguramos el texto inicial
+                 originalAceptarEliminarText = btnAceptarEliminar.innerHTML;
+            } else {
+                 originalAceptarEliminarText = btnAceptarEliminar.innerHTML;
+            }
+
+            initializeApp();
+        });
+        
+         /**
+         * Maneja el estado de carga del botón de Aceptar Eliminar.
+         * @param {boolean} isLoading - Si debe entrar en estado de carga (true) o salir (false).
+         */
+        function setLoadingState(isLoading) {
+            btnAceptarEliminar.disabled = isLoading;
+
+            if (isLoading) {
+                btnAceptarEliminar.innerHTML = `
+                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    Aguarde...
+                `;
+                // Se agregan clases para centrar el spinner y texto (tomado de gestor_novedades)
+                btnAceptarEliminar.classList.add('d-flex', 'align-items-center', 'justify-content-center'); 
+            } else {
+                btnAceptarEliminar.innerHTML = originalAceptarEliminarText;
+                btnAceptarEliminar.classList.remove('d-flex', 'align-items-center', 'justify-content-center');
+            }
+        }
 
         /**
-         * Muestra un mensaje de error en la interfaz.
+         * Muestra un mensaje en la interfaz.
+         * @param {string} msg - Mensaje a mostrar.
+         * @param {string} type - 'success', 'error', o 'warning'.
          */
-        function displayMessage(msg) {
+        function displayMessage(msg, type = 'error') {
             messagesDiv.textContent = msg;
-            messagesDiv.classList.remove('hidden', 'bg-yellow-100', 'text-yellow-800');
-            messagesDiv.classList.add('bg-red-100', 'text-red-800');
+            messagesDiv.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800', 'bg-yellow-100', 'text-yellow-800');
+            
+            if (type === 'success') {
+                messagesDiv.classList.add('bg-green-100', 'text-green-800');
+            } else if (type === 'warning') {
+                messagesDiv.classList.add('bg-yellow-100', 'text-yellow-800');
+            } else { // default to error
+                messagesDiv.classList.add('bg-red-100', 'text-red-800');
+            }
+            // Ocultar después de 5 segundos
+            setTimeout(() => { messagesDiv.classList.add('hidden'); }, 5000);
         }
-        
+
         /**
          * Convierte el formato de fecha de Google Sheets a un formato más legible (DD/MM/YYYY).
          */
@@ -386,6 +513,78 @@
         }
         
         /**
+         * Muestra el modal de confirmación de borrado.
+         */
+        function showDeleteConfirm(affiliateId, affiliateName) {
+            affiliateIdToDelete = affiliateId;
+            document.getElementById('deleteAffiliateId').textContent = affiliateId;
+            document.getElementById('deleteAffiliateName').textContent = affiliateName;
+            setLoadingState(false);
+            confirmDeleteModal.show();
+        }
+        
+        /**
+         * Ejecuta la lógica final de borrado.
+         */
+        async function manejarBorradoFinal(affiliateId) {
+            setLoadingState(true);
+            confirmDeleteModal.hide(); // Ocultamos el modal de confirmación
+            detailCardDiv.classList.add('hidden'); // Ocultamos la tarjeta de detalles
+            
+            try {
+                const response = await fetch(`${DELETE_GAS_URL}?id=${affiliateId}`, {
+                    method: 'GET', 
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Buscamos el nombre para el mensaje de éxito (esto es opcional)
+                    const deletedAffiliate = allAffiliateData.find(a => a.ID === affiliateId);
+                    const name = deletedAffiliate ? deletedAffiliate['Nombre y Apellido'] : 'Afiliado';
+                    
+                    displayMessage(`¡Afiliado ${name} borrado con éxito! La tabla se recargará.`, 'success');
+                    // Recargar los datos para actualizar la tabla
+                    initializeApp();
+                } else {
+                    displayMessage(`¡Fallo al borrar! Detalles del quilombo: ${data.message}`, 'error');
+                }
+
+            } catch (error) {
+                console.error('Error al intentar borrar:', error);
+                displayMessage(`¡No pudimos comunicarnos con el servidor (GAS)! Detalle: ${error.message}`, 'error'); 
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+
+        /**
+         * Maneja la eliminación del afiliado. 
+         * @param {number} rowIndex - Índice del afiliado en el array allAffiliateData.
+         * @param {Event} event - Evento del click para evitar propagación a la fila.
+         */
+        function handleDeleteAffiliate(rowIndex, event) {
+            // Detener la propagación para que no se abra la tarjeta de detalle
+            event.stopPropagation(); 
+            
+            const affiliate = allAffiliateData[rowIndex];
+            if (!affiliate) return;
+
+            const affiliateId = affiliate['ID']; // Obtenemos el ID del afiliado (Columna A)
+            const name = affiliate['Nombre y Apellido'];
+
+            if (!affiliateId) {
+                displayMessage('¡Error! No se encontró un ID para este afiliado. No se puede borrar.', 'error');
+                return;
+            }
+
+            // 🚨 Reemplazamos el confirm() nativo por la llamada al modal de Bootstrap 🚨
+            showDeleteConfirm(affiliateId, name);
+        }
+
+
+        /**
          * Genera y muestra la credencial QR del afiliado en un modal, usando el diseño de credencial_qr.html.
          */
         function handleCredentialGeneration(rowIndex) {
@@ -397,7 +596,8 @@
             const legajo = affiliate['Legajo'] || 'N/A';
             const dni = affiliate['DNI'] || 'N/A';
             
-            const logoSrc = "logo_STM.png"; 
+            // Usar placeholder si no existe la imagen
+            const logoSrc = "https://placehold.co/50x50/5A377B/ffffff?text=STM"; 
 
             // 2. Generar el contenido del QR (Copiado de credencial_qr.html)
             const qrContent = `SINDICATO DE TRABAJADORES MUNICIPALES MGP
@@ -449,6 +649,9 @@ DNI: ${dni}`;
             // 4. Generar el Código QR
             const qrDiv = document.getElementById('qrcode-target'); 
             
+            // Asegurarse de que el div esté vacío antes de generar un nuevo QR
+            qrDiv.innerHTML = '';
+            
             new QRCode(qrDiv, {
                 text: qrContent,
                 width: 85,
@@ -464,7 +667,14 @@ DNI: ${dni}`;
         }
         
         /**
-         * Muestra el card de detalles del afiliado con el botón de llamada y el nuevo botón QR.
+         * Oculta el card de detalles.
+         */
+        function hideDetailCard() {
+            detailCardDiv.classList.add('hidden');
+        }
+        
+        /**
+         * Muestra el card de detalles del afiliado. (Restaurada la versión sin el botón 'X' en el header)
          */
         function showDetailCard(rowIndex) {
             const affiliate = allAffiliateData[rowIndex];
@@ -473,14 +683,25 @@ DNI: ${dni}`;
             const name = affiliate[ALL_COLUMN_HEADINGS[1]] || 'Afiliado Desconocido'; 
             const email = affiliate[ALL_COLUMN_HEADINGS[9]] || ''; 
             const phone = affiliate[ALL_COLUMN_HEADINGS[8]] || ''; 
+            const affiliateId = affiliate['ID'] || ''; 
             
             const cleanPhone = phone.replace(/[^\d]/g, '');
 
             let cardContent = `
-                <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg shadow-xl mx-auto">
-                    <h3 class="text-2xl font-bold text-blue-800 mb-4 border-b pb-2">
-                        Detalles de ${name} 📋
-                    </h3>
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg shadow-xl mx-auto relative">
+                    
+                    <div class="flex justify-between items-start mb-4 border-b pb-2">
+                        <h3 class="text-2xl font-bold text-blue-800">
+                            Detalles de ${name} <span class="text-base text-gray-500">(ID: ${affiliateId || 'N/A'})</span> 📋
+                        </h3>
+                        <button type="button" 
+                                class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-100 shadow-sm transition duration-150 ease-in-out"
+                                onclick="hideDetailCard()" 
+                                aria-label="Cerrar detalles">
+                            <i class="fas fa-times mr-1"></i> Cerrar
+                        </button>
+                    </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-gray-700">
             `;
 
@@ -506,26 +727,26 @@ DNI: ${dni}`;
                 `;
             });
 
-            // --- BLOQUE DE BOTONES (incluye el botón de Llamar solo para móvil: sm:hidden) ---
+            // Pie de la tarjeta con los botones de acción (Mantengo el botón de eliminar fuera del footer, siguiendo el último feedback)
             cardContent += `
                     </div>
-                    <div class="mt-6 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <div class="mt-6 flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4 justify-center">
                         
                         <button onclick="handleCredentialGeneration(${rowIndex})"
                            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                            💳 Generar Credencial QR
+                            💳 Credencial QR
                         </button>
+                        
+                        <a href="mailto:${email}" 
+                           class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out ${!email ? 'opacity-50 cursor-not-allowed' : ''}"
+                           ${!email ? 'disabled aria-disabled="true"' : ''}>
+                            ✉️ Enviar Email
+                        </a>
                         
                         <a href="tel:${cleanPhone}" 
                            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out sm:hidden ${!cleanPhone ? 'opacity-50 cursor-not-allowed' : ''}"
                            ${!cleanPhone ? 'disabled aria-disabled="true"' : ''}>
                             📱 Llamar
-                        </a>
-
-                        <a href="mailto:${email}" 
-                           class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out ${!email ? 'opacity-50 cursor-not-allowed' : ''}"
-                           ${!email ? 'disabled aria-disabled="true"' : ''}>
-                            ✉️ Enviar Email
                         </a>
                     </div>
                     ${!cleanPhone && !email ? '<p class="mt-4 text-sm text-red-500 text-center">No se encontraron datos de contacto (teléfono o email).</p>' : ''}
@@ -543,7 +764,7 @@ DNI: ${dni}`;
             try {
                 const table = dataJson.table;
                 if (!table || !table.rows || table.rows.length === 0) {
-                    displayMessage('¡No se encontraron datos, che! Revisá si el ID y el GID están bien o si la planilla tiene contenido.');
+                    displayMessage('¡No se encontraron datos, che! Revisá si el ID y el GID están bien o si la planilla tiene contenido.', 'warning');
                     return;
                 }
 
@@ -554,10 +775,10 @@ DNI: ${dni}`;
                 
                 allAffiliateData = [];
 
-                // 1. Crear encabezados (<thead>) con solo las columnas visibles
+                // 1. Crear encabezados (<thead>) con todas las columnas visibles (incluyendo 'Acciones')
                 let headerRow = '<tr>';
                 VISIBLE_COLUMN_HEADINGS.forEach(header => {
-                    headerRow += `<th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">${header}</th>`;
+                    headerRow += `<th scope="col" class="px-6 py-3 text-left">${header}</th>`;
                 });
                 headerRow += '</tr>';
                 thead.innerHTML = headerRow;
@@ -578,17 +799,31 @@ DNI: ${dni}`;
                         
                         rowData[ALL_COLUMN_HEADINGS[i]] = cellValue;
 
-                        if (VISIBLE_COLUMN_INDICES.includes(i)) {
+                        // Solo agregar celdas para las columnas visibles (excepto Acciones)
+                        if (DISPLAY_COLUMN_INDICES.includes(i)) {
                             rowHtml += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${cellValue}</td>`;
                         }
                     }
                     
                     allAffiliateData.push(rowData);
 
+                    // Agregar la celda de ACCIONES (el botón de eliminar)
+                    // Este es el ícono de "X" o "eliminar" que pediste en la tabla.
+                    rowHtml += `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onclick="handleDeleteAffiliate(${rowIndex}, event)" class="focus:outline-none p-1" title="Eliminar Afiliado">
+                                <i class="fas fa-trash-alt btn-delete-icon text-xl" style="font-size: 1.25rem;"></i>
+                            </button>
+                        </td>
+                    `;
+
+
                     const rowElement = document.createElement('tr');
-                    rowElement.className = 'cursor-pointer hover:bg-blue-50 transition duration-150 ease-in-out';
+                    // Agregamos la clase para el hover y el cursor. El click abrirá el detalle.
+                    rowElement.className = 'cursor-pointer transition duration-150 ease-in-out';
                     rowElement.innerHTML = rowHtml;
                     
+                    // El click en la fila abrirá el detalle
                     rowElement.addEventListener('click', () => showDetailCard(rowIndex)); 
                     tbody.appendChild(rowElement);
                 });
@@ -598,7 +833,7 @@ DNI: ${dni}`;
 
             } catch (error) {
                 console.error('Error al renderizar la tabla:', error);
-                displayMessage('¡Uy! Hubo un quilombo al procesar los datos. Revisá la consola para más detalles.');
+                displayMessage('¡Uy! Hubo un quilombo al procesar los datos. Revisá la consola para más detalles.', 'error');
             }
         }
 
@@ -625,12 +860,12 @@ DNI: ${dni}`;
                     renderTable(data);
                 } else {
                     console.error('Error de la API de Google Sheets:', data.errors);
-                    displayMessage(`¡Falló la carga! Puede ser un problema de permisos. Asegurate que la hoja es PÚBLICA. Detalle: ${data.errors[0].message}`);
+                    displayMessage(`¡Falló la carga! Puede ser un problema de permisos. Asegurate que la hoja es PÚBLICA. Detalle: ${data.errors[0].message}`, 'error');
                 }
 
             } catch (error) {
                 console.error('Error al obtener los datos:', error);
-                displayMessage(`¡No pudimos conectar con la planilla, che! Revisá si el ID (${SPREADSHEET_ID}) y el GID (${GID}) están bien y si la hoja está compartida como PÚBLICA. Detalles técnicos: ${error.message}`);
+                displayMessage(`¡No pudimos conectar con la planilla, che! Revisá si el ID (${SPREADSHEET_ID}) y el GID (${GID}) están bien y si la hoja está compartida como PÚBLICA. Detalles técnicos: ${error.message}`, 'error');
             } finally {
                 if (loadingDiv && !tableContainerDiv.classList.contains('hidden')) {
                     loadingDiv.classList.add('hidden');
