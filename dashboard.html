@@ -197,12 +197,14 @@
             window.location.href = 'index.html';
         }
         
-        // 🇦🇷 ¡NUEVO CÓDIGO! Cargar y mostrar el nombre de usuario
-        const username = localStorage.getItem('stm_username'); // Asumiendo que la clave es 'stm_username'
+        // 🇦🇷 ¡CÓDIGO MODIFICADO Y CLAVE PARA EL PERMISO!
+        const username = localStorage.getItem('stm_username'); 
+        const userType = localStorage.getItem('stm_user_type'); // <-- ¡LEEMOS EL TIPO DE USUARIO!
         const usernameElement = document.getElementById('logged-in-username');
+        
         if (username && usernameElement) {
-            // 🇦🇷 Formato solicitado: "Usuario conectado: [Nombre]"
-            usernameElement.textContent = `Usuario conectado: ${username}`;
+            // 🇦🇷 Mostramos el nombre Y el permiso
+            usernameElement.textContent = `Usuario conectado: ${username} (${userType || 'N/A'})`; 
         }
         // --- FIN CÓDIGO DE VERIFICACIÓN / CARGA DE USUARIO ---
         
@@ -215,8 +217,8 @@
         const sheetGids = {
             'tabla_consulta': '0',
             'gestor_novedades_external': null,
-            'gestor_afiliaciones_external': null, // AGREGADO
-            'gestor_convenios_external': null, // AGREGADO POR EL USUARIO
+            'gestor_afiliaciones_external': null, 
+            'gestor_convenios_external': null, 
             'credencial_qr': null,
         };
 
@@ -319,8 +321,9 @@
          */
         window.logout = function() {
             localStorage.removeItem('isAuthenticatedSTM');
-            // 🇦🇷 ¡MODIFICADO! Eliminar el nombre de usuario guardado
+            // 🇦🇷 ¡MODIFICADO! Eliminar el nombre de usuario guardado y el tipo de usuario
             localStorage.removeItem('stm_username'); 
+            localStorage.removeItem('stm_user_type'); // <-- Agregado para limpiar el permiso
             window.location.href = 'index.html';
         }
 
@@ -527,6 +530,45 @@
             }
         }
 
+        // --- 🇦🇷 LÓGICA DE PERMISOS (Corregida) ---
+        
+        /**
+         * Función para aplicar la restricción de botones si el usuario NO es ADMIN.
+         */
+        function applyUserPermissions() {
+            const userType = localStorage.getItem('stm_user_type');
+            // Regla: Es Admin si el tipo es 'ADMIN'. Usamos .toUpperCase() por seguridad.
+            const isAdmin = userType && String(userType).toUpperCase() === 'ADMIN'; 
+            const btnGroup = document.getElementById('btn-group');
+            const consultasBtn = document.querySelector('[data-sheet="tabla_consulta"]'); // Buscamos el botón de consultas
+
+            // Solo aplicar si NO es admin
+            if (!isAdmin) {
+                // Ocultar todos los botones EXCEPTO 'Consultas' (tabla_consulta)
+                buttons.forEach(btn => {
+                    const sheet = btn.getAttribute('data-sheet');
+                    if (sheet !== 'tabla_consulta') { 
+                        btn.classList.add('hidden');
+                    }
+                });
+                
+                // 🇦🇷 ¡CLAVE! Forzar el botón "Consultas" a la derecha, manteniendo el tamaño.
+                if (consultasBtn) {
+                    // Usamos las clases 'col-start' de Tailwind para forzar el botón a la última columna de cada grid size.
+                    // Esto mantiene su tamaño original (1/5 del ancho total en desktop).
+                    consultasBtn.classList.add('col-start-2', 'sm:col-start-3', 'lg:col-start-5');
+                }
+                
+                // 🇦🇷 ¡IMPORTANTE! Se eliminó el código que hacía que el contenedor cambiara a 'grid-cols-1' 
+                // para que el botón no se estire.
+            } else {
+                 // Si es ADMIN, nos aseguramos de que el botón de consultas esté en su posición inicial (izquierda)
+                 if (consultasBtn) {
+                    consultasBtn.classList.remove('col-start-2', 'sm:col-start-3', 'lg:col-start-5');
+                }
+            }
+        }
+
 
         // --- NAVEGACIÓN Y CARGA INICIAL ---
 
@@ -595,6 +637,9 @@
 
         // Carga inicial
         document.addEventListener('DOMContentLoaded', () => {
+            // 🇦🇷 ¡NUEVO! Aplicar los permisos antes de cargar la vista por defecto
+            applyUserPermissions(); 
+            
             // Carga la vista de "Tabla Consulta" por defecto
             loadView('tabla_consulta');
         });

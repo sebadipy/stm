@@ -158,7 +158,7 @@
     </div>
     <script>
         // --- CONFIGURACIÓN Y CONSTANTES ---
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx33wIu0oWlX9dwJwU3AkU54xPjDKji_RLiXar-vNf-FczTGsvABOdZS4bnX1PHlBLLXQ/exec'; 
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybImPtLd8JSSJk-grUagTAfxBUVG8wsPp2zcedCmazDtqtycAjSP5x1jECfPKEmQ4FJg/exec'; 
         const SHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
         const SHEET_NAME_FOR_VALIDATION = 'user'; 
         const USERNAME_COLUMN_INDEX = 3; 
@@ -298,8 +298,12 @@
                     // MOSTRAMOS EL MODAL CON EL NOMBRE Y APELLIDO 
                     const fullName = result.fullName || 'Usuario Desconocido'; 
                     
-                    // 🇦🇷 ¡MODIFICADO! Guardar el nombre de usuario en localStorage
+                    // 🇦🇷 ¡NUEVO! Obtener el permiso devuelto por Apps Script
+                    const userType = result.user_type || 'USER'; // Si no viene, por defecto es USER
+                    
+                    // 🇦🇷 ¡CLAVE! Guardar el nombre de usuario Y EL TIPO de usuario en localStorage
                     localStorage.setItem('stm_username', fullName); 
+                    localStorage.setItem('stm_user_type', userType); // <-- ¡ESTA ES LA LÍNEA CLAVE!
 
                     showWelcomeModal(fullName);
                     
