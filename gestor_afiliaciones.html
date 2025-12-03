@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Afiliados - Gestor Simplificado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* CONSTANTES DE COLOR COPIADAS DE gestor_novedades.html */
+        :root {
+            --stm-purple: #5A377B; /* Púrpura principal */
+            --stm-teal: #34B3C5;   /* Turquesa */
+            --stm-red: #dc3545;    /* Rojo */
+            --stm-indigo: #4f46e5; /* Índigo del dashboard (Cabecera de Tabla) */
+            --stm-dark-purple: #492a63; /* Variante oscura del púrpura para hover */
+        }
+
+        /* ------------------------------------------------------------------- */
+        /* ESTILOS DE ENCABEZADO COPIADOS DE gestor_novedades.html */
+        /* ------------------------------------------------------------------- */
+        body {
+            /* Usamos la fuente Roboto del Gestor de Novedades */
+            font-family: 'Roboto', sans-serif; 
+            background-color: #f3f4f6; 
+        }
+
+        /* Contenedor principal con borde superior */
+        .main-container {
+            border-top: 4px solid var(--stm-indigo); /* Borde superior como el dashboard */
+        }
+        
+        .header-main-flex {
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px; 
+        }
+
+        .header-logo-title {
+            display: flex;
+            align-items: center;
+            flex-grow: 1; 
+            max-width: calc(100% - 150px); 
+        }
+
+        .header-logo-title img {
+            max-width: 50px; 
+            height: auto; 
+            border-radius: 50%; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-right: 12px; 
+            flex-shrink: 0;
+        }
+
+        .header-title-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1; 
+        }
+        
+        .header-title-text .subtitle {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #4b5563; 
+            margin: 0;
+        }
+        
+        .header-title-text .title {
+            font-size: 1.5rem; 
+            font-weight: 700;
+            color: var(--stm-purple); 
+            margin: 0;
+            white-space: nowrap; 
+        }
+        
+        .header-main-flex > .btn-dashboard {
+            flex-shrink: 0; 
+        }
+
+        /* BOTÓN 'Tablero de mando' (Púrpura) */
+        .btn-dashboard {
+            background-color: var(--stm-purple); 
+            border-color: var(--stm-dark-purple); 
+            color: #ffffff;
+            font-weight: 600;
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(90, 55, 123, 0.4);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none; 
+            white-space: nowrap; 
+        }
+        .btn-dashboard:hover,
+        .btn-dashboard:focus {
+            background-color: var(--stm-dark-purple); 
+            border-color: var(--stm-dark-purple);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        
+        /* Ajuste en móvil */
+        @media (max-width: 767.98px) {
+            .header-main-flex {
+                flex-direction: row; 
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+            .header-logo-title {
+                max-width: 100%;
+                flex-grow: 1;
+            }
+            .header-title-text .subtitle {
+                font-size: 0.9rem;
+            }
+            .header-title-text .title {
+                font-size: 1.3rem; 
+            }
+        }
+        /* ------------------------------------------------------------------- */
+        /* FIN ESTILOS DE ENCABEZADO */
+        /* ------------------------------------------------------------------- */
+
+        /* Estilos preexistentes */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #9ca3af; 
+            border-radius: 10px;
+        }
+        tr.cursor-pointer:hover {
+            background-color: #eef2ff !important; 
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl main-container">
+        
+        <div class="header-main-flex">
+            
+            <div class="header-logo-title">
+                <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales">
+                
+                <div class="header-title-text">
+                    <p class="subtitle">Gestor de</p>
+                    <h1 class="title">Afiliaciones</h1>
+                </div>
+            </div>
+
+            <a href="dashboard.html" class="btn-dashboard">
+                <i class="fas fa-chart-line me-2"></i> Tablero de mando
+            </a>
+        </div>
+        
+        <p class="text-gray-600 mb-6 sm:mb-8 border-b pb-4">
+            Datos del afiliado.
+        </p>
+
+        <div id="messages" class="mt-6 p-4 bg-yellow-100 text-yellow-800 rounded-lg hidden">
+            </div>
+
+        <div id="loading" class="text-center p-8 text-lg font-semibold text-blue-600">
+            Cargando datos... 
+        </div>
+
+        <div id="table-container" class="table-container overflow-x-auto rounded-lg shadow-lg hidden">
+            <table id="data-table" class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-blue-600 text-white sticky top-0">
+                    </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    </tbody>
+            </table>
+        </div>
+
+    </div> <div id="detail-card" class="max-w-7xl mx-auto mt-8 mb-6 hidden">
+    </div>
+
+    <script>
+        // --- INSTRUCCIONES IMPORTANTES PARA EL USUARIO ARGENTINO ---
+        // 1. Reemplazá 'TU_SPREADSHEET_ID' con el ID real de tu planilla (lo sacás de la URL).
+        // 2. Reemplazá '0' por el GID de la hoja que querés mostrar (la primera hoja es 0, si es otra, cambialo).
+        // 3. ¡MUY IMPORTANTE! Tenés que hacer pública la planilla: 
+        //    'Compartir' -> 'Acceso general' -> 'Cualquier persona con el enlace' -> 'Lector'.
+        
+        // ¡ACTUALIZÁ ESTOS VALORES!
+        const SPREADSHEET_ID = '1OZnWCvh9NpBaoZndAV1IPPqtNWgQnv8GMh6J2-l3wZo'; 
+        const GID = '1600259031'; 
+        
+        // URL para la API de Google Visualization que devuelve JSON
+        const GOOGLE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+
+        // Nombres de TODAS las columnas, el orden es clave.
+        const ALL_COLUMN_HEADINGS = [
+            'ID', 'Nombre y Apellido', 'Legajo', 'DNI', 'F. Nac.', 
+            'Nacionalidad', 'Est. Civil', 'Domicilio', 'Teléfono', 'Email', 
+            'Ente Sec.', 'Dependencia', 'Cargo', 'Planta', 'Email PDF', 'Enviado'
+        ];
+        
+        // Columnas a mostrar en la tabla (solo las claves)
+        const VISIBLE_COLUMN_HEADINGS = ['Nombre y Apellido', 'Legajo', 'Teléfono'];
+        
+        // Índices de las columnas visibles en la tabla
+        const VISIBLE_COLUMN_INDICES = VISIBLE_COLUMN_HEADINGS.map(
+            name => ALL_COLUMN_HEADINGS.indexOf(name)
+        );
+
+        // --- ETIQUETAS PERSONALIZADAS PARA EL DETALLE SOLICITADAS PREVIAMENTE ---
+        const DETAIL_LABELS_MAP = {
+            'DNI': 'DNI',
+            'F. Nac.': 'Fecha de Nacimiento',
+            'Nacionalidad': 'Nacionalidad',
+            'Est. Civil': 'Estado Civil',
+            'Domicilio': 'Domicilio',
+            'Email': 'Correo elecrónico', 
+            'Ente Sec.': 'Ente/Secretaria',
+            'Dependencia': 'Dependencia',
+            'Cargo': 'Cargo',
+            'Planta': 'Planta',
+        };
+
+        // Columnas que NO queremos que aparezcan en la tarjeta de detalle
+        const EXCLUDE_FROM_DETAIL = ['ID', 'Nombre y Apellido', 'Legajo', 'Teléfono', 'Email PDF', 'Enviado'];
+
+
+        const loadingDiv = document.getElementById('loading');
+        const tableContainerDiv = document.getElementById('table-container');
+        const dataTable = document.getElementById('data-table');
+        const messagesDiv = document.getElementById('messages');
+        const detailCardDiv = document.getElementById('detail-card');
+        
+        // Variable global para guardar todos los datos por fila
+        let allAffiliateData = [];
+
+        /**
+         * Muestra un mensaje de error en la interfaz.
+         * @param {string} msg El mensaje a mostrar.
+         */
+        function displayMessage(msg) {
+            messagesDiv.textContent = msg;
+            messagesDiv.classList.remove('hidden', 'bg-yellow-100', 'text-yellow-800');
+            messagesDiv.classList.add('bg-red-100', 'text-red-800');
+        }
+        
+        /**
+         * Convierte el formato de fecha de Google Sheets a un formato más legible (DD/MM/YYYY).
+         */
+        function formatGoogleDate(googleDateStr) {
+            if (typeof googleDateStr === 'string' && googleDateStr.startsWith('Date(')) {
+                const match = googleDateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+                if (match) {
+                    const year = match[1];
+                    // El mes es 0-indexado en Sheets/JS, sumamos 1 para mostrar el mes real
+                    const month = parseInt(match[2], 10) + 1; 
+                    const day = match[3];
+
+                    const formattedMonth = String(month).padStart(2, '0');
+                    const formattedDay = String(day).padStart(2, '0');
+
+                    return `${formattedDay}/${formattedMonth}/${year}`;
+                }
+            }
+            return googleDateStr;
+        }
+        
+        /**
+         * Muestra el card de detalles del afiliado con el botón de llamada RESPONSIVE.
+         */
+        function showDetailCard(rowIndex) {
+            const affiliate = allAffiliateData[rowIndex];
+            if (!affiliate) return;
+
+            // Columna 1: Nombre y Apellido
+            const name = affiliate[ALL_COLUMN_HEADINGS[1]] || 'Afiliado Desconocido'; 
+            // Columna 9: Email (para el botón)
+            const email = affiliate[ALL_COLUMN_HEADINGS[9]] || ''; 
+            // Columna 8: Teléfono (para el botón)
+            const phone = affiliate[ALL_COLUMN_HEADINGS[8]] || ''; 
+            
+            // Función para limpiar el teléfono (solo dígitos para la URL tel:)
+            const cleanPhone = phone.replace(/[^\d]/g, '');
+
+            let cardContent = `
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg shadow-xl mx-auto">
+                    <h3 class="text-2xl font-bold text-blue-800 mb-4 border-b pb-2">
+                        Detalles de ${name} 📋
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-gray-700">
+            `;
+
+            // Generar el cuerpo del Card con el resto de la información (el mismo filtro y etiquetas)
+            ALL_COLUMN_HEADINGS.forEach((heading) => {
+                
+                // 1. Filtrar las columnas que no van
+                if (EXCLUDE_FROM_DETAIL.includes(heading)) {
+                    return; 
+                }
+                
+                let value = affiliate[heading] || 'N/A';
+                
+                if (heading === 'F. Nac.' && value !== 'N/A') {
+                   value = formatGoogleDate(value);
+                }
+                
+                const label = DETAIL_LABELS_MAP[heading] || heading; 
+
+                cardContent += `
+                    <p>
+                        <strong class="font-semibold text-gray-900">${label}:</strong> ${value}
+                    </p>
+                `;
+            });
+
+            // --- BLOQUE DE BOTONES RESPONSIVE (Móvil) ---
+            cardContent += `
+                    </div>
+                    <div class="mt-6 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        
+                        <a href="tel:${cleanPhone}" 
+                           class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out sm:hidden ${!cleanPhone ? 'opacity-50 cursor-not-allowed' : ''}"
+                           ${!cleanPhone ? 'disabled aria-disabled="true"' : ''}>
+                            📱 Llamar
+                        </a>
+
+                        <a href="mailto:${email}" 
+                           class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out ${!email ? 'opacity-50 cursor-not-allowed' : ''}"
+                           ${!email ? 'disabled aria-disabled="true"' : ''}>
+                            ✉️ Enviar Email
+                        </a>
+                    </div>
+                    ${!cleanPhone && !email ? '<p class="mt-4 text-sm text-red-500 text-center">No se encontraron datos de contacto (teléfono o email).</p>' : ''}
+                </div>
+            `;
+
+            detailCardDiv.innerHTML = cardContent;
+            detailCardDiv.classList.remove('hidden');
+        }
+
+        /**
+         * Procesa y muestra los datos de la hoja de cálculo.
+         */
+        function renderTable(dataJson) {
+            try {
+                const table = dataJson.table;
+                if (!table || !table.rows || table.rows.length === 0) {
+                    displayMessage('¡No se encontraron datos, che! Revisá si el ID y el GID están bien o si la planilla tiene contenido.');
+                    return;
+                }
+
+                const thead = dataTable.querySelector('thead');
+                const tbody = dataTable.querySelector('tbody');
+                thead.innerHTML = '';
+                tbody.innerHTML = '';
+                
+                // Limpiar la data anterior
+                allAffiliateData = [];
+
+                // 1. Crear encabezados (<thead>) con solo las columnas visibles
+                let headerRow = '<tr>';
+                VISIBLE_COLUMN_HEADINGS.forEach(header => {
+                    headerRow += `<th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">${header}</th>`;
+                });
+                headerRow += '</tr>';
+                thead.innerHTML = headerRow;
+
+                // 2. Llenar filas (<tbody>)
+                table.rows.forEach((row, rowIndex) => {
+                    
+                    // Objeto para guardar toda la data de la fila
+                    let rowData = {};
+                    let rowHtml = ''; // Para el contenido de los <td> visibles
+                    
+                    // Almacenar TODOS los datos de la fila
+                    for (let i = 0; i < ALL_COLUMN_HEADINGS.length; i++) {
+                        const cell = row.c[i];
+                        // cell.f es valor formateado, cell.v es el valor crudo
+                        let cellValue = cell ? (cell.f || cell.v) : ''; 
+
+                        // Formato especial para la fecha (si aplica a la columna 4: F. Nac.)
+                        if (i === 4 && cellValue) {
+                           cellValue = formatGoogleDate(cellValue);
+                        }
+                        
+                        // Almacenar el dato con el nombre de la columna como clave
+                        rowData[ALL_COLUMN_HEADINGS[i]] = cellValue;
+
+                        // Si la columna es visible, la agregamos al HTML de la fila
+                        if (VISIBLE_COLUMN_INDICES.includes(i)) {
+                            rowHtml += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${cellValue}</td>`;
+                        }
+                    }
+                    
+                    // Guardar todos los datos de la fila
+                    allAffiliateData.push(rowData);
+
+                    // Crear la fila e inyectar el HTML de las celdas
+                    const rowElement = document.createElement('tr');
+                    // Clase para el efecto hover y el cursor
+                    rowElement.className = 'cursor-pointer hover:bg-blue-50 transition duration-150 ease-in-out';
+                    rowElement.innerHTML = rowHtml;
+                    
+                    // Agregar el evento de click que muestra el detalle
+                    rowElement.addEventListener('click', () => showDetailCard(rowIndex)); 
+                    tbody.appendChild(rowElement);
+                });
+
+                // Mostrar la tabla y ocultar el mensaje de carga
+                loadingDiv.classList.add('hidden');
+                tableContainerDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error al renderizar la tabla:', error);
+                displayMessage('¡Uy! Hubo un quilombo al procesar los datos. Revisá la consola para más detalles.');
+            }
+        }
+
+        /**
+         * Inicializa la aplicación: obtiene los datos de la hoja de cálculo.
+         */
+        async function initializeApp() {
+            try {
+                // Hacemos el fetch al URL de Google Sheets
+                const response = await fetch(GOOGLE_SHEET_URL);
+                const text = await response.text();
+                
+                // Extraer el JSON puro del wrapper de la API de Google
+                const jsonStr = text.substring(
+                    text.indexOf('{'), 
+                    text.lastIndexOf('}') + 1
+                );
+                
+                const data = JSON.parse(jsonStr);
+
+                if (data.status === 'ok') {
+                    renderTable(data);
+                } else {
+                    // Manejo de errores de la API (ej: permisos denegados)
+                    console.error('Error de la API de Google Sheets:', data.errors);
+                    displayMessage(`¡Falló la carga! Puede ser un problema de permisos. Asegurate que la hoja es PÚBLICA. Detalle: ${data.errors[0].message}`);
+                }
+
+            } catch (error) {
+                console.error('Error al obtener los datos:', error);
+                // Si la URL es incorrecta o hay problemas de red/CORS
+                displayMessage(`¡No pudimos conectar con la planilla, che! Revisá si el ID (${SPREADSHEET_ID}) y el GID (${GID}) están bien y si la hoja está compartida como PÚBLICA. Detalles técnicos: ${error.message}`);
+            } finally {
+                // Si algo falla, ocultamos el mensaje de carga de todas formas
+                if (loadingDiv && !tableContainerDiv.classList.contains('hidden')) {
+                    loadingDiv.classList.add('hidden');
+                }
+            }
+        }
+
+        // Ejecutar la función de inicialización cuando el script se carga
+        initializeApp();
+    </script>
+</body>
+</html>
