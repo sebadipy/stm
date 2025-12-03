@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <base target="_top"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Convenios - STM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CONSTANTES DE COLOR MIGRADO DE gestor_novedades.html */
+        :root {
+            --stm-purple: #5A377B; /* Púrpura principal (Guardar/Gestor Novedades) */
+            --stm-teal: #34B3C5;   /* Turquesa (Crear Novedad) */
+            --stm-red: #dc3545;    /* Rojo (Eliminar) */
+            --stm-indigo: #4f46e5; /* Índigo del dashboard (Cabecera de Tabla) */
+            --stm-dark-purple: #492a63; /* Variante oscura del púrpura para hover */
+        }
+
+        body { 
+            background-color: #eef2f7; /* Fondo del dashboard */
+            font-size: 15px;
+            font-family: 'Roboto', sans-serif; 
+        }
+        .main-container {
+            max-width: 1100px; 
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--stm-indigo); /* Borde superior como el dashboard */
+        }
+        
+        /* ------------------------------------------------------------------- */
+        /* ESTILOS DE ENCABEZADO RESPONSIVE */
+        /* ------------------------------------------------------------------- */
+        .header-main-flex {
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0; 
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-logo-title {
+            display: flex;
+            align-items: center;
+            flex-grow: 1; 
+            max-width: calc(100% - 150px); 
+        }
+
+        .header-logo-title img {
+            max-width: 50px;
+            height: auto; 
+            border-radius: 50%; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-right: 12px; 
+            flex-shrink: 0;
+        }
+
+        .header-title-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+        
+        .header-title-text .subtitle {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #4b5563;
+            margin: 0;
+        }
+        
+        .header-title-text .title {
+            font-size: 1.5rem; 
+            font-weight: 700;
+            color: var(--stm-purple);
+            margin: 0;
+            white-space: nowrap;
+        }
+        
+        .header-main-flex > .btn-dashboard {
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 767.98px) {
+            .main-container {
+                padding: 15px;
+                margin: 15px auto;
+            }
+            .header-main-flex {
+                flex-direction: row; 
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+            .header-logo-title {
+                max-width: 100%;
+                flex-grow: 1;
+            }
+            .header-title-text .subtitle {
+                font-size: 0.9rem;
+            }
+            .header-title-text .title {
+                font-size: 1.3rem; 
+            }
+            .d-flex.justify-content-end.mb-4 {
+                justify-content: center !important; 
+                margin-bottom: 20px !important;
+            }
+        }
+        
+        /* ------------------------------------------------------------------- */
+        /* ESTILOS DE BOTONES (CRUD) */
+        /* ------------------------------------------------------------------- */
+        
+        /* BOTÓN CREAR (Turquesa - stm-teal) */
+        .btn-stm-create {
+            background-color: var(--stm-teal); 
+            border-color: var(--stm-teal); 
+            color: #ffffff; 
+            font-weight: 600;
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            box-shadow: 0 4px 15px -3px rgba(52, 179, 197, 0.5); 
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-stm-create:hover, 
+        .btn-stm-create:focus {
+            background-color: #2a8e9b; 
+            border-color: #2a8e9b;
+            color: #ffffff;
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 18px -3px rgba(52, 179, 197, 0.7);
+        }
+
+        /* BOTÓN GUARDAR (Púrpura - stm-purple) */
+        .btn-stm-save {
+            background-color: var(--stm-purple); 
+            border-color: var(--stm-purple); 
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(90, 55, 123, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-stm-save:hover, 
+        .btn-stm-save:focus {
+            background-color: var(--stm-dark-purple); 
+            border-color: var(--stm-dark-purple);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* BOTÓN 'Tablero de mando' (Púrpura) */
+        .btn-dashboard {
+            background-color: var(--stm-purple); 
+            border-color: var(--stm-dark-purple); 
+            color: #ffffff;
+            font-weight: 600;
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(90, 55, 123, 0.4);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none; 
+            white-space: nowrap;
+        }
+        .btn-dashboard:hover,
+        .btn-dashboard:focus {
+            background-color: var(--stm-dark-purple); 
+            border-color: var(--stm-dark-purple);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        
+        /* BOTÓN ELIMINAR (Rojo - stm-red) */
+        .btn-stm-delete {
+            background-color: var(--stm-red); 
+            border-color: var(--stm-red); 
+            color: #ffffff; 
+            border-radius: 8px; 
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-stm-delete:hover, 
+        .btn-stm-delete:focus {
+            background-color: #b02a37;
+            border-color: #b02a37;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        
+        /* ------------------------------------------------------------------- */
+        /* ESTILOS DE TABLA */
+        /* ------------------------------------------------------------------- */
+        .table-responsive {
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .table thead {
+            background-color: var(--stm-indigo);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .table th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        
+        #loadingSpinner {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        /* Estilos de la fila: El click se manejará a través del evento delegado en JS */
+        .table-hover tbody tr:not(.row-actions) {
+            cursor: pointer;
+        }
+        .table-hover tbody tr:not(.row-actions):hover {
+            background-color: #f0f4f9; 
+        }
+
+        .activo-icon {
+            font-size: 1.2rem;
+            display: block;
+            text-align: center;
+        }
+        .text-success { color: #28a745 !important; } 
+        .text-danger { color: #dc3545 !important; } 
+
+        .table th.col-activo {
+            width: 1%;
+            text-align: center;
+        }
+        .table td.col-activo {
+            text-align: center;
+        }
+        
+        /* Estilo para la columna de Acciones */
+        .col-actions {
+            width: 1%; /* Mínimo ancho */
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-container">
+            
+            <div class="header-main-flex">
+                
+                <div class="header-logo-title">
+                    <img src="logo_STM.png" alt="Logo Sindicato de Trabajadores Municipales"> 
+                    
+                    <div class="header-title-text">
+                        <p class="subtitle">Gestor de</p>
+                        <h1 class="title">Convenios</h1>
+                    </div>
+                </div>
+
+                <a href="dashboard.html" class="btn btn-dashboard">
+                    <i class="fas fa-chart-line me-2"></i> Tablero de mando
+                </a>
+            </div>
+            
+            <div class="d-flex justify-content-end mb-4">
+                <button type="button" class="btn btn-stm-create" onclick="openModal()">
+                    <i class="fas fa-plus-circle me-2"></i> Crear Nuevo Convenio
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-activo">ACTIVO</th>
+                            <th scope="col">Rubro</th> <th scope="col">Título/Entidad</th> <th scope="col">Contenido/Detalle</th> <th scope="col" class="col-actions text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="novedadesTableBody">
+                        </tbody >
+                </table>
+                <div id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando convenios...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando convenios...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="modal fade" id="novedadModal" tabindex="-1" aria-labelledby="novedadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="novedadForm" novalidate class="needs-validation"> 
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="novedadModalLabel">Crear Convenio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="inputIdNovedad" name="ID">
+                        
+                        <div class="mb-3">
+                            <label for="inputRubro" class="form-label">
+                                Rubro/Categoría: <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="inputRubro" name="Rubro" required>
+                                <option value="" disabled selected>Seleccioná un rubro</option>
+                                <option value="BALNEARIOS">BALNEARIOS: Balnearios - Temporada 2025/2026</option>
+                                <option value="TURISMO">TURISMO: Transporte y Turismo</option>
+                                <option value="COMERCIOS">COMERCIOS: Comercios y Compras</option>
+                                <option value="HOGAR">HOGAR: Electrodomésticos y Hogar</option>
+                                <option value="INDUMENTARIA">INDUMENTARIA: Indumentaria y Deportes</option>
+                                <option value="DEPORTE">DEPORTE: Deportes y Gimnasios</option>
+                                <option value="AUTOMOTOR">AUTOMOTOR: Automotores</option>
+                                <option value="VETERINARIA">VETERINARIA: Veterinarias y Mascotas</option>
+                                <option value="SALUD">SALUD: Salud y Estética</option>
+                                <option value="RECREACION">RECREACION: Recreación, Eventos y Gastronomía</option>
+                                <option value="SERVICIOS">SERVICIOS: Servicios Profesionales</option>
+                                <option value="BENEFICIOS">BENEFICIOS: Beneficios Internos STM</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccioná un rubro.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="inputTitulo" class="form-label">
+                                Título/Entidad del Convenio: <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="inputTitulo" name="Titulo" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingresá un título o entidad para el convenio.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="textareaContenido" class="form-label d-flex justify-content-between">
+                                <span>Contenido Detallado del Convenio (Columna **Detalle**): <span class="text-danger">*</span></span>
+                                <span class="text-muted small" id="charCount">0/1000 caracteres</span>
+                            </label>
+                            <textarea class="form-control" id="textareaContenido" name="Contenido" rows="6" required maxlength="1000"></textarea>
+                            <div class="invalid-feedback">
+                                Por favor, ingresá el detalle del convenio (máximo 1000 caracteres).
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="inputActivo" name="Activo" value="SI">
+                            <label class="form-check-label" for="inputActivo">
+                                ¿Convenio Activo? (Marcar para mostrar)
+                            </label>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-stm-delete" id="btnEliminarEnModal" style="display: none;">
+                            <i class="fas fa-trash-alt me-2"></i> Eliminar Convenio
+                        </button>
+                        
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCancelarModal">Cancelar</button>
+                            <button type="submit" class="btn btn-stm-save" id="btnGuardar">Guardar Convenio</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">⚠️ Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro/a que querés eliminar el convenio con ID: <strong id="deleteNovedadId" class="text-danger"></strong>?</p>
+                    <p class="text-danger">¡Esta acción no se puede deshacer!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-stm-delete" id="btnAceptarEliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Resultado de la Operación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="feedbackModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        
+        // --- 🚨 CÓDIGO DE VERIFICACIÓN DE SEGURIDAD 🚨 ---
+        if (localStorage.getItem('isAuthenticatedSTM') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        // --- FIN CÓDIGO DE VERIFICACIÓN ---
+        
+        // LÓGICA DE JAVASCRIPT - ADAPTADA PARA SOLO USAR RUBRO, TITULO, DETALLE, ACTIVO
+        
+        // ATENCIÓN: REEMPLAZAR CON LA URL DE DESPLIEGUE REAL PARA CONVENIOS
+        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgD9-ggtZjFyK7I4FfwLETVtj5TUBvQIZWF5om5yAKLhj4BuerpbdHN-3PnTfLDzdxBA/exec'; 
+
+        const novedadesTableBody = document.getElementById('novedadesTableBody');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        const novedadForm = document.getElementById('novedadForm');
+        const novedadModal = new bootstrap.Modal(document.getElementById('novedadModal'));
+        const novedadModalLabel = document.getElementById('novedadModalLabel');
+        const btnGuardar = document.getElementById('btnGuardar');
+        const btnCancelarModal = document.getElementById('btnCancelarModal'); 
+        
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const btnAceptarEliminar = document.getElementById('btnAceptarEliminar');
+        const btnEliminarEnModal = document.getElementById('btnEliminarEnModal'); 
+        
+        const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+        const feedbackModalBody = document.getElementById('feedbackModalBody');
+        
+        const textareaContenido = document.getElementById('textareaContenido');
+        const charCountElement = document.getElementById('charCount');
+
+
+        let novedadIdToDelete = null;
+
+        let originalGuardarText = '';
+        let originalEliminarText = '';
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            originalGuardarText = btnGuardar.textContent;
+            originalEliminarText = btnAceptarEliminar.textContent;
+            fetchNovedades();
+        });
+
+        // Evento para actualizar el contador de caracteres al escribir
+        textareaContenido.addEventListener('input', () => {
+            const currentLength = textareaContenido.value.length;
+            const maxLength = textareaContenido.getAttribute('maxlength');
+            charCountElement.textContent = `${currentLength}/${maxLength} caracteres`;
+            
+            if (currentLength >= maxLength * 0.9) {
+                charCountElement.classList.remove('text-muted');
+                charCountElement.classList.add('text-danger');
+            } else {
+                charCountElement.classList.remove('text-danger');
+                charCountElement.classList.add('text-muted');
+            }
+        });
+
+
+        novedadForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            if (!novedadForm.checkValidity()) {
+                event.stopPropagation();
+                novedadForm.classList.add('was-validated');
+                return;
+            }
+            
+            if (textareaContenido.value.length > 1000) {
+                showFeedback('El contenido excede el límite de 1000 caracteres.', false);
+                return;
+            }
+
+            const id = document.getElementById('inputIdNovedad').value;
+            const accion = id ? 'ACTUALIZAR' : 'CREAR';
+            await manejarEnvio(accion, id);
+        });
+
+        btnEliminarEnModal.addEventListener('click', function() {
+            const id = document.getElementById('inputIdNovedad').value;
+            if (id) {
+                novedadModal.hide(); 
+                showDeleteConfirm(id);
+            }
+        });
+
+        btnAceptarEliminar.addEventListener('click', async function() {
+            if (novedadIdToDelete) {
+                setLoadingState(true, 'ELIMINAR');
+                confirmDeleteModal.hide();
+                await manejarEnvio('ELIMINAR', novedadIdToDelete);
+                novedadIdToDelete = null; 
+            }
+        });
+
+        /**
+         * Maneja el estado de carga de los botones principales del CRUD.
+         */
+        function setLoadingState(isLoading, accion) {
+            const isGuardar = !accion || accion === 'GUARDAR';
+            const isEliminar = accion === 'ELIMINAR';
+
+            if (isGuardar) {
+                btnGuardar.disabled = isLoading;
+                btnCancelarModal.disabled = isLoading; 
+                btnEliminarEnModal.disabled = isLoading;
+
+                if (isLoading) {
+                    btnGuardar.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        Aguarde...
+                    `;
+                    btnGuardar.classList.add('d-flex', 'align-items-center', 'justify-content-center'); 
+                } else {
+                    btnGuardar.textContent = originalGuardarText;
+                    btnGuardar.classList.remove('d-flex', 'align-items-center', 'justify-content-center'); 
+                }
+            }
+
+            if (isEliminar) {
+                btnAceptarEliminar.disabled = isLoading;
+
+                if (isLoading) {
+                    btnAceptarEliminar.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        Aguarde...
+                    `;
+                    btnAceptarEliminar.classList.add('d-flex', 'align-items-center', 'justify-content-center');
+                } else {
+                    btnAceptarEliminar.textContent = originalEliminarText;
+                    btnAceptarEliminar.classList.remove('d-flex', 'align-items-center', 'justify-content-center');
+                }
+            }
+        }
+        
+        
+        function renderTable(convenios) {
+            novedadesTableBody.innerHTML = '';
+            loadingSpinner.style.display = 'none';
+            // 5 columnas: Activo, Rubro, Título, Detalle, Acciones
+            const COLSPAN_COUNT = 5; 
+
+            if (convenios.length === 0) {
+                novedadesTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="${COLSPAN_COUNT}" class="text-center py-4 text-muted"> 
+                            Aún no hay convenios cargados. ¡Creá el primero!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            convenios.forEach(convenio => {
+                // Se asume que los campos son rubro, titulo, detalle y ACTIVO
+                const isActive = (convenio.ACTIVO || '').toUpperCase().trim() === 'SI'; 
+                
+                const activoIcono = isActive 
+                    ? '<i class="activo-icon fas fa-check-circle text-success" title="Activo"></i>' 
+                    : '<i class="activo-icon fas fa-times-circle text-danger" title="No Activo"></i>';
+                
+                const row = novedadesTableBody.insertRow();
+                
+                // --- AJUSTE DE CODIFICACIÓN PARA EVITAR PROBLEMAS CON CARACTERES ESPECIALES ---
+                const encodedID = encodeURIComponent(convenio.ID || '');
+                const encodedTitulo = encodeURIComponent(convenio.titulo || '');
+                const encodedDetalle = encodeURIComponent(convenio.detalle || '');
+                const encodedActivo = encodeURIComponent(convenio.ACTIVO || 'NO');
+                const encodedRubro = encodeURIComponent(convenio.rubro || '');
+
+                // Usamos los parámetros codificados en el onclick
+                row.setAttribute('onclick', `openModal(
+                    '${encodedID}', 
+                    '${encodedTitulo}', 
+                    '${encodedDetalle}', 
+                    '${encodedActivo}',
+                    '${encodedRubro}'
+                )`);
+                
+                // Las celdas de datos - SOLO ACTIVO, RUBRO, TITULO, DETALLE
+                row.innerHTML = `
+                    <td class="col-activo">${activoIcono}</td>
+                    <td>${convenio.rubro || 'SIN RUBRO'}</td> 
+                    <td>${convenio.titulo}</td>
+                    <td>${convenio.detalle.substring(0, 80).trim()}${convenio.detalle.length > 80 ? '...' : ''}</td>
+                    <td class="col-actions text-center">
+                        <button class="btn btn-sm btn-outline-warning me-2 btn-editar" title="Editar Convenio" data-id="${convenio.ID || ''}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar Convenio" data-id="${convenio.ID || ''}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                
+            });
+            
+            // Delegación de eventos para los botones Editar/Eliminar
+            novedadesTableBody.querySelectorAll('.btn-editar').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation(); // Evita que se dispare el evento click de la fila
+                    const row = btn.closest('tr');
+                    row.click(); // Ejecuta el click de la fila
+                };
+            });
+            
+            novedadesTableBody.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation(); // Evita que se dispare el evento click de la fila
+                    const id = btn.getAttribute('data-id');
+                    showDeleteConfirm(id);
+                };
+            });
+        }
+
+        // --- AJUSTE DE DECODIFICACIÓN AL RECIBIR LOS DATOS ---
+        function openModal(encodedID = '', encodedTitulo = '', encodedDetalle = '', encodedActivo = 'NO', encodedRubro = '') {
+            
+            // Decodificar los parámetros recibidos
+            const id = decodeURIComponent(encodedID);
+            const titulo = decodeURIComponent(encodedTitulo);
+            const detalle = decodeURIComponent(encodedDetalle);
+            const activo = decodeURIComponent(encodedActivo);
+            const rubro = decodeURIComponent(encodedRubro);
+
+            // ------------------------------------------------------------------
+            
+            novedadForm.reset(); 
+            novedadForm.classList.remove('was-validated'); 
+            
+            const inputIdNovedad = document.getElementById('inputIdNovedad');
+            const inputTitulo = document.getElementById('inputTitulo');
+            const inputActivo = document.getElementById('inputActivo');
+            const inputRubro = document.getElementById('inputRubro'); 
+            
+            // Si el ID decodificado es vacío o 'undefined', lo dejamos vacío.
+            inputIdNovedad.value = id === 'undefined' ? '' : id; 
+
+            if (id && id !== 'undefined' && id !== '') {
+                // Modo Edición
+                novedadModalLabel.textContent = 'Editar Convenio';
+                originalGuardarText = 'Guardar Cambios';
+                
+                inputTitulo.value = titulo;
+                textareaContenido.value = detalle; 
+                inputActivo.checked = (activo || '').toUpperCase().trim() === 'SI'; 
+                inputRubro.value = rubro; 
+                
+                btnEliminarEnModal.style.display = 'block'; 
+                
+            } else {
+                // Modo Creación
+                novedadModalLabel.textContent = 'Crear Nuevo Convenio';
+                originalGuardarText = 'Guardar Convenio';
+                inputActivo.checked = true; 
+                inputRubro.value = ""; 
+
+                btnEliminarEnModal.style.display = 'none'; 
+            }
+            
+            // Actualizar el contador de caracteres al abrir el modal
+            const currentLength = textareaContenido.value.length;
+            const maxLength = textareaContenido.getAttribute('maxlength');
+            charCountElement.textContent = `${currentLength}/${maxLength} caracteres`;
+
+            setLoadingState(false, 'GUARDAR');
+
+            novedadModal.show();
+        }
+        // --- FIN DE AJUSTE CLAVE: Decodificamos los datos al recibirlos ---
+
+        function showDeleteConfirm(id) {
+            novedadIdToDelete = id;
+            document.getElementById('deleteNovedadId').textContent = id;
+            setLoadingState(false, 'ELIMINAR');
+            confirmDeleteModal.show();
+        }
+
+        function showFeedback(message, success = true) {
+            const title = success ? '✅ ¡Operación Exitosa!' : '❌ ¡Error!';
+            const header = document.getElementById('feedbackModal').querySelector('.modal-header');
+            const titleEl = document.getElementById('feedbackModalLabel');
+            
+            titleEl.textContent = title;
+            header.classList.remove('bg-danger', 'bg-success', 'text-white');
+            
+            feedbackModalBody.innerHTML = `<p>${message}</p>`;
+
+            if (success) {
+                header.classList.add('bg-success', 'text-white'); 
+            } else {
+                header.classList.add('bg-danger', 'text-white'); 
+            }
+            document.getElementById('feedbackModal').querySelector('.btn-close').classList.add('btn-close-white');
+
+            feedbackModal.show();
+        }
+
+
+        async function fetchNovedades() {
+            loadingSpinner.style.display = 'block';
+            novedadesTableBody.innerHTML = ''; 
+
+            try {
+                // Asumiendo que el AppScript soporta el parámetro action=READ_ALL
+                const response = await fetch(APPSSCRIPT_URL + '?action=READ_ALL');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    const dataArray = data.convenios || data.novedades; 
+                    
+                    if (data.status === 'success' && Array.isArray(dataArray)) {
+                        
+                        // *** INICIO DE MODIFICACIÓN PARA ORDENAR POR RUBRO (Ascendente) ***
+                        dataArray.sort((a, b) => {
+                            const rubroA = String(a.rubro || '').toUpperCase();
+                            const rubroB = String(b.rubro || '').toUpperCase();
+                            if (rubroA < rubroB) {
+                                return -1;
+                            }
+                            if (rubroA > rubroB) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        // *** FIN DE MODIFICACIÓN PARA ORDENAR POR RUBRO ***
+                        
+                        renderTable(dataArray);
+                    } else {
+                        throw new Error(data.message || 'Error en el formato de datos devueltos. Asegurate que tu AppScript devuelva status: success y un array de convenios.');
+                    }
+                } else {
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                loadingSpinner.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        Error al cargar los convenios: ${error.message}
+                        <br>Revisá la configuración de tu AppScript y la URL.
+                    </div>
+                `;
+                console.error('Error al cargar convenios:', error);
+            }
+        }
+
+        async function manejarEnvio(accion, id) {
+            let method, body, apiUrl, successMessage;
+
+            setLoadingState(true, accion === 'ELIMINAR' ? 'ELIMINAR' : 'GUARDAR');
+            
+            // Usamos FormData que es compatible con el AppScript para envíos POST simples
+            const formData = new FormData(novedadForm); 
+            
+            const inputActivo = document.getElementById('inputActivo');
+            // Aseguramos que el campo Activo se envíe como 'NO' si está desmarcado
+            if (!inputActivo.checked) {
+                formData.set('Activo', 'NO'); 
+            } else {
+                 formData.set('Activo', 'SI');
+            }
+            
+            // Aseguramos que el campo ID no se envíe en CREAR
+            if (accion === 'CREAR') {
+                formData.delete('ID');
+            }
+            
+            // *** AJUSTE CRUCIAL: Renombrar 'Contenido' (del formulario) a 'Detalle' (de la planilla)
+            const contenidoValue = formData.get('Contenido');
+            formData.set('Detalle', contenidoValue); // Enviamos como 'Detalle' para tu columna D
+            formData.delete('Contenido'); // Eliminamos el nombre 'Contenido'
+
+            switch (accion) {
+                case 'CREAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    formData.append('action', 'CREATE');
+                    body = formData;
+                    successMessage = 'El convenio se creó exitosamente.';
+                    break;
+                case 'ACTUALIZAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    formData.append('action', 'UPDATE');
+                    formData.append('ID', id);
+                    body = formData;
+                    successMessage = `El convenio se actualizó correctamente.`;
+                    break;
+                case 'ELIMINAR':
+                    method = 'POST';
+                    apiUrl = APPSSCRIPT_URL;
+                    const deleteData = new FormData();
+                    deleteData.append('action', 'DELETE');
+                    deleteData.append('ID', id);
+                    body = deleteData;
+                    successMessage = `El convenio fue eliminado.`;
+                    break;
+                default:
+                    showFeedback('Acción desconocida.', false);
+                    return;
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: method,
+                    body: body 
+                });
+
+                const responseText = await response.text();
+                let result = {};
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    if (responseText.includes('Error')) {
+                        throw new Error('Error desconocido del servidor de AppScript.');
+                    }
+                    result = { status: 'success' };
+                }
+
+                if (response.ok && result.status === 'success') {
+                    novedadModal.hide();
+                    showFeedback(successMessage, true);
+                    await fetchNovedades(); // Recarga la tabla
+                } else {
+                    const errorDetail = result.message || 'Error en la operación en la planilla.';
+                    throw new Error(errorDetail);
+                }
+
+            } catch (error) {
+                if (accion !== 'ELIMINAR') {
+                    novedadModal.hide();
+                }
+                showFeedback(`¡Error al ejecutar la operación! Detalle: ${error.message}`, false);
+                console.error(`Error de ${accion}:`, error);
+            } finally {
+                setLoadingState(false, accion === 'ELIMINAR' ? 'ELIMINAR' : 'GUARDAR');
+            }
+        }
+
+    </script>
+</body>
+</html>

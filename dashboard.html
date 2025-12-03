@@ -120,7 +120,7 @@
             
         </header>
 
-        <div id="btn-group" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 p-4 bg-white rounded-xl shadow-xl">
+        <div id="btn-group" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4 p-4 bg-white rounded-xl shadow-xl">
             <button 
                 data-sheet="tabla_consulta"
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg active-indigo"
@@ -138,6 +138,12 @@
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
             >
                 Gestor Novedades
+            </button>
+            <button 
+                data-sheet="gestor_convenios_external"
+                class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
+            >
+                Gestor Convenios
             </button>
             <button 
                 data-sheet="credencial_qr"
@@ -210,6 +216,7 @@
             'tabla_consulta': '0',
             'gestor_novedades_external': null,
             'gestor_afiliaciones_external': null, // AGREGADO
+            'gestor_convenios_external': null, // AGREGADO POR EL USUARIO
             'credencial_qr': null,
         };
 
@@ -297,6 +304,14 @@
         function openGestorNovedades() {
             // Utilizamos window.location.href para abrir en la misma pestaña
             window.location.href = 'gestor_novedades.html';
+        }
+        
+        /**
+         * Función para abrir el Gestor Convenios en la misma ventana.
+         */
+        function openGestorConvenios() {
+            // Utilizamos window.location.href para abrir en la misma pestaña
+            window.location.href = 'gestor_convenios.html';
         }
 
         /**
@@ -534,23 +549,30 @@
                 return; 
             }
 
-            // 3. REDIRECCIÓN PARA CREDENCIAL_QR (AHORA ABRE EN LA MISMA PESTAÑA)
+            // 3. Manejo especial para el gestor de convenios (AHORA ABRE EN LA MISMA PESTAÑA)
+            if (sheetName === 'gestor_convenios_external') {
+                openGestorConvenios();
+                // REDIRECCIÓN COMPLETA: Salimos de la función
+                return; 
+            }
+
+            // 4. REDIRECCIÓN PARA CREDENCIAL_QR (AHORA ABRE EN LA MISMA PESTAÑA)
             if (sheetName === 'credencial_qr') {
                 window.location.href = 'credencial_qr.html'; // Abre en la misma pestaña
                 // REDIRECCIÓN COMPLETA: Salimos de la función
                 return;
             }
             
-            // 4. Cargar datos
+            // 5. Cargar datos
             const gid = sheetGids[sheetName];
             if (gid) { // Solo cargamos data si es una vista de tabla con GID (tabla_consulta)
                  loadSheetData(sheetName);
             }
            
-            // 5. Actualizar el estado del último botón activo
+            // 6. Actualizar el estado del último botón activo
             lastActiveSheet = sheetName;
 
-            // 6. Actualizar botones activos (solo los de las vistas de tabla)
+            // 7. Actualizar botones activos (solo los de las vistas de tabla)
             buttons.forEach(btn => {
                 const btnSheet = btn.getAttribute('data-sheet');
                 
@@ -558,7 +580,7 @@
                 btn.classList.remove('active-indigo');
 
                 // Si es un botón de vista de tabla y es el seleccionado, lo activa.
-                if (btnSheet !== 'gestor_novedades_external' && btnSheet !== 'gestor_afiliaciones_external' && btnSheet !== 'credencial_qr' && btnSheet === sheetName) {
+                if (btnSheet !== 'gestor_novedades_external' && btnSheet !== 'gestor_afiliaciones_external' && btnSheet !== 'gestor_convenios_external' && btnSheet !== 'credencial_qr' && btnSheet === sheetName) {
                     btn.classList.add('active-indigo');
                 }
             });
