@@ -6,31 +6,37 @@
     <title>Tabla de Afiliados - Gestor Simplificado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
-        /* CONSTANTES DE COLOR COPIADAS DE gestor_novedades.html */
+        /* CONSTANTES DE COLOR */
         :root {
-            --stm-purple: #5A377B; /* Púrpura principal */
-            --stm-teal: #34B3C5;   /* Turquesa */
-            --stm-red: #dc3545;    /* Rojo */
-            --stm-indigo: #4f46e5; /* Índigo del dashboard (Cabecera de Tabla) */
-            --stm-dark-purple: #492a63; /* Variante oscura del púrpura para hover */
+            --stm-purple: #5A377B; 
+            --stm-teal: #34B3C5;   
+            --stm-red: #dc3545;    
+            --stm-indigo: #4f46e5; 
+            --stm-dark-purple: #492a63;
         }
 
         /* ------------------------------------------------------------------- */
-        /* ESTILOS DE ENCABEZADO COPIADOS DE gestor_novedades.html */
+        /* ESTILOS DE GESTOR Y RESPONSIVENESS */
         /* ------------------------------------------------------------------- */
         body {
-            /* Usamos la fuente Roboto del Gestor de Novedades */
             font-family: 'Roboto', sans-serif; 
             background-color: #f3f4f6; 
         }
 
-        /* Contenedor principal con borde superior */
         .main-container {
-            border-top: 4px solid var(--stm-indigo); /* Borde superior como el dashboard */
+            border-top: 4px solid var(--stm-indigo);
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
         .header-main-flex {
@@ -39,6 +45,7 @@
             justify-content: space-between; 
             margin-bottom: 20px; 
             padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
             flex-wrap: wrap;
             gap: 10px; 
         }
@@ -80,19 +87,6 @@
             white-space: nowrap; 
         }
         
-        .header-actions {
-            display: flex;
-            gap: 10px; /* Espacio entre los botones */
-            flex-shrink: 0;
-            flex-wrap: wrap; 
-            justify-content: flex-end; 
-        }
-        .header-main-flex > .btn-dashboard {
-             /* Eliminamos el estilo obsoleto para que se gestione por header-actions */
-            display: none; 
-        }
-
-        /* BOTÓN 'Tablero de mando' (Púrpura) */
         .btn-dashboard {
             background-color: var(--stm-purple); 
             border-color: var(--stm-dark-purple); 
@@ -104,6 +98,7 @@
             transition: all 0.2s ease-in-out;
             text-decoration: none; 
             white-space: nowrap; 
+            flex-shrink: 0;
         }
         .btn-dashboard:hover,
         .btn-dashboard:focus {
@@ -113,21 +108,19 @@
             transform: translateY(-1px);
         }
         
-        /* Ajuste en móvil */
         @media (max-width: 767.98px) {
+            .main-container {
+                padding: 15px;
+                margin: 15px auto;
+            }
             .header-main-flex {
-                flex-direction: column; 
-                justify-content: center;
-                align-items: center;
-                text-align: center; 
+                flex-direction: row; 
+                justify-content: space-between;
+                align-items: flex-start;
             }
             .header-logo-title {
                 max-width: 100%;
                 flex-grow: 1;
-                margin-bottom: 10px; /* Espacio antes de los botones */
-            }
-            .header-title-text {
-                align-items: center; /* Centrar texto en móvil */
             }
             .header-title-text .subtitle {
                 font-size: 0.9rem;
@@ -135,16 +128,15 @@
             .header-title-text .title {
                 font-size: 1.3rem; 
             }
-            .header-actions {
-                justify-content: center; /* Centrar botones en móvil */
-                width: 100%;
-            }
         }
-        /* ------------------------------------------------------------------- */
-        /* FIN ESTILOS DE ENCABEZADO */
-        /* ------------------------------------------------------------------- */
 
-        /* Estilos preexistentes */
+        .table-container {
+            border-radius: 8px;
+            overflow: hidden; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto; 
+        }
+        
         .table-container::-webkit-scrollbar {
             height: 8px;
         }
@@ -152,14 +144,84 @@
             background-color: #9ca3af; 
             border-radius: 10px;
         }
+        
         tr.cursor-pointer:hover {
             background-color: #eef2ff !important; 
         }
+        
+        #data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        /* ------------------------------------------------------------------- */
+        /* ESTILOS DE LA CREDENCIAL QR (Copiados EXACTAMENTE de credencial_qr.html) */
+        /* ------------------------------------------------------------------- */
+        .logo-stm-img {
+            height: 60px;
+            width: auto;
+        }
+
+        .card-container {
+            font-family: 'Inter', sans-serif; 
+            width: 340px; 
+            height: 215px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 10px;
+            overflow: hidden; 
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #credential-modal,
+            #credential-modal * {
+                visibility: visible;
+            }
+
+            #credential-modal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                display: block !important;
+                background: none;
+                padding: 0;
+            }
+
+            #credential-modal .bg-white {
+                background-color: transparent !important;
+                box-shadow: none;
+                padding: 0;
+            }
+
+            #credential-modal .card-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                box-shadow: none;
+                border: 1px solid #ccc; 
+                margin: 0;
+            }
+            
+            .print-btn-container,
+            .close-btn,
+            .modal-title {
+                display: none !important;
+            }
+        }
+        /* ------------------------------------------------------------------- */
+        /* FIN ESTILOS DE LA CREDENCIAL QR */
+        /* ------------------------------------------------------------------- */
     </style>
 </head>
 <body class="p-4 sm:p-8">
 
-    <div class="max-w-7xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl main-container">
+    <div class="main-container"> 
         
         <div class="header-main-flex">
             
@@ -172,11 +234,10 @@
                 </div>
             </div>
 
-            <div class="header-actions">
-                <a href="dashboard.html" class="btn-dashboard">
-                    <i class="fas fa-chart-line me-2"></i> Tablero de mando
-                </a>
-            </div>
+            <a href="dashboard.html" class="btn-dashboard">
+                <i class="fas fa-chart-line me-2"></i> Tablero de mando
+            </a>
+            
         </div>
         
         <p class="text-gray-600 mb-6 sm:mb-8 border-b pb-4">
@@ -190,7 +251,7 @@
             Cargando datos... 
         </div>
 
-        <div id="table-container" class="table-container overflow-x-auto rounded-lg shadow-lg hidden">
+        <div id="table-container" class="table-container hidden"> 
             <table id="data-table" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-600 text-white sticky top-0">
                     </thead>
@@ -199,9 +260,28 @@
             </table>
         </div>
 
-    </div> <div id="detail-card" class="max-w-7xl mx-auto mt-8 mb-6 hidden">
+    </div> 
+    
+    <div id="detail-card" class="max-w-7xl mx-auto mt-8 mb-6 hidden">
     </div>
 
+    <div id="credential-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 justify-center items-center hidden p-4">
+        <div class="bg-white p-6 rounded-lg shadow-2xl relative max-w-sm w-full" style="max-width: 400px;">
+            <h3 class="modal-title text-xl font-bold text-gray-800 mb-4 border-b pb-2">Credencial Digital del Afiliado</h3>
+            
+            <div id="credential-card-container" class="flex justify-center">
+                </div>
+            
+            <div class="print-btn-container mt-4 flex flex-col space-y-2">
+                <button onclick="window.print()" class="print-btn inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition duration-150 ease-in-out">
+                    <i class="fas fa-print mr-2"></i> Imprimir / Guardar PDF
+                </button>
+                <button onclick="document.getElementById('credential-modal').classList.add('hidden'); document.getElementById('credential-modal').classList.remove('flex')" class="close-btn inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
     <script>
         // --- INSTRUCCIONES IMPORTANTES PARA EL USUARIO ARGENTINO ---
         // 1. Reemplazá 'TU_SPREADSHEET_ID' con el ID real de tu planilla (lo sacás de la URL).
@@ -255,7 +335,6 @@
         const messagesDiv = document.getElementById('messages');
         const detailCardDiv = document.getElementById('detail-card');
         
-        // Variable global para guardar todos los datos por fila
         let allAffiliateData = [];
         
         
@@ -263,22 +342,15 @@
         // === FUNCIONES DE AUTENTICACIÓN Y SEGURIDAD ==============================
         // =========================================================================
         
-        /**
-         * 🚨 VERIFICA LA SESIÓN: Si no está logueado (isAuthenticatedSTM no es 'true'), 
-         * redirige al index.html para que inicie sesión.
-         */
         function checkAuthentication() {
             const isAuthenticated = localStorage.getItem('isAuthenticatedSTM') === 'true';
             if (!isAuthenticated) {
-                // Redirigir al login si no está autenticado
                 window.location.href = 'index.html';
                 return false; 
             }
             return true;
         }
 
-        // Se eliminó la función 'logout()' a pedido del usuario.
-        
         // =========================================================================
         // === FIN FUNCIONES DE AUTENTICACIÓN Y SEGURIDAD ==========================
         // =========================================================================
@@ -286,7 +358,6 @@
 
         /**
          * Muestra un mensaje de error en la interfaz.
-         * @param {string} msg El mensaje a mostrar.
          */
         function displayMessage(msg) {
             messagesDiv.textContent = msg;
@@ -302,7 +373,6 @@
                 const match = googleDateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
                 if (match) {
                     const year = match[1];
-                    // El mes es 0-indexado en Sheets/JS, sumamos 1 para mostrar el mes real
                     const month = parseInt(match[2], 10) + 1; 
                     const day = match[3];
 
@@ -316,20 +386,94 @@
         }
         
         /**
-         * Muestra el card de detalles del afiliado con el botón de llamada RESPONSIVE.
+         * Genera y muestra la credencial QR del afiliado en un modal, usando el diseño de credencial_qr.html.
+         */
+        function handleCredentialGeneration(rowIndex) {
+            const affiliate = allAffiliateData[rowIndex];
+            if (!affiliate) return;
+
+            // 1. Obtener datos clave
+            const nombreCompleto = affiliate['Nombre y Apellido'] || 'AFILIADO STM';
+            const legajo = affiliate['Legajo'] || 'N/A';
+            const dni = affiliate['DNI'] || 'N/A';
+            
+            const logoSrc = "logo_STM.png"; 
+
+            // 2. Generar el contenido del QR (Copiado de credencial_qr.html)
+            const qrContent = `SINDICATO DE TRABAJADORES MUNICIPALES MGP
+Legajo: ${legajo}
+Afiliado: ${nombreCompleto.toUpperCase()}
+DNI: ${dni}`; 
+
+            // 3. Crear el HTML de la credencial (Copiado de credencial_qr.html y adaptado para inyección de datos)
+            const cardHtml = `
+                <div class="card-container">
+
+                    <div class="p-3 border-b border-gray-200 flex justify-between items-start bg-gray-50">
+                        <div>
+                            <p class="text-lg font-bold leading-tight text-gray-900">Sindicato de Trabajadores</p>
+                            <p class="text-lg font-bold leading-tight text-gray-900">Municipales</p>
+                            <p class="text-xs text-gray-600">de Gral. Pueyrredón</p>
+                        </div>
+                        <img src="${logoSrc}" alt="Logo STM" class="logo-stm-img">
+                    </div>
+
+                    <div class="flex p-3 space-x-3 border-b border-gray-300">
+                        <div id="qrcode-target" class="w-24 h-24 flex-shrink-0 border p-1 rounded-sm">
+                            </div>
+
+                        <div class="flex-grow overflow-hidden">
+                            <p class="text-xs font-semibold text-gray-700 mb-1">Legajo N° <span id="legajo-output"
+                                    class="text-gray-900 text-sm font-bold">${legajo}</span></p>
+                            <p id="nombre-output"
+                                class="text-sm sm:text-lg font-extrabold leading-tight text-gray-900 uppercase truncate">
+                                ${nombreCompleto.toUpperCase()}</p>
+                            <p class="text-sm font-semibold text-gray-700 mt-1">DNI <span id="dni-output"
+                                    class="text-gray-900 text-base font-bold">${dni}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-100 p-2 text-center">
+                        <p class="text-sm font-extrabold text-blue-800 tracking-wide mb-1">CREDENCIAL DE AFILIADO</p>
+                        <p class="text-xs text-gray-700 leading-tight">Moreno 4359 - (223) 4723756 - Mar del Plata - Pcia.
+                            Bs. As.</p>
+                        <p class="text-xs italic text-gray-800 leading-tight mt-0.5">Carece de validez si no se exhibe con
+                            DNI</p>
+                    </div>
+                </div>
+            `;
+
+            const cardContainer = document.getElementById('credential-card-container');
+            cardContainer.innerHTML = cardHtml; // Inyectar el HTML de la credencial
+
+            // 4. Generar el Código QR
+            const qrDiv = document.getElementById('qrcode-target'); 
+            
+            new QRCode(qrDiv, {
+                text: qrContent,
+                width: 85,
+                height: 85,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // 5. Mostrar el modal
+            document.getElementById('credential-modal').classList.remove('hidden');
+            document.getElementById('credential-modal').classList.add('flex'); // Usar flex para centrar
+        }
+        
+        /**
+         * Muestra el card de detalles del afiliado con el botón de llamada y el nuevo botón QR.
          */
         function showDetailCard(rowIndex) {
             const affiliate = allAffiliateData[rowIndex];
             if (!affiliate) return;
 
-            // Columna 1: Nombre y Apellido
             const name = affiliate[ALL_COLUMN_HEADINGS[1]] || 'Afiliado Desconocido'; 
-            // Columna 9: Email (para el botón)
             const email = affiliate[ALL_COLUMN_HEADINGS[9]] || ''; 
-            // Columna 8: Teléfono (para el botón)
             const phone = affiliate[ALL_COLUMN_HEADINGS[8]] || ''; 
             
-            // Función para limpiar el teléfono (solo dígitos para la URL tel:)
             const cleanPhone = phone.replace(/[^\d]/g, '');
 
             let cardContent = `
@@ -340,10 +484,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-gray-700">
             `;
 
-            // Generar el cuerpo del Card con el resto de la información (el mismo filtro y etiquetas)
+            // Generar el cuerpo del Card con el resto de la información
             ALL_COLUMN_HEADINGS.forEach((heading) => {
                 
-                // 1. Filtrar las columnas que no van
                 if (EXCLUDE_FROM_DETAIL.includes(heading)) {
                     return; 
                 }
@@ -363,10 +506,15 @@
                 `;
             });
 
-            // --- BLOQUE DE BOTONES RESPONSIVE (Móvil) ---
+            // --- BLOQUE DE BOTONES (incluye el botón de Llamar solo para móvil: sm:hidden) ---
             cardContent += `
                     </div>
                     <div class="mt-6 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        
+                        <button onclick="handleCredentialGeneration(${rowIndex})"
+                           class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            💳 Generar Credencial QR
+                        </button>
                         
                         <a href="tel:${cleanPhone}" 
                            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out sm:hidden ${!cleanPhone ? 'opacity-50 cursor-not-allowed' : ''}"
@@ -404,7 +552,6 @@
                 thead.innerHTML = '';
                 tbody.innerHTML = '';
                 
-                // Limpiar la data anterior
                 allAffiliateData = [];
 
                 // 1. Crear encabezados (<thead>) con solo las columnas visibles
@@ -418,45 +565,34 @@
                 // 2. Llenar filas (<tbody>)
                 table.rows.forEach((row, rowIndex) => {
                     
-                    // Objeto para guardar toda la data de la fila
                     let rowData = {};
-                    let rowHtml = ''; // Para el contenido de los <td> visibles
+                    let rowHtml = '';
                     
-                    // Almacenar TODOS los datos de la fila
                     for (let i = 0; i < ALL_COLUMN_HEADINGS.length; i++) {
                         const cell = row.c[i];
-                        // cell.f es valor formateado, cell.v es el valor crudo
                         let cellValue = cell ? (cell.f || cell.v) : ''; 
 
-                        // Formato especial para la fecha (si aplica a la columna 4: F. Nac.)
                         if (i === 4 && cellValue) {
                            cellValue = formatGoogleDate(cellValue);
                         }
                         
-                        // Almacenar el dato con el nombre de la columna como clave
                         rowData[ALL_COLUMN_HEADINGS[i]] = cellValue;
 
-                        // Si la columna es visible, la agregamos al HTML de la fila
                         if (VISIBLE_COLUMN_INDICES.includes(i)) {
                             rowHtml += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${cellValue}</td>`;
                         }
                     }
                     
-                    // Guardar todos los datos de la fila
                     allAffiliateData.push(rowData);
 
-                    // Crear la fila e inyectar el HTML de las celdas
                     const rowElement = document.createElement('tr');
-                    // Clase para el efecto hover y el cursor
                     rowElement.className = 'cursor-pointer hover:bg-blue-50 transition duration-150 ease-in-out';
                     rowElement.innerHTML = rowHtml;
                     
-                    // Agregar el evento de click que muestra el detalle
                     rowElement.addEventListener('click', () => showDetailCard(rowIndex)); 
                     tbody.appendChild(rowElement);
                 });
 
-                // Mostrar la tabla y ocultar el mensaje de carga
                 loadingDiv.classList.add('hidden');
                 tableContainerDiv.classList.remove('hidden');
 
@@ -470,19 +606,14 @@
          * Inicializa la aplicación: obtiene los datos de la hoja de cálculo.
          */
         async function initializeApp() {
-            // 🚨 1. PRIMERO CHEQUEAMOS LA AUTENTICACIÓN
-            // Si checkAuthentication devuelve false, la función ya redirigió y no seguimos.
             if (!checkAuthentication()) {
                 return; 
             }
             
-            // 2. Si está autenticado, cargamos los datos
             try {
-                // Hacemos el fetch al URL de Google Sheets
                 const response = await fetch(GOOGLE_SHEET_URL);
                 const text = await response.text();
                 
-                // Extraer el JSON puro del wrapper de la API de Google
                 const jsonStr = text.substring(
                     text.indexOf('{'), 
                     text.lastIndexOf('}') + 1
@@ -493,24 +624,20 @@
                 if (data.status === 'ok') {
                     renderTable(data);
                 } else {
-                    // Manejo de errores de la API (ej: permisos denegados)
                     console.error('Error de la API de Google Sheets:', data.errors);
                     displayMessage(`¡Falló la carga! Puede ser un problema de permisos. Asegurate que la hoja es PÚBLICA. Detalle: ${data.errors[0].message}`);
                 }
 
             } catch (error) {
                 console.error('Error al obtener los datos:', error);
-                // Si la URL es incorrecta o hay problemas de red/CORS
                 displayMessage(`¡No pudimos conectar con la planilla, che! Revisá si el ID (${SPREADSHEET_ID}) y el GID (${GID}) están bien y si la hoja está compartida como PÚBLICA. Detalles técnicos: ${error.message}`);
             } finally {
-                // Si algo falla, ocultamos el mensaje de carga de todas formas
                 if (loadingDiv && !tableContainerDiv.classList.contains('hidden')) {
                     loadingDiv.classList.add('hidden');
                 }
             }
         }
         
-        // Ejecutar la función de inicialización cuando el script se carga
         initializeApp();
     </script>
 </body>
