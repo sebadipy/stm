@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beneficios y Convenios STM</title>
+    <!-- Cargamos la nueva tipografía: Poppins (más moderna y con personalidad) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Incluimos Tailwind CSS para un diseño moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Usamos Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        /* Configuraciones personalizadas de Tailwind (Paleta STM) */
+        :root {
+            --color-stm-purple: #5A377B; /* Púrpura principal (Fuerte) */
+            --color-stm-teal: #34B3C5;   /* Turquesa (Acento Vibrante) */
+            --color-bg-light: #f7f7f8;   /* Fondo muy claro */
+            --color-card-bg: #ffffff;    /* Fondo de tarjeta blanco puro */
+        }
+
+        /* Aplicar la fuente POPPINS y colores base */
+        body {
+            font-family: 'Poppins', sans-serif; /* ¡Tipografía cambiada a Poppins! */
+            background-color: var(--color-bg-light);
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* Contenedor principal para simular la pantalla de una app */
+        .app-container {
+            max-width: 480px; 
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: var(--color-card-bg); 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); 
+        }
+        
+        /* Estilo para el contenedor principal de tarjetas (Acordeón) */
+        .convenio-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 6px 15px -3px rgba(0, 0, 0, 0.08); 
+            border-radius: 1rem; 
+            overflow: hidden;
+            background-color: var(--color-card-bg);
+        }
+        
+        /* Efecto al pasar el mouse (lift) y focus - Más pronunciado */
+        .convenio-card:hover, .convenio-card.open {
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.15);
+            border-color: var(--color-stm-teal); 
+        }
+        
+        /* Estilo para la barra de título del convenio */
+        .convenio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem; 
+            background-color: var(--color-card-bg);
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        /* Estilo al estar abierta la tarjeta */
+        .convenio-card.open .convenio-header {
+            background-color: #fcfcfc; 
+        }
+        
+        /* Estilo del Rubro Tag (púrpura STM) */
+        .rubro-tag {
+            transition: all 0.2s ease;
+            background-color: var(--color-stm-purple); 
+            box-shadow: 0 2px 8px rgba(90, 55, 123, 0.4); 
+        }
+
+        /* Estilo del contenido desplegable */
+        .convenio-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding: 0 1.25rem;
+            background-color: #ffffff;
+        }
+        
+        /* Estilo del contenido al estar abierto */
+        .convenio-card.open .convenio-content {
+            max-height: 1000px; 
+            padding: 1rem 1.25rem 1.5rem; 
+        }
+
+        /* Icono de flecha giratoria (con color de acento turquesa) */
+        .chevron {
+            transition: transform 0.4s ease-out; 
+            color: var(--color-stm-teal); 
+            font-size: 1rem;
+        }
+        .convenio-card.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Estilo para el contenedor de filtros fijo */
+        .filter-sticky-container {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: var(--color-card-bg);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 1rem 1.25rem; 
+            margin-bottom: 1rem;
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+            transition: box-shadow 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contenedor Principal que simula la pantalla de un móvil -->
+    <div class="app-container">
+        
+        <!-- HEADER / Barra de Navegación Estilo App (Full width, STM Purple) -->
+        <header class="p-5 bg-[var(--color-stm-purple)] text-white shadow-xl">
+            <div class="flex items-center">
+                <!-- Icono/Logo STM (Color de acento Turquesa) -->
+                <i class="fas fa-hand-holding-heart text-3xl text-[var(--color-stm-teal)] mr-3 animate-pulse"></i>
+                <!-- Usamos 'font-extrabold' y 'tracking-tight' de Poppins -->
+                <h1 class="text-2xl font-extrabold tracking-tight">
+                    BENEFICIOS STM
+                </h1>
+            </div>
+            <p class="text-indigo-200 text-sm mt-1 font-light">
+                Convenios exclusivos y llamativos para vos.
+            </p>
+        </header>
+
+        <!-- Contenedor de Filtros (Fijo en la parte superior al hacer scroll) -->
+        <div class="filter-sticky-container">
+            
+            <!-- Filtro de Rubro (Categorías) -->
+            <div class="w-full">
+                <label for="rubroFilter" class="block text-sm font-semibold text-gray-800 mb-2">
+                    <i class="fas fa-magnifying-glass text-[var(--color-stm-teal)] mr-2"></i> Explorar Categorías
+                </label>
+                <select id="rubroFilter" class="w-full p-3 border-2 border-gray-200 rounded-xl shadow-md text-gray-800 font-medium focus:ring-4 focus:ring-[var(--color-stm-teal)] focus:border-[var(--color-stm-teal)] transition duration-200 appearance-none bg-white pr-8">
+                    <!-- Opciones se llenarán con JS -->
+                    <option value="TODOS" class="font-bold">TODOS los Convenios</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Contenedor principal de los convenios (con padding interior) -->
+        <div class="p-4 space-y-4">
+            
+            <h2 class="text-xl font-bold text-gray-800 mb-4 px-1">Convenios Destacados:</h2>
+
+            <div id="conveniosList" class="space-y-4 pb-12">
+                <!-- Spinner de carga inicial -->
+                <div id="loadingSpinner" class="text-center p-12 bg-gray-100 rounded-2xl shadow-inner">
+                    <i class="fas fa-spinner fa-spin text-5xl text-[var(--color-stm-teal)]"></i>
+                    <p class="mt-4 text-gray-700 font-bold text-lg">Cargando beneficios...</p>
+                </div>
+                
+                <!-- Aquí se cargarán dinámicamente los convenios -->
+            </div>
+
+            <!-- Mensaje de no resultados (oculto por defecto) -->
+            <div id="noResults" class="hidden text-center p-10 bg-red-50 rounded-2xl shadow-md border-2 border-red-300 mt-6">
+                <i class="fas fa-search-minus text-4xl text-red-500"></i>
+                <p class="mt-4 text-red-700 font-bold">¡Uy! No hay convenios en esta categoría.</p>
+                <p class="text-sm text-red-600">Probá filtrando por "TODOS" para ver todo lo que tenemos.</p>
+            </div>
+            
+        </div>
+        
+        <!-- FOOTER (Simple para mobile) -->
+        <footer class="p-4 text-center text-xs text-gray-500 border-t mt-6 bg-gray-50">
+            <p>&copy; 2024 STM - Sindicato de Trabajadores Municipales</p>
+        </footer>
+    </div>
+
+    <script>
+        // La URL de tu AppScript que devuelve los datos de los convenios
+        // NOTA: Reemplazar con la URL real de tu AppScript
+        const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgD9-ggtZjFyK7I4FfwLETVtj5TUBvQIZWF5om5yAKLhj4BuerpbdHN-3PnTfLDzdxBA/exec'; 
+
+        const conveniosList = document.getElementById('conveniosList');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const rubroFilter = document.getElementById('rubroFilter');
+        const noResults = document.getElementById('noResults');
+        let allConvenios = []; // Almacenará todos los convenios cargados
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchConvenios();
+            rubroFilter.addEventListener('change', filterConvenios);
+        });
+        
+        /**
+         * Simula un simple fetch con reintento y backoff exponencial (para manejar posibles fallos de red)
+         */
+        async function fetchWithRetry(url, options = {}, maxRetries = 3, delay = 1000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        throw new Error(`HTTP Error: ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                        throw error;
+                    }
+                    // Espera con backoff exponencial
+                    await new Promise(resolve => setTimeout(resolve, delay * (2 ** i)));
+                }
+            }
+        }
+        
+        /**
+         * Carga los convenios desde el AppScript.
+         */
+        async function fetchConvenios() {
+            loadingSpinner.classList.remove('hidden');
+            conveniosList.innerHTML = '';
+            noResults.classList.add('hidden');
+
+            try {
+                // Hacemos el fetch, asumiendo que el AppScript soporta action=READ_ALL
+                const response = await fetchWithRetry(APPSSCRIPT_URL + '?action=READ_ALL');
+                const responseText = await response.text();
+                
+                let data = {};
+                try {
+                    data = JSON.parse(responseText);
+                } catch(e) {
+                     // Si falla el JSON.parse, asumimos error de formato o AppScript no responde correctamente
+                     throw new Error('Respuesta del servidor no es JSON válida o estructura inesperada.');
+                }
+                
+                // Usamos 'convenios' o 'novedades' dependiendo de la estructura que devuelva el AppScript
+                const dataArray = data.convenios || data.novedades; 
+                
+                if (data.status === 'success' && Array.isArray(dataArray)) {
+                    // Solo mantenemos los convenios que están 'ACTIVOS'
+                    allConvenios = dataArray.filter(c => (c.ACTIVO || '').toUpperCase().trim() === 'SI');
+                    
+                    // Ordenamos por Rubro para mejor visualización
+                    allConvenios.sort((a, b) => (a.rubro || '').localeCompare(b.rubro || ''));
+                    
+                    populateFilters(allConvenios);
+                    renderConvenios(allConvenios);
+
+                } else {
+                    throw new Error(data.message || 'Error: Formato de datos inesperado o status no es "success".');
+                }
+            } catch (error) {
+                console.error('Error al cargar convenios:', error);
+                conveniosList.innerHTML = `
+                    <div class="alert bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md" role="alert">
+                        <h4 class="font-bold">¡Error de Conexión!</h4>
+                        <p>No se pudieron cargar los convenios. Verificá la URL del AppScript o la conexión a internet.</p>
+                        <p class="text-sm mt-1">Detalle: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Rellena el select de filtros con los rubros únicos encontrados.
+         */
+        function populateFilters(convenios) {
+            const rubros = new Set();
+            convenios.forEach(c => {
+                if (c.rubro) {
+                    rubros.add(c.rubro.toUpperCase().trim());
+                }
+            });
+
+            // Limpiar y añadir la opción 'TODOS'
+            rubroFilter.innerHTML = '<option value="TODOS" class="font-bold">TODOS los Convenios</option>';
+
+            // Convertir el Set a Array, ordenar alfabéticamente y agregar opciones
+            Array.from(rubros).sort().forEach(rubro => {
+                const option = document.createElement('option');
+                option.value = rubro;
+                option.textContent = rubro;
+                rubroFilter.appendChild(option);
+            });
+        }
+        
+        /**
+         * Filtra los convenios basados en la selección del rubro.
+         */
+        function filterConvenios() {
+            const selectedRubro = rubroFilter.value;
+            let filteredConvenios = [];
+
+            if (selectedRubro === 'TODOS') {
+                filteredConvenios = allConvenios;
+            } else {
+                filteredConvenios = allConvenios.filter(c => 
+                    (c.rubro || '').toUpperCase().trim() === selectedRubro
+                );
+            }
+
+            renderConvenios(filteredConvenios);
+        }
+
+        /**
+         * Devuelve un icono de Font Awesome basado en el nombre del rubro.
+         */
+        function getRubroIcon(rubro) {
+            const r = rubro.toUpperCase().trim();
+            // Iconos ajustados para ser más descriptivos
+            switch (r) {
+                case 'SALUD':
+                case 'MEDICINA':
+                    return '<i class="fas fa-heart-pulse mr-1"></i>'; 
+                case 'EDUCACION':
+                case 'FORMACION':
+                    return '<i class="fas fa-book-open-reader mr-1"></i>'; 
+                case 'TURISMO':
+                case 'VIAJES':
+                    return '<i class="fas fa-plane-departure mr-1"></i>'; 
+                case 'DEPORTES':
+                case 'GIMNASIOS':
+                    return '<i class="fas fa-dumbbell mr-1"></i>'; 
+                case 'COMERCIO':
+                case 'COMPRAS':
+                    return '<i class="fas fa-store mr-1"></i>'; 
+                case 'GASTRONOMIA':
+                case 'COMIDA':
+                    return '<i class="fas fa-utensils mr-1"></i>'; 
+                case 'SERVICIOS':
+                    return '<i class="fas fa-screwdriver-wrench mr-1"></i>'; 
+                case 'BELLEZA':
+                case 'ESTETICA':
+                    return '<i class="fas fa-spa mr-1"></i>'; 
+                case 'FINANZAS':
+                    return '<i class="fas fa-sack-dollar mr-1"></i>'; 
+                case 'LEGAL':
+                    return '<i class="fas fa-balance-scale-right mr-1"></i>'; 
+                default:
+                    return '<i class="fas fa-star mr-1"></i>'; 
+            }
+        }
+
+        /**
+         * Renderiza la lista de convenios en formato de acordeón.
+         */
+        function renderConvenios(convenios) {
+            conveniosList.innerHTML = '';
+            
+            if (convenios.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            }
+            noResults.classList.add('hidden');
+
+            convenios.forEach(convenio => {
+                const rubro = (convenio.rubro || 'SIN RUBRO').toUpperCase().trim();
+                const titulo = convenio.titulo || 'Convenio sin Título';
+                const detalle = (convenio.detalle || 'Detalle no especificado.').replace(/\n/g, '<br>'); 
+                const rubroIcon = getRubroIcon(rubro); 
+
+                const card = document.createElement('div');
+                card.className = 'convenio-card'; 
+
+                // Asigna la función de toggling al hacer click en la tarjeta
+                card.onclick = function() {
+                    toggleConvenio(this);
+                };
+
+                card.innerHTML = `
+                    <div class="convenio-header hover:bg-gray-50 active:bg-gray-100 transition duration-150">
+                        <!-- Lado Izquierdo: Rubro y Título -->
+                        <div class="flex-1 min-w-0 pr-4">
+                            <!-- Tag Púrpura Fuerte -->
+                            <span class="rubro-tag inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full text-white mb-2 shadow-lg">
+                                ${rubroIcon} ${rubro} 
+                            </span>
+                            <!-- Título con más peso tipográfico -->
+                            <h2 class="text-xl font-extrabold text-gray-900">${titulo}</h2>
+                        </div>
+                        
+                        <!-- Lado Derecho: Icono de Despliegue Turquesa -->
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-chevron-down chevron text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenido Desplegable (Detalle) -->
+                    <div class="convenio-content">
+                        <div class="text-base text-gray-700 leading-relaxed">
+                            <!-- Detalle del beneficio con color de acento Púrpura -->
+                            <h3 class="font-bold text-[var(--color-stm-purple)] mb-3 border-b-2 border-gray-100 pb-1">Detalles y Beneficios:</h3>
+                            <p>${detalle}</p>
+                        </div>
+                        
+                        <!-- BLOQUE DEL BOTÓN ELIMINADO SEGÚN SOLICITUD DEL USUARIO -->
+                    </div>
+                `;
+                conveniosList.appendChild(card);
+            });
+        }
+        
+        /**
+         * Abre o cierra la tarjeta de convenio y cierra las otras abiertas.
+         */
+        function toggleConvenio(card) {
+            const isOpen = card.classList.contains('open');
+
+            // 1. Cerrar todas las otras tarjetas abiertas
+            document.querySelectorAll('.convenio-card.open').forEach(openCard => {
+                if (openCard !== card) {
+                    openCard.classList.remove('open');
+                }
+            });
+
+            // 2. Abrir/Cerrar la tarjeta actual
+            if (!isOpen) {
+                card.classList.add('open');
+            } else {
+                card.classList.remove('open');
+            }
+        }
+    </script>
+</body>
+</html>
