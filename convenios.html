@@ -526,7 +526,8 @@
         
         /**
          * Devuelve el icono de Font Awesome 6 para el rubro, LÓGICOS y CLAROS.
-         * *Actualizado el ícono de DEPORTES/FITNESS a fa-dumbbell*
+         * *ACTUALIZADO: Balneario/Turismo a Sombrilla (fa-umbrella-beach)*
+         * *ACTUALIZADO: Deportes/Fitness a Raqueta de Tenis (fa-tennis-ball)*
          */
         function getRubroIcon(rubro) {
             // Convertimos a mayúsculas para las comparaciones
@@ -552,7 +553,8 @@
             
             // 5. Turismo y Balnearios 
             if (r.includes('TURISMO') || r.includes('VIAJES') || r.includes('HOTEL') || r.includes('AGENCIA') || r.includes('BALNEARIO')) {
-                return '<i class="fas fa-globe-americas"></i>'; 
+                // CAMBIO SOLICITADO: Sombrilla de playa
+                return '<i class="fa-solid fa-umbrella-beach"></i>'; 
             }
             
             // 6. Comercio y Tienda (QUITAMOS ROPA, que va a INDUMENTARIA)
@@ -560,9 +562,10 @@
                 return '<i class="fas fa-cart-shopping"></i>'; 
             }
             
-            // 7. Fitness/Deportes (Ícono de pesas)
+            // 7. Fitness/Deportes 
             if (r.includes('DEPORTES') || r.includes('GIMNASIO') || r.includes('FITNESS') || r.includes('ENTRENAMIENTO')) {
-                return '<i class="fa-solid fa-dumbbell"></i>'; 
+                // CAMBIO SOLICITADO: Raqueta de tenis (fa-tennis-ball)
+                return '<i class="fa-solid fa-tennis-ball"></i>'; 
             }
             
             // 8. Servicios
