@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TÍTULO ACTUALIZADO -->
     <title>Convenios STM</title>
-    <!-- Cargamos la tipografía ROBOTO (como en novedades.html) -->
+    <!-- Cargamos la tipografía ROBOTO -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <!-- Incluimos Tailwind CSS para un diseño moderno y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -286,7 +286,7 @@
                 </div>
                 
                 <!-- Lado Derecho: BOTÓN DE ACCIÓN (Consulta) -->
-                <!-- NUEVO BOTÓN DE CONSULTA SOLICITADO -->
+                <!-- BOTÓN DE CONSULTA SOLICITADO -->
                 <a href="consulta.html" class="flex flex-col items-center text-center -mt-2">
                     <div class="consulta-icon-bg">
                         <!-- Icono de información 'i' dentro del círculo -->
@@ -320,7 +320,7 @@
                 <!-- CARA TRASERA: LISTA DE CONVENIOS -->
                 <div id="backFace" class="flip-face back-face">
                     
-                    <!-- Botón para volver a la lista de Rubros (Back Button) (Icono cambiado: a fa-chevron-left) -->
+                    <!-- Botón para volver a la lista de Rubros (Back Button) -->
                     <button id="backToRubros" 
                             class="mb-4 flex items-center text-sm font-medium text-white bg-[var(--color-stm-teal)] hover:bg-[#2092a4] active:bg-[#1a7080] transition duration-150 py-2 px-4 rounded-full shadow-md self-start">
                         <i class="fas fa-chevron-left mr-2"></i> Volver a Rubros
@@ -500,26 +500,33 @@
             // Colores tipo Bootstrap para los iconos, con un fondo muy suave
             switch (r) {
                 case 'TODOS': return { color: 'var(--color-stm-purple)', bg: '#f1f1f9' };
-                // Colores para los rubros con íconos actualizados
+                // Rubros Existentes
                 case 'GASTRONOMIA': case 'COMIDA': return { color: 'var(--color-rubro-secondary)', bg: '#f8f9fa' };
                 case 'SALUD': case 'MEDICINA': case 'BELLEZA': case 'ESTETICA': return { color: 'var(--color-rubro-danger)', bg: '#fef3f4' }; 
                 case 'EDUCACION': case 'FORMACION': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' };
-                case 'TURISMO': case 'VIAJES': case 'BALNEARIO': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' }; // Agregado BALNEARIO
+                case 'TURISMO': case 'VIAJES': case 'BALNEARIO': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' }; 
                 case 'COMERCIO': case 'COMPRAS': case 'TIENDA': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' };
                 case 'DEPORTES': case 'GIMNASIOS': case 'FITNESS': return { color: 'var(--color-stm-teal)', bg: '#f0fbff' }; 
-                
-                // Otros Rubros (Mantenidos)
                 case 'SERVICIOS': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' }; 
                 case 'FINANZAS': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' };
                 case 'LEGAL': return { color: 'var(--color-rubro-secondary)', bg: '#f8f9fa' };
-                case 'HOGAR': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' }; // Nuevo rubro
-                case 'ACCESORIOS': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' }; // Nuevo rubro
+                case 'HOGAR': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' }; 
+                case 'ACCESORIOS': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' }; 
+                
+                // Nuevos Rubros
+                case 'AUTOMOTOR': return { color: 'var(--color-rubro-danger)', bg: '#fef3f4' }; // Rojo/Gris oscuro para vehículos
+                case 'BENEFICIOS': return { color: 'var(--color-stm-purple)', bg: '#fcfaff' }; // Púrpura de acento STM
+                case 'INDUMENTARIA': return { color: 'var(--color-rubro-info)', bg: '#f0fbff' }; // Azul claro/Info para ropa
+                case 'RECREACION': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' }; // Verde/éxito para ocio
+                case 'VETERINARIA': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' }; // Amarillo/Advertencia para salud animal
+                
                 default: return { color: 'var(--color-rubro-info)', bg: '#f0fbff' }; // INFO o DEFAULT (Azul claro)
             }
         }
         
         /**
          * Devuelve el icono de Font Awesome 6 para el rubro, LÓGICOS y CLAROS.
+         * *Actualizado el ícono de DEPORTES/FITNESS a fa-dumbbell*
          */
         function getRubroIcon(rubro) {
             // Convertimos a mayúsculas para las comparaciones
@@ -543,24 +550,24 @@
                 return '<i class="fas fa-graduation-cap"></i>'; 
             }
             
-            // 5. Turismo y Balnearios
+            // 5. Turismo y Balnearios 
             if (r.includes('TURISMO') || r.includes('VIAJES') || r.includes('HOTEL') || r.includes('AGENCIA') || r.includes('BALNEARIO')) {
-                return '<i class="fas fa-beach-umbrella"></i>'; 
+                return '<i class="fas fa-globe-americas"></i>'; 
             }
             
-            // 6. Comercio y Tienda
-            if (r.includes('COMERCIO') || r.includes('COMPRAS') || r.includes('TIENDA') || r.includes('MERCADO') || r.includes('ROPA')) {
+            // 6. Comercio y Tienda (QUITAMOS ROPA, que va a INDUMENTARIA)
+            if (r.includes('COMERCIO') || r.includes('COMPRAS') || r.includes('TIENDA') || r.includes('MERCADO')) {
                 return '<i class="fas fa-cart-shopping"></i>'; 
             }
             
-            // 7. Fitness/Deportes
+            // 7. Fitness/Deportes (Ícono de pesas)
             if (r.includes('DEPORTES') || r.includes('GIMNASIO') || r.includes('FITNESS') || r.includes('ENTRENAMIENTO')) {
-                return '<i class="fas fa-person-running"></i>'; 
+                return '<i class="fa-solid fa-dumbbell"></i>'; 
             }
             
             // 8. Servicios
             if (r.includes('SERVICIO')) {
-                 return '<i class="fas fa-headset"></i>'; 
+                 return '<i class="fas fa-handshake"></i>'; 
             }
             
             // 9. Finanzas
@@ -575,7 +582,7 @@
 
             // 11. Hogar
             if (r.includes('HOGAR') || r.includes('MUEBLES') || r.includes('DECORACION')) {
-                return '<i class="fas fa-house-chimney"></i>'; 
+                return '<i class="fas fa-house"></i>'; 
             }
             
             // 12. Accesorios / Tecnología
@@ -583,7 +590,36 @@
                 return '<i class="fas fa-mobile-screen-button"></i>'; 
             }
 
-            // Icono de Fallback (Información/Otro, para asegurar que no se repita con ningún rubro)
+            // ******************************************************
+            // ************ NUEVOS RUBROS SOLICITADOS ***************
+            // ******************************************************
+            
+            // 13. Automotor (Coche)
+            if (r.includes('AUTOMOTOR') || r.includes('VEHICULO') || r.includes('AUTO') || r.includes('MECANICA') || r.includes('GARAGE')) {
+                return '<i class="fas fa-car"></i>';
+            }
+            
+            // 14. Beneficios (Regalo/Premio)
+            if (r.includes('BENEFICIO') || r.includes('REGALO') || r.includes('VENTAJA')) {
+                return '<i class="fas fa-gift"></i>';
+            }
+            
+            // 15. Indumentaria / Ropa (Camisa/Vestimenta)
+            if (r.includes('INDUMENTARIA') || r.includes('ROPA') || r.includes('MODA') || r.includes('ZAPATERIA')) {
+                return '<i class="fas fa-shirt"></i>';
+            }
+            
+            // 16. Recreación / Ocio (Máscaras de teatro/Entretenimiento)
+            if (r.includes('RECREACION') || r.includes('OCIO') || r.includes('ENTRETENIMIENTO') || r.includes('CINE') || r.includes('TEATRO')) {
+                return '<i class="fas fa-masks-theater"></i>'; 
+            }
+            
+            // 17. Veterinaria / Mascotas (Huella de Pata)
+            if (r.includes('VETERINARIA') || r.includes('MASCOTAS') || r.includes('ANIMALES')) {
+                return '<i class="fas fa-paw"></i>';
+            }
+
+            // Icono de Fallback (Información/Otro)
             return '<i class="fas fa-circle-info"></i>'; 
         }
 
