@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beneficios y Convenios STM</title>
+    <!-- TÍTULO ACTUALIZADO -->
+    <title>Convenios STM</title>
     <!-- Cargamos la nueva tipografía: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Incluimos Tailwind CSS para un diseño moderno y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Usamos Font Awesome 6 para iconos -->
+    <!-- Usamos Font Awesome 6 para iconos (necesarios para el listado) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
@@ -19,7 +20,7 @@
             --color-bg-light: #f7f7f8;   /* Fondo muy claro */
             --color-card-bg: #ffffff;    /* Fondo de tarjeta blanco puro */
             
-            /* Colores Adicionales para Rubros (Para los iconos y texto) */
+            /* Colores Adicionales para Rubros (Más fuertes para el efecto lineal) */
             --color-rubro-green: #2ecc71;
             --color-rubro-blue: #3498db;
             --color-rubro-orange: #e67e22;
@@ -32,7 +33,7 @@
         }
 
         /* ************************************************* */
-        /* CORRECCIÓN CRÍTICA DE ALTURA PARA EL EFECTO FLIP */
+        /* FIX DE SCROLL CRÍTICO PARA EL MÓVIL (Viewport Height) */
         /* ************************************************* */
         html, body {
             height: 100%; 
@@ -43,13 +44,13 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--color-bg-light);
-            overflow-x: hidden;
+            overflow: hidden; /* Evita el scroll del body */
         }
         
         .app-container {
             max-width: 480px; 
             margin: 0 auto;
-            height: 100%; 
+            height: 100%; /* El contenedor principal toma el 100% de la altura de la pantalla */
             background-color: var(--color-card-bg); 
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); 
             display: flex;
@@ -57,7 +58,7 @@
         }
         
         .content-area {
-            flex: 1; 
+            flex: 1; /* Esto hace que ocupe todo el espacio restante */
             position: relative;
             overflow: hidden; 
             background-color: var(--color-card-bg);
@@ -68,10 +69,10 @@
         /* ==================================== */
         .flip-container {
             width: 100%;
-            height: 100%; 
+            height: 100%; /* Ocupa el 100% del 'content-area' */
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1); /* Curva de transición más dinámica */
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
         }
         
         .flip-container.flipped {
@@ -83,11 +84,11 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%; 
+            height: 100%; /* Crítico: 100% del flip-container */
             backface-visibility: hidden;
             display: flex;
             flex-direction: column;
-            overflow-y: auto; 
+            overflow-y: auto; /* PERMITE EL SCROLL VERTICAL AHORA */
             padding-bottom: 1rem; 
         }
 
@@ -97,14 +98,14 @@
         }
 
         /* ==================================== */
-        /* Estilos de Rubro Tile (CRÍTICO) */
+        /* Estilos de Rubro Tile (Iconos Lineal Color) */
         /* ==================================== */
         
         .rubro-tile {
             transition: all 0.3s ease;
             cursor: pointer;
             border-radius: 1rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Sombra más sutil */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             background-color: var(--color-card-bg);
             padding: 1rem 0.5rem;
             text-align: center;
@@ -112,7 +113,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            border: 2px solid #e5e7eb; /* Borde gris suave por defecto */
+            border: 2px solid transparent; /* Borde por defecto transparente */
         }
         
         .rubro-tile:hover {
@@ -120,25 +121,38 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
         }
         
-        /* ESTILO PARA EL BOTÓN DE RUBRO SELECCIONADO (Acento STM Teal) */
         .rubro-tile.active {
             border-color: var(--color-stm-teal);
-            box-shadow: 0 0 15px rgba(52, 179, 197, 0.6), 0 0 0 3px rgba(52, 179, 197, 0.3); /* Resalte con sombra exterior */
-            transform: scale(1.02); /* Pequeño efecto de zoom */
+            box-shadow: 0 0 15px rgba(52, 179, 197, 0.6), 0 0 0 3px rgba(52, 179, 197, 0.3);
+            transform: scale(1.02);
         }
         
+        /* Contenedor del icono/imagen (El círculo llamativo) */
         .rubro-icon-bg {
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            width: 3.5rem;
-            height: 3.5rem;
+            width: 4rem; /* 64px, un poco más grande */
+            height: 4rem; 
             border-radius: 50%;
-            font-size: 1.5rem;
+            font-size: 1.8rem; /* Icono grande */
             margin-bottom: 0.5rem;
             margin-left: auto;
             margin-right: auto;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para el círculo */
+        }
+        
+        /* NUEVO ESTILO: Simula el borde lineal de color de Freepik */
+        .rubro-icon-bg-lineal {
+            border: 3px solid; /* El color se aplica inline en JS */
+        }
+
+        /* El icono en sí */
+        .rubro-icon-bg i {
+            /* Fuerte contraste para que el icono se destaque */
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); 
+            transition: color 0.3s;
         }
 
         .stm-logo-header {
@@ -148,7 +162,7 @@
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
-        /* Estilos de las tarjetas (Acordeón) y Rubros (Mantengo el resto) */
+        /* Estilos de las tarjetas (Acordeón) */
         .convenio-card {
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             cursor: pointer;
@@ -203,26 +217,27 @@
     <!-- Contenedor Principal que simula la pantalla de un móvil -->
     <div class="app-container">
         
-        <!-- HEADER / Barra de Navegación Estilo App (ESTÁTICO, NO GIRA) -->
+        <!-- HEADER / Barra de Navegación (ESTÁTICO) -->
         <header class="p-5 bg-[var(--color-stm-purple)] text-white shadow-xl flex-shrink-0">
             <div class="flex items-center">
                 <!-- LOGO STM (Imagen subida por el usuario) -->
-                <img src="http://googleusercontent.com/image_generation_content/0" 
+                <img src="logo_STM.png" 
                      onerror="this.onerror=null; this.src='https://placehold.co/36x36/5A377B/FFFFFF?text=STM';"
                      alt="Logo STM" 
                      class="stm-logo-header mr-3">
                      
-                <!-- Usamos 'font-extrabold' y 'tracking-tight' de Poppins -->
+                <!-- TÍTULO CAMBIADO -->
                 <h1 class="text-2xl font-extrabold tracking-tight">
-                    BENEFICIOS STM
+                    CONVENIOS STM
                 </h1>
             </div>
+            <!-- SUBTÍTULO CAMBIADO -->
             <p class="text-indigo-200 text-sm mt-1 font-light">
-                Convenios exclusivos y llamativos para vos.
+                Convenios exclusivos para vos.
             </p>
         </header>
 
-        <!-- AREA DE CONTENIDO (ESTE CONTENEDOR ES EL QUE GIRA) -->
+        <!-- AREA DE CONTENIDO (ESTE CONTENEDOR ES EL QUE GIRA Y SCROLLEA) -->
         <div class="content-area">
             <div id="flipContainer" class="flip-container">
                 
@@ -275,7 +290,16 @@
             </div>
         </div>
         
-        <!-- FOOTER (ESTÁTICO, NO GIRA) -->
+        <!-- NUEVO: Botón de Consultas (Fijo y Visible) -->
+        <div id="consultasButtonContainer" class="p-3 bg-white border-t shadow-2xl flex-shrink-0">
+            <a href="consulta.html" 
+               class="w-full inline-flex items-center justify-center py-3 rounded-xl font-bold text-lg transition duration-200 hover:scale-[1.01]"
+               style="background-color: var(--color-stm-purple); color: white; box-shadow: 0 4px 15px rgba(90, 55, 123, 0.4);">
+                <i class="fas fa-comment-dots mr-2"></i> Formulario de Consultas
+            </a>
+        </div>
+
+        <!-- FOOTER (ESTÁTICO) -->
         <footer class="p-4 text-center text-xs text-gray-500 border-t mt-auto bg-gray-50 flex-shrink-0">
             <p>&copy; 2024 STM - Sindicato de Trabajadores Municipales</p>
         </footer>
@@ -283,7 +307,6 @@
 
     <script>
         // La URL de tu AppScript que devuelve los datos de los convenios
-        // NOTA: Reemplazar con la URL real de tu AppScript
         const APPSSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgD9-ggtZjFyK7I4FfwLETVtj5TUBvQIZWF5om5yAKLhj4BuerpbdHN-3PnTfLDzdxBA/exec'; 
 
         const flipContainer = document.getElementById('flipContainer');
@@ -295,14 +318,13 @@
         const conveniosTitle = document.getElementById('conveniosTitle');
         const backButton = document.getElementById('backToRubros');
         
-        let allConvenios = []; // Almacenará todos los convenios cargados
-        let uniqueRubros = new Set(); // Almacenará los rubros únicos
-        let currentFilter = 'TODOS'; // Filtro actual seleccionado
+        let allConvenios = []; 
+        let uniqueRubros = new Set();
+        let currentFilter = 'TODOS'; 
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchConvenios();
             
-            // Asignar el evento para volver a los rubros
             backButton.addEventListener('click', () => {
                 flipTo('front');
             });
@@ -323,7 +345,6 @@
                     if (i === maxRetries - 1) {
                         throw error;
                     }
-                    // Espera con backoff exponencial
                     await new Promise(resolve => setTimeout(resolve, delay * (2 ** i)));
                 }
             }
@@ -372,7 +393,7 @@
                     populateRubroGrid(allConvenios);
                     
                     // 2. Renderizar todos los convenios por defecto (Back Face)
-                    filterConvenios(currentFilter, false); // No girar en la carga inicial
+                    filterConvenios(currentFilter, false); 
 
                 } else {
                     throw new Error(data.message || 'Error: Formato de datos inesperado o status no es "success".');
@@ -387,7 +408,6 @@
                         <p>No se pudieron cargar los convenios. Detalle: ${error.message}</p>
                     </div>
                 `;
-                // Si la carga falla, asegúrate de que el spinner de rubros no se muestre
                 rubroGridLoading.classList.add('hidden');
             } finally {
                 loadingSpinner.classList.add('hidden');
@@ -419,48 +439,49 @@
         }
         
         /**
-         * Devuelve un color de acento para el tile del rubro.
+         * Devuelve un color de acento y un color de fondo pastel para el tile del rubro.
          */
         function getRubroColor(rubro) {
             const r = rubro.toUpperCase().trim();
-            // Mapeo simple de colores para los rubros
+            // Los colores de fondo son más pastel para hacer que el borde de color y el ícono se destaquen (efecto lineal)
             switch (r) {
-                case 'TODOS':
-                    return { color: 'var(--color-stm-teal)', bg: 'rgba(52, 179, 197, 0.1)' }; // Turquesa STM
-                case 'SALUD':
-                case 'MEDICINA':
-                    return { color: 'var(--color-rubro-red)', bg: 'rgba(231, 76, 60, 0.1)' }; 
-                case 'EDUCACION':
-                case 'FORMACION':
-                    return { color: 'var(--color-rubro-blue)', bg: 'rgba(52, 152, 219, 0.1)' };
-                case 'TURISMO':
-                case 'VIAJES':
-                    return { color: 'var(--color-rubro-green)', bg: 'rgba(46, 204, 113, 0.1)' };
-                case 'DEPORTES':
-                case 'GIMNASIOS':
-                    return { color: 'var(--color-stm-purple)', bg: 'rgba(90, 55, 123, 0.1)' }; 
-                case 'COMERCIO':
-                case 'COMPRAS':
-                    return { color: 'var(--color-rubro-orange)', bg: 'rgba(230, 126, 34, 0.1)' };
-                case 'GASTRONOMIA':
-                case 'COMIDA':
-                    return { color: 'var(--color-rubro-yellow)', bg: 'rgba(241, 196, 15, 0.1)' };
-                case 'SERVICIOS':
-                    return { color: 'var(--color-rubro-indigo)', bg: 'rgba(142, 68, 173, 0.1)' }; 
-                case 'BELLEZA':
-                case 'ESTETICA':
-                    return { color: 'var(--color-rubro-pink)', bg: 'rgba(247, 56, 156, 0.1)' };
-                case 'FINANZAS':
-                    return { color: 'var(--color-rubro-cyan)', bg: 'rgba(26, 188, 156, 0.1)' }; // Cyan
-                case 'LEGAL':
-                    return { color: 'var(--color-rubro-brown)', bg: 'rgba(150, 75, 0, 0.1)' }; // Marrón
-                case 'OTROS': // Por si hay rubros que caen fuera de los principales
-                    return { color: '#7f8c8d', bg: 'rgba(127, 140, 141, 0.1)' }; // Gris plomo
-                default:
-                    return { color: 'var(--color-stm-teal)', bg: 'rgba(52, 179, 197, 0.1)' }; // Default Turquesa STM
+                case 'TODOS': return { color: 'var(--color-stm-purple)', bg: '#f1f1f9' };
+                case 'SALUD': case 'MEDICINA': return { color: 'var(--color-rubro-red)', bg: '#fdebeb' }; 
+                case 'EDUCACION': case 'FORMACION': return { color: 'var(--color-rubro-blue)', bg: '#ebf4fd' };
+                case 'TURISMO': case 'VIAJES': return { color: 'var(--color-rubro-green)', bg: '#ebfdf1' };
+                case 'DEPORTES': case 'GIMNASIOS': return { color: 'var(--color-stm-teal)', bg: '#e8f7fa' }; 
+                case 'COMERCIO': case 'COMPRAS': return { color: 'var(--color-rubro-orange)', bg: '#fdf3eb' };
+                case 'GASTRONOMIA': case 'COMIDA': return { color: 'var(--color-rubro-yellow)', bg: '#fdfbeb' };
+                case 'SERVICIOS': return { color: 'var(--color-rubro-indigo)', bg: '#f4ebfd' }; 
+                case 'BELLEZA': case 'ESTETICA': return { color: 'var(--color-rubro-pink)', bg: '#fdebf5' };
+                case 'FINANZAS': return { color: 'var(--color-rubro-cyan)', bg: '#ebfdfd' };
+                case 'LEGAL': return { color: 'var(--color-rubro-brown)', bg: '#f7f4f2' };
+                default: return { color: 'var(--color-stm-teal)', bg: '#e8f7fa' };
             }
         }
         
+        /**
+         * Devuelve el icono de Font Awesome 6 (ahora más específicos) para el rubro.
+         * Usamos los mismos iconos para la grilla (isTile=true) y la lista (isTile=false).
+         */
+        function getRubroIcon(rubro) {
+            const r = rubro.toUpperCase().trim();
+            switch (r) {
+                case 'TODOS': return '<i class="fas fa-layer-group"></i>';
+                case 'SALUD': case 'MEDICINA': return '<i class="fas fa-notes-medical"></i>'; 
+                case 'EDUCACION': case 'FORMACION': return '<i class="fas fa-graduation-cap"></i>';
+                case 'TURISMO': case 'VIAJES': return '<i class="fas fa-plane-departure"></i>'; 
+                case 'DEPORTES': case 'GIMNASIOS': return '<i class="fas fa-dumbbell"></i>'; 
+                case 'COMERCIO': case 'COMPRAS': return '<i class="fas fa-store"></i>'; 
+                case 'GASTRONOMIA': case 'COMIDA': return '<i class="fas fa-burger"></i>'; 
+                case 'SERVICIOS': return '<i class="fas fa-screwdriver-wrench"></i>'; 
+                case 'BELLEZA': case 'ESTETICA': return '<i class="fas fa-spa"></i>'; 
+                case 'FINANZAS': return '<i class="fas fa-sack-dollar"></i>'; 
+                case 'LEGAL': return '<i class="fas fa-gavel"></i>'; 
+                default: return '<i class="fas fa-handshake"></i>'; 
+            }
+        }
+
         /**
          * Renderiza la grilla de tarjetas de rubros.
          */
@@ -469,21 +490,21 @@
             rubroGrid.innerHTML = '';
             
             rubros.forEach(rubro => {
-                const isTodos = rubro === 'TODOS';
-                const rubroName = isTodos ? 'TODOS' : rubro;
-                const rubroIcon = getRubroIcon(rubro, true); // Usa el icono de Tile
+                const rubroName = rubro;
+                const rubroIconHTML = getRubroIcon(rubro); 
                 const rubroStyle = getRubroColor(rubro);
 
                 const card = document.createElement('div');
                 card.className = 'col-span-1';
                 card.innerHTML = `
-                    <div class="rubro-tile ${rubro === currentFilter ? 'active' : ''}" data-rubro="${rubro}">
-                        <div class="rubro-icon-bg" 
-                             style="color: ${rubroStyle.color}; background-color: ${rubroStyle.bg}; border: 2px solid ${rubroStyle.color};">
-                            ${rubroIcon}
+                    <div class="rubro-tile ${rubro === currentFilter ? 'active' : ''} active:scale-[0.97] transition-transform" data-rubro="${rubro}">
+                        <!-- Círculo de Icono llamativo con estilo Lineal -->
+                        <div class="rubro-icon-bg rubro-icon-bg-lineal p-1" 
+                             style="background-color: ${rubroStyle.bg}; border-color: ${rubroStyle.color};">
+                            <span style="color: ${rubroStyle.color};">${rubroIconHTML}</span>
                         </div>
                         <!-- Texto del rubro ahora usa el color del rubroStyle -->
-                        <p class="text-[0.65rem] font-bold uppercase leading-tight mt-1" 
+                        <p class="text-[0.7rem] font-bold uppercase leading-tight mt-1 px-0.5" 
                            style="color: ${rubroStyle.color};">
                            ${rubroName}
                         </p>
@@ -493,7 +514,7 @@
                 // Asigna la función de filtro al hacer click
                 card.querySelector('.rubro-tile').onclick = function() {
                     currentFilter = rubro;
-                    filterConvenios(rubro, true); // Girar la pantalla
+                    filterConvenios(rubro, true);
                     // Actualiza la clase activa y los estilos de borde
                     document.querySelectorAll('.rubro-tile').forEach(tile => tile.classList.remove('active'));
                     this.classList.add('active');
@@ -505,8 +526,6 @@
         
         /**
          * Filtra los convenios basados en la selección del rubro y actualiza la vista.
-         * @param {string} selectedRubro - Rubro seleccionado.
-         * @param {boolean} shouldFlip - Indica si debe realizarse la animación de giro.
          */
         function filterConvenios(selectedRubro, shouldFlip = false) {
             currentFilter = selectedRubro;
@@ -530,63 +549,18 @@
         }
 
         /**
-         * Devuelve un icono de Font Awesome basado en el nombre del rubro.
-         * isTile=true usa un icono más temático para la grilla
-         */
-        function getRubroIcon(rubro, isTile = false) {
-            const r = rubro.toUpperCase().trim();
-            
-            // Iconos ajustados para ser más representativos
-            switch (r) {
-                case 'TODOS':
-                    return '<i class="fas fa-layer-group"></i>'; // Icono para mostrar todos los grupos
-                case 'SALUD':
-                case 'MEDICINA':
-                    return isTile ? '<i class="fas fa-hospital-user"></i>' : '<i class="fas fa-heart-pulse mr-1"></i>'; 
-                case 'EDUCACION':
-                case 'FORMACION':
-                    return isTile ? '<i class="fas fa-graduation-cap"></i>' : '<i class="fas fa-book-open-reader mr-1"></i>'; 
-                case 'TURISMO':
-                case 'VIAJES':
-                    return isTile ? '<i class="fas fa-plane"></i>' : '<i class="fas fa-map-marked-alt mr-1"></i>'; 
-                case 'DEPORTES':
-                case 'GIMNASIOS':
-                    return isTile ? '<i class="fas fa-dumbbell"></i>' : '<i class="fas fa-running mr-1"></i>'; 
-                case 'COMERCIO':
-                case 'COMPRAS':
-                    return isTile ? '<i class="fas fa-store-alt"></i>' : '<i class="fas fa-shopping-basket mr-1"></i>'; 
-                case 'GASTRONOMIA':
-                case 'COMIDA':
-                    return isTile ? '<i class="fas fa-pizza-slice"></i>' : '<i class="fas fa-utensils mr-1"></i>'; 
-                case 'SERVICIOS':
-                    return isTile ? '<i class="fas fa-hand-holding-box"></i>' : '<i class="fas fa-screwdriver-wrench mr-1"></i>'; // Caja de servicio
-                case 'BELLEZA':
-                case 'ESTETICA':
-                    return isTile ? '<i class="fas fa-spa"></i>' : '<i class="fas fa-cut mr-1"></i>'; 
-                case 'FINANZAS':
-                    return isTile ? '<i class="fas fa-piggy-bank"></i>' : '<i class="fas fa-sack-dollar mr-1"></i>'; 
-                case 'LEGAL':
-                    return isTile ? '<i class="fas fa-balance-scale"></i>' : '<i class="fas fa-gavel mr-1"></i>'; 
-                default:
-                    // Nuevo icono por defecto, no la estrella
-                    return isTile ? '<i class="fas fa-handshake"></i>' : '<i class="fas fa-handshake mr-1"></i>'; 
-            }
-        }
-
-        /**
          * Renderiza la lista de convenios en formato de acordeón.
          */
         function renderConvenios(convenios) {
             conveniosList.innerHTML = '';
             
-            // Cierra todas las tarjetas abiertas antes de renderizar (limpieza visual)
             document.querySelectorAll('.convenio-card.open').forEach(openCard => {
                 openCard.classList.remove('open');
             });
             
             if (convenios.length === 0) {
                 noResults.classList.remove('hidden');
-                conveniosList.classList.add('hidden'); // Ocultar el contenedor de lista si no hay resultados
+                conveniosList.classList.add('hidden'); 
                 return;
             }
             noResults.classList.add('hidden');
@@ -596,24 +570,23 @@
                 const rubro = (convenio.rubro || 'SIN RUBRO').toUpperCase().trim();
                 const titulo = convenio.titulo || 'Convenio sin Título';
                 const detalle = (convenio.detalle || 'Detalle no especificado.').replace(/\n/g, '<br>'); 
-                const rubroIcon = getRubroIcon(rubro, false); // Usamos el icono de lista (no tile)
+                const rubroIconHTML = getRubroIcon(rubro); // Usa el mismo HTML de icono
+                const rubroColor = getRubroColor(rubro).color; // Color de acento
 
                 const card = document.createElement('div');
                 card.className = 'convenio-card'; 
 
-                // Asigna la función de toggling al hacer click en la tarjeta
                 card.onclick = function() {
                     toggleConvenio(this);
                 };
 
-                // El convenio-header debe tener padding que estaba en el contenedor anterior
                 card.innerHTML = `
                     <div class="p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition duration-150">
                         <!-- Lado Izquierdo: Rubro y Título -->
                         <div class="flex-1 min-w-0 pr-4">
                             <!-- Tag Púrpura Fuerte -->
-                            <span class="rubro-tag inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full text-white mb-2 shadow-lg">
-                                ${rubroIcon} ${rubro} 
+                            <span class="rubro-tag inline-flex items-center px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full text-white mb-2 shadow-lg">
+                                <span class="mr-1 text-sm">${rubroIconHTML}</span> ${rubro} 
                             </span>
                             <!-- Título con más peso tipográfico -->
                             <h2 class="text-xl font-extrabold text-gray-900">${titulo}</h2>
@@ -629,7 +602,7 @@
                     <div class="convenio-content">
                         <div class="text-base text-gray-700 leading-relaxed">
                             <!-- Detalle del beneficio con color de acento Púrpura -->
-                            <h3 class="font-bold text-[var(--color-stm-purple)] mb-3 border-b-2 border-gray-100 pb-1">Detalles y Beneficios:</h3>
+                            <h3 class="font-bold mb-3 border-b-2 border-gray-100 pb-1" style="color: ${rubroColor};">Detalles y Beneficios:</h3>
                             <p>${detalle}</p>
                         </div>
                     </div>
