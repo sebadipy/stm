@@ -56,7 +56,7 @@
         .content-area {
             flex: 1; 
             position: relative;
-            overflow-y: auto; /* PERMITE SCROLL VERTICAL EN LA ZONA CENTRAL */
+            /* ELIMINAMOS overflow-y: auto; de aquí, el scroll lo maneja ahora .flip-face */
             background-color: var(--color-card-bg);
         }
 
@@ -84,7 +84,9 @@
             backface-visibility: hidden;
             display: flex;
             flex-direction: column;
-            overflow-y: auto; /* PERMITE EL SCROLL DENTRO DE CADA CARA */
+            overflow-y: auto; /* AHORA SOLO ESTA CLASE MANEJA EL SCROLL VERTICAL */
+            /* FIX CRÍTICO DE SCROLL EN iOS/Touch */
+            -webkit-overflow-scrolling: touch; 
             padding-bottom: 1rem; 
         }
 
@@ -283,7 +285,7 @@
         <!-- Botón de Consultas (Fijo y Visible) -->
         <!-- Mantenido el href="consultas.html" según lo solicitado -->
         <div id="consultasButtonContainer" class="p-3 bg-white border-t shadow-2xl flex-shrink-0">
-            <a href="consultas.html" 
+            <a href="consulta.html" 
                class="w-full inline-flex items-center justify-center py-3 rounded-lg font-bold text-lg transition duration-200 hover:scale-[1.01]"
                style="background-color: var(--color-stm-purple); color: white; box-shadow: 0 4px 10px rgba(90, 55, 123, 0.4);">
                 <i class="fas fa-comment-dots mr-2"></i> Formulario de Consultas
@@ -351,6 +353,7 @@
                 flipContainer.classList.remove('flipped');
             }
             // Asegurarse de que el scroll se resetee al cambiar de cara
+            // Nota: El scroll ahora lo manejan las caras (.flip-face)
             const activeFace = face === 'front' ? document.getElementById('frontFace') : document.getElementById('backFace');
             activeFace.scrollTop = 0;
         }
@@ -457,8 +460,6 @@
         
         /**
          * Devuelve el icono de Font Awesome 6 para el rubro.
-         * Lógica de `includes()` para ser robusto con nombres de rubro compuestos.
-         * **ICONOS ACTUALIZADOS SEGÚN SOLICITUD DEL USUARIO**
          */
         function getRubroIcon(rubro) {
             // Convertimos a mayúsculas para las comparaciones
