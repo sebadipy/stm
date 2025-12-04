@@ -6,7 +6,7 @@
     <!-- TÍTULO ACTUALIZADO -->
     <title>Convenios STM</title>
     <!-- Cargamos la tipografía ROBOTO (como en novedades.html) -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght:300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <!-- Incluimos Tailwind CSS para un diseño moderno y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Usamos Font Awesome 6 para iconos -->
@@ -88,7 +88,6 @@
             flex-direction: column;
             overflow-y: auto; /* AHORA EL SCROLL SE GESTIONA AQUÍ */
             -webkit-overflow-scrolling: touch; /* Mejora el desplazamiento en iOS */
-            /* Quitamos padding-bottom de aquí, lo pondremos en el grid */
         }
         
         /* AJUSTE CLAVE PARA LA CARA FRONTAL (BOTONERA) */
@@ -101,65 +100,67 @@
             padding: 1rem; 
         }
 
-        /* AJUSTE CLAVE: Darle mucho padding al grid para forzar el scroll */
+        /* AJUSTE CLAVE: Eliminamos el padding extra ya que la idea es que entre todo */
         #rubroGrid {
-            padding-bottom: 5rem; /* Asegura un área de arrastre (scroll) debajo de los últimos iconos */
+            padding-bottom: 1rem; 
         }
 
         /* ==================================== */
-        /* ESTILOS MODERNOS DE BOTONERA (RUBRO TILE) */
+        /* ESTILOS DE BOTONERA (RUBRO TILE) - REDUCIDOS */
         /* ==================================== */
         
         .rubro-tile {
             transition: all 0.3s ease-in-out;
             cursor: pointer;
-            border-radius: 1rem; /* Más redondeado */
-            background-color: var(--color-card-bg); /* Fondo blanco */
-            padding: 1.25rem 0.5rem; /* Más padding para que se vea más grande */
+            border-radius: 0.75rem; /* Menos redondeado para ahorrar espacio */
+            background-color: var(--color-card-bg);
+            padding: 0.75rem 0.25rem; /* REDUCIDO */
             text-align: center;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            /* Sombra moderna y suave (soft shadow) */
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.05); 
-            border: 1px solid rgba(229, 231, 235, 0.5); /* Borde muy sutil */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05); 
+            border: 1px solid rgba(229, 231, 235, 0.5); 
         }
         
         .rubro-tile:hover {
-            transform: translateY(-2px); /* Un pequeño levantamiento */
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px); /* Pequeño levantamiento */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
         }
         
         .rubro-tile.active {
-            border-color: var(--color-stm-purple); /* Borde fuerte del color principal */
-            background-color: #fcfaff; /* Fondo ligeramente teñido */
+            border-color: var(--color-stm-purple);
+            background-color: #fcfaff; 
             transform: scale(1.0); 
-            /* Sombra de acento para la selección */
-            box-shadow: 0 0 0 4px rgba(90, 55, 123, 0.2); 
+            box-shadow: 0 0 0 3px rgba(90, 55, 123, 0.2); /* Sombra de acento más delgada */
         }
         
-        /* Contenedor del icono/imagen */
+        /* Contenedor del icono/imagen - REDUCIDO */
         .rubro-icon-bg {
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            width: 4rem; /* Icono un poco más grande */
-            height: 4rem; 
+            width: 3rem; /* REDUCIDO de 4rem a 3rem */
+            height: 3rem; /* REDUCIDO de 4rem a 3rem */
             border-radius: 50%;
-            font-size: 1.8rem; /* Tamaño del icono interno */
-            margin-bottom: 0.75rem;
+            font-size: 1.5rem; /* REDUCIDO el icono interno */
+            margin-bottom: 0.5rem; /* REDUCIDO */
             margin-left: auto;
             margin-right: auto;
-            /* Fondo del icono ahora es más sutil y se define por getRubroColor */
             background-color: #f0f0f0; 
             color: #333;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06); /* Sombra interna sutil */
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06); 
             transition: all 0.3s ease;
         }
         
         .rubro-tile:hover .rubro-icon-bg {
-             transform: scale(1.05) rotate(-3deg);
+             transform: scale(1.03) rotate(-3deg);
+        }
+
+        /* Texto del Rubro - REDUCIDO */
+        .rubro-tile p {
+             font-size: 0.65rem; /* REDUCIDO de 0.7rem a 0.65rem */
         }
         
         /* ==================================== */
@@ -269,9 +270,9 @@
                             <i class="fas fa-tags text-[var(--color-stm-teal)] mr-2"></i> Explorar Rubros
                         </h2>
     
-                        <!-- Grid para mostrar los rubros como tarjetas -->
-                        <div id="rubroGrid" class="grid grid-cols-3 gap-3 mb-6">
-                            <div class="col-span-3 text-center p-4 text-gray-500" id="rubroGridLoading">Cargando rubros...</div>
+                        <!-- Grid para mostrar los rubros como tarjetas (CAMBIO: grid-cols-4) -->
+                        <div id="rubroGrid" class="grid grid-cols-4 gap-2 mb-6">
+                            <div class="col-span-4 text-center p-4 text-gray-500" id="rubroGridLoading">Cargando rubros...</div>
                         </div>
                     </div>
                 </div>
@@ -489,57 +490,57 @@
 
             // 2. Gastronomía
             if (r.includes('GASTRONOMIA') || r.includes('COMIDA') || r.includes('RESTAURANTE') || r.includes('CAFÉ')) {
-                return '<i class="fas fa-utensils"></i>'; // CAMBIO: fa-mug-hot -> fa-utensils (Cubiertos, más genérico de comida)
+                return '<i class="fas fa-utensils"></i>'; 
             }
             
             // 3. Salud y Estética
             if (r.includes('SALUD') || r.includes('MEDICINA') || r.includes('BELLEZA') || r.includes('ESTETICA') || r.includes('ODONTO')) {
-                return '<i class="fas fa-stethoscope"></i>'; // CAMBIO: fa-clinic-medical -> fa-stethoscope (Estetoscopio, símbolo de medicina/salud)
+                return '<i class="fas fa-stethoscope"></i>'; 
             }
             
             // 4. Educación
             if (r.includes('EDUCACION') || r.includes('FORMACION') || r.includes('CURSO') || r.includes('ESCUELA')) {
-                return '<i class="fas fa-graduation-cap"></i>'; // CAMBIO: fa-book -> fa-graduation-cap (Gorro de graduación, más claro para educación)
+                return '<i class="fas fa-graduation-cap"></i>'; 
             }
             
             // 5. Turismo y Balnearios
             if (r.includes('TURISMO') || r.includes('VIAJES') || r.includes('HOTEL') || r.includes('AGENCIA') || r.includes('BALNEARIO')) {
-                return '<i class="fas fa-beach-umbrella"></i>'; // CAMBIO: fa-suitcase-rolling -> fa-beach-umbrella (Sombrilla de playa, específico para balneario/turismo)
+                return '<i class="fas fa-beach-umbrella"></i>'; 
             }
             
             // 6. Comercio y Tienda
             if (r.includes('COMERCIO') || r.includes('COMPRAS') || r.includes('TIENDA') || r.includes('MERCADO') || r.includes('ROPA')) {
-                return '<i class="fas fa-cart-shopping"></i>'; // CAMBIO: fa-cash-register -> fa-cart-shopping (Carrito de compras, más directo)
+                return '<i class="fas fa-cart-shopping"></i>'; 
             }
             
             // 7. Fitness/Deportes
             if (r.includes('DEPORTES') || r.includes('GIMNASIO') || r.includes('FITNESS') || r.includes('ENTRENAMIENTO')) {
-                return '<i class="fas fa-person-running"></i>'; // CAMBIO: fa-dumbbell -> fa-person-running (Persona corriendo/movimiento)
+                return '<i class="fas fa-person-running"></i>'; 
             }
             
             // 8. Servicios
             if (r.includes('SERVICIO')) {
-                 return '<i class="fas fa-headset"></i>'; // CAMBIO: fa-gears -> fa-headset (Auriculares de atención al cliente/servicio)
+                 return '<i class="fas fa-headset"></i>'; 
             }
             
             // 9. Finanzas
             if (r.includes('FINANZA') || r.includes('BANCO')) {
-                return '<i class="fas fa-wallet"></i>'; // CAMBIO: fa-coins -> fa-wallet (Billetera/Cartera, símbolo de dinero personal)
+                return '<i class="fas fa-wallet"></i>'; 
             }
             
             // 10. Legal
             if (r.includes('LEGAL') || r.includes('ABOGADO') || r.includes('ASESORAMIENTO')) {
-                return '<i class="fas fa-scale-balanced"></i>'; // CAMBIO: fa-gavel -> fa-scale-balanced (Balanza de justicia)
+                return '<i class="fas fa-scale-balanced"></i>'; 
             }
 
             // 11. Hogar
             if (r.includes('HOGAR') || r.includes('MUEBLES') || r.includes('DECORACION')) {
-                return '<i class="fas fa-house-chimney"></i>'; // Icono de casa
+                return '<i class="fas fa-house-chimney"></i>'; 
             }
             
             // 12. Accesorios / Tecnología
             if (r.includes('ACCESORIOS') || r.includes('TECNOLOGIA') || r.includes('CELULAR')) {
-                return '<i class="fas fa-mobile-screen-button"></i>'; // Icono de celular
+                return '<i class="fas fa-mobile-screen-button"></i>'; 
             }
 
             // Icono de Fallback (Información/Otro, para asegurar que no se repita con ningún rubro)
@@ -570,7 +571,7 @@
                             ${rubroIconHTML}
                         </div>
                         <!-- Texto del rubro ahora usa el color del rubroStyle -->
-                        <p class="text-[0.7rem] font-medium uppercase leading-tight mt-1 px-0.5 text-gray-700">
+                        <p class="text-[0.65rem] font-medium uppercase leading-tight mt-1 px-0.5 text-gray-700">
                            ${rubroName}
                         </p>
                     </div>
