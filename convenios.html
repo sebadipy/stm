@@ -211,7 +211,7 @@
         <header class="p-5 bg-[var(--color-stm-purple)] text-white shadow-xl flex-shrink-0">
             <div class="flex items-center">
                 <!-- LOGO STM (Imagen subida por el usuario) -->
-                <img src="http://googleusercontent.com/image_generation_content/0" 
+                <img src="logo_STM.png" 
                      onerror="this.onerror=null; this.src='https://placehold.co/36x36/5A377B/FFFFFF?text=STM';"
                      alt="Logo STM" 
                      class="stm-logo-header mr-3">
@@ -281,6 +281,7 @@
         </div>
         
         <!-- Botón de Consultas (Fijo y Visible) -->
+        <!-- Mantenido el href="consultas.html" según lo solicitado -->
         <div id="consultasButtonContainer" class="p-3 bg-white border-t shadow-2xl flex-shrink-0">
             <a href="consultas.html" 
                class="w-full inline-flex items-center justify-center py-3 rounded-lg font-bold text-lg transition duration-200 hover:scale-[1.01]"
@@ -415,6 +416,7 @@
 
             convenios.forEach(c => {
                 if (c.rubro) {
+                    // Cuidado: Al obtener el rubro de los datos, lo convertimos a mayúsculas
                     uniqueRubros.add(c.rubro.toUpperCase().trim());
                 }
             });
@@ -437,14 +439,16 @@
             // Colores tipo Bootstrap para los iconos, con un fondo muy suave
             switch (r) {
                 case 'TODOS': return { color: 'var(--color-stm-purple)', bg: '#f1f1f9' };
-                case 'SALUD': case 'MEDICINA': return { color: 'var(--color-rubro-danger)', bg: '#fef3f4' }; 
+                // Colores para los rubros con íconos actualizados
+                case 'GASTRONOMIA': case 'COMIDA': return { color: 'var(--color-rubro-secondary)', bg: '#f8f9fa' };
+                case 'SALUD': case 'MEDICINA': case 'BELLEZA': case 'ESTETICA': return { color: 'var(--color-rubro-danger)', bg: '#fef3f4' }; 
                 case 'EDUCACION': case 'FORMACION': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' };
                 case 'TURISMO': case 'VIAJES': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' };
-                case 'DEPORTES': case 'GIMNASIOS': return { color: 'var(--color-stm-teal)', bg: '#f0fbff' }; 
                 case 'COMERCIO': case 'COMPRAS': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' };
-                case 'GASTRONOMIA': case 'COMIDA': return { color: 'var(--color-rubro-secondary)', bg: '#f8f9fa' };
+                case 'DEPORTES': case 'GIMNASIOS': case 'FITNESS': return { color: 'var(--color-stm-teal)', bg: '#f0fbff' }; 
+                
+                // Otros Rubros (Mantenidos)
                 case 'SERVICIOS': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' }; 
-                case 'BELLEZA': case 'ESTETICA': return { color: 'var(--color-rubro-info)', bg: '#f0fdff' };
                 case 'FINANZAS': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' };
                 case 'LEGAL': return { color: 'var(--color-rubro-secondary)', bg: '#f8f9fa' };
                 default: return { color: 'var(--color-stm-teal)', bg: '#f0fbff' };
@@ -452,24 +456,64 @@
         }
         
         /**
-         * Devuelve el icono de Font Awesome 6 (ahora más específicos) para el rubro.
+         * Devuelve el icono de Font Awesome 6 para el rubro.
+         * Lógica de `includes()` para ser robusto con nombres de rubro compuestos.
+         * **ICONOS ACTUALIZADOS SEGÚN SOLICITUD DEL USUARIO**
          */
         function getRubroIcon(rubro) {
-            const r = rubro.toUpperCase().trim();
-            switch (r) {
-                case 'TODOS': return '<i class="fas fa-layer-group"></i>';
-                case 'SALUD': case 'MEDICINA': return '<i class="fas fa-notes-medical"></i>'; 
-                case 'EDUCACION': case 'FORMACION': return '<i class="fas fa-graduation-cap"></i>';
-                case 'TURISMO': case 'VIAJES': return '<i class="fas fa-plane-departure"></i>'; 
-                case 'DEPORTES': case 'GIMNASIOS': return '<i class="fas fa-dumbbell"></i>'; 
-                case 'COMERCIO': case 'COMPRAS': return '<i class="fas fa-store"></i>'; 
-                case 'GASTRONOMIA': case 'COMIDA': return '<i class="fas fa-burger"></i>'; 
-                case 'SERVICIOS': return '<i class="fas fa-screwdriver-wrench"></i>'; 
-                case 'BELLEZA': case 'ESTETICA': return '<i class="fas fa-spa"></i>'; 
-                case 'FINANZAS': return '<i class="fas fa-sack-dollar"></i>'; 
-                case 'LEGAL': return '<i class="fas fa-gavel"></i>'; 
-                default: return '<i class="fas fa-handshake"></i>'; 
+            // Convertimos a mayúsculas para las comparaciones
+            const r = rubro.toUpperCase(); 
+
+            // 1. Todos
+            if (r === 'TODOS') return '<i class="fas fa-grip-vertical"></i>'; // Nuevo: fas fa-grip-vertical (grilla)
+
+            // 2. Gastronomía
+            if (r.includes('GASTRONOMIA') || r.includes('COMIDA') || r.includes('RESTAURANTE') || r.includes('CAFÉ')) {
+                return '<i class="fas fa-utensils"></i>'; // Nuevo: fas fa-utensils (Cubiertos)
             }
+            
+            // 3. Salud y Estética
+            if (r.includes('SALUD') || r.includes('MEDICINA') || r.includes('BELLEZA') || r.includes('ESTETICA') || r.includes('ODONTO')) {
+                return '<i class="fas fa-spa"></i>'; // Nuevo: fas fa-spa (Bienestar/Estética)
+            }
+            
+            // 4. Educación
+            if (r.includes('EDUCACION') || r.includes('FORMACION') || r.includes('CURSO') || r.includes('ESCUELA')) {
+                return '<i class="fas fa-graduation-cap"></i>'; // Nuevo: fas fa-graduation-cap (Birrete)
+            }
+            
+            // 5. Turismo y Viajes
+            if (r.includes('TURISMO') || r.includes('VIAJES') || r.includes('HOTEL') || r.includes('AGENCIA')) {
+                return '<i class="fas fa-plane-departure"></i>'; // Nuevo: fas fa-plane-departure (Avión)
+            }
+            
+            // 6. Comercio
+            if (r.includes('COMERCIO') || r.includes('COMPRAS') || r.includes('TIENDA') || r.includes('MERCADO') || r.includes('ROPA')) {
+                return '<i class="fas fa-store"></i>'; // Nuevo: fas fa-store (Tienda/Local)
+            }
+            
+            // 7. Fitness/Deportes
+            if (r.includes('DEPORTES') || r.includes('GIMNASIO') || r.includes('FITNESS') || r.includes('ENTRENAMIENTO')) {
+                return '<i class="fas fa-dumbbell"></i>'; // Nuevo: fas fa-dumbbell (Pesa)
+            }
+            
+            // 8. Servicios
+            if (r.includes('SERVICIO')) {
+                 return '<i class="fas fa-wrench"></i>'; // Nuevo: fas fa-wrench (Llave inglesa - simple)
+            }
+            
+            // 9. Finanzas
+            if (r.includes('FINANZA') || r.includes('BANCO')) {
+                return '<i class="fas fa-money-bill-transfer"></i>'; // Nuevo: fas fa-money-bill-transfer (Transferencia/Dinero)
+            }
+            
+            // 10. Legal
+            if (r.includes('LEGAL') || r.includes('ABOGADO')) {
+                return '<i class="fas fa-balance-scale-left"></i>'; // Nuevo: fas fa-balance-scale-left (Balanza de justicia)
+            }
+
+            // Icono de Fallback
+            return '<i class="fas fa-star"></i>'; // Nuevo Fallback: fas fa-star (Destacado)
         }
 
         /**
@@ -480,7 +524,9 @@
             rubroGrid.innerHTML = '';
             
             rubros.forEach(rubro => {
+                // El rubroName es el texto real que viene de los datos, p.ej. "Salud y Belleza"
                 const rubroName = rubro;
+                // getRubroIcon ahora es más inteligente con los nombres compuestos
                 const rubroIconHTML = getRubroIcon(rubro); 
                 const rubroStyle = getRubroColor(rubro);
 
@@ -559,6 +605,7 @@
                 const rubro = (convenio.rubro || 'SIN RUBRO').toUpperCase().trim();
                 const titulo = convenio.titulo || 'Convenio sin Título';
                 const detalle = (convenio.detalle || 'Detalle no especificado.').replace(/\n/g, '<br>'); 
+                // Usamos la función de icono mejorada
                 const rubroIconHTML = getRubroIcon(rubro); 
                 const rubroColor = getRubroColor(rubro).color; // Color de acento
 
@@ -573,9 +620,9 @@
                     <div class="p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition duration-150">
                         <!-- Lado Izquierdo: Rubro y Título -->
                         <div class="flex-1 min-w-0 pr-4">
-                            <!-- Tag Púrpura principal, más simple -->
+                            <!-- Tag Púrpura principal, incluye barra vertical | para separar ícono y texto -->
                             <span class="rubro-tag inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wider rounded-md text-white mb-1">
-                                <span class="mr-1 text-sm">${rubroIconHTML}</span> ${rubro} 
+                                <span class="mr-1 text-sm">${rubroIconHTML}</span> | ${rubro} 
                             </span>
                             <!-- Título con fuente Roboto y más simple -->
                             <h2 class="text-xl font-bold text-gray-900">${titulo}</h2>
