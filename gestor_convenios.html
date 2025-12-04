@@ -248,11 +248,7 @@
             text-align: center;
         }
         
-        /* Estilo para la columna de Acciones */
-        .col-actions {
-            width: 1%; /* Mínimo ancho */
-            white-space: nowrap;
-        }
+        /* Se elimina el estilo .col-actions ya que se elimina la columna */
     </style>
 </head>
 <body>
@@ -287,8 +283,10 @@
                     <thead>
                         <tr>
                             <th scope="col" class="col-activo">ACTIVO</th>
-                            <th scope="col">Rubro</th> <th scope="col">Título/Entidad</th> <th scope="col">Contenido/Detalle</th> <th scope="col" class="col-actions text-center">Acciones</th>
-                        </tr>
+                            <th scope="col">Rubro</th> 
+                            <th scope="col">Título/Entidad</th> 
+                            <th scope="col">Contenido/Detalle</th>
+                            </tr>
                     </thead>
                     <tbody id="novedadesTableBody">
                         </tbody >
@@ -561,8 +559,8 @@
         function renderTable(convenios) {
             novedadesTableBody.innerHTML = '';
             loadingSpinner.style.display = 'none';
-            // 5 columnas: Activo, Rubro, Título, Detalle, Acciones
-            const COLSPAN_COUNT = 5; 
+            // 4 columnas: Activo, Rubro, Título, Detalle (ANTES: 5 - se quita Acciones)
+            const COLSPAN_COUNT = 4; 
 
             if (convenios.length === 0) {
                 novedadesTableBody.innerHTML = `
@@ -592,7 +590,7 @@
                 const encodedActivo = encodeURIComponent(convenio.ACTIVO || 'NO');
                 const encodedRubro = encodeURIComponent(convenio.rubro || '');
 
-                // Usamos los parámetros codificados en el onclick
+                // Usamos los parámetros codificados en el onclick para abrir el modal (Editar/Ver)
                 row.setAttribute('onclick', `openModal(
                     '${encodedID}', 
                     '${encodedTitulo}', 
@@ -607,34 +605,13 @@
                     <td>${convenio.rubro || 'SIN RUBRO'}</td> 
                     <td>${convenio.titulo}</td>
                     <td>${convenio.detalle.substring(0, 80).trim()}${convenio.detalle.length > 80 ? '...' : ''}</td>
-                    <td class="col-actions text-center">
-                        <button class="btn btn-sm btn-outline-warning me-2 btn-editar" title="Editar Convenio" data-id="${convenio.ID || ''}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar Convenio" data-id="${convenio.ID || ''}">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
+                    `;
                 
             });
             
-            // Delegación de eventos para los botones Editar/Eliminar
-            novedadesTableBody.querySelectorAll('.btn-editar').forEach(btn => {
-                btn.onclick = (e) => {
-                    e.stopPropagation(); // Evita que se dispare el evento click de la fila
-                    const row = btn.closest('tr');
-                    row.click(); // Ejecuta el click de la fila
-                };
-            });
+            // Se eliminan las delegaciones de eventos para .btn-editar y .btn-eliminar ya que no existen los botones.
+            // La funcionalidad de edición se mantiene con el click en la fila.
             
-            novedadesTableBody.querySelectorAll('.btn-eliminar').forEach(btn => {
-                btn.onclick = (e) => {
-                    e.stopPropagation(); // Evita que se dispare el evento click de la fila
-                    const id = btn.getAttribute('data-id');
-                    showDeleteConfirm(id);
-                };
-            });
         }
 
         // --- AJUSTE DE DECODIFICACIÓN AL RECIBIR LOS DATOS ---
