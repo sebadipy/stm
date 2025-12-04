@@ -231,6 +231,29 @@
             white-space: pre-wrap; 
             word-wrap: break-word; 
         }
+
+        /* ************************************************* */
+        /* ESTILOS ESPECÍFICOS DEL BOTÓN DE CONSULTA */
+        /* ************************************************* */
+        .consulta-icon-bg {
+            /* Usamos los mismos colores que la tarjeta de 'Automotor' que subiste */
+            background-color: #e5f6fa; /* Fondo muy claro, similar al turquesa pastel */
+            color: var(--color-stm-teal); /* Color del icono: el turquesa principal */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            box-shadow: 0 0 0 5px rgba(52, 179, 197, 0.1); /* Sombra suave para el anillo exterior */
+        }
+        .consulta-text {
+            font-size: 0.75rem; /* Pequeño para que quepa bien */
+            font-weight: 500;
+            color: white; /* Color blanco en la cabecera morada */
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -240,22 +263,39 @@
         
         <!-- HEADER / Barra de Navegación (ESTÁTICO) -->
         <header class="p-5 bg-[var(--color-stm-purple)] text-white shadow-xl flex-shrink-0">
-            <div class="flex items-center">
-                <!-- LOGO STM (Imagen subida por el usuario) -->
-                <img src="logo_STM.png" 
-                     onerror="this.onerror=null; this.src='https://placehold.co/36x36/5A377B/FFFFFF?text=STM';"
-                     alt="Logo STM" 
-                     class="stm-logo-header mr-3">
-                     
-                <!-- TÍTULO -->
-                <h1 class="header-title text-2xl tracking-tight">
-                    CONVENIOS STM
-                </h1>
+            <!-- Contenedor FLEX principal para Título/Logo a la izquierda y Acciones a la derecha -->
+            <div class="flex items-start justify-between">
+                
+                <!-- Lado Izquierdo: LOGO y TÍTULO -->
+                <div class="flex items-center">
+                    <!-- LOGO STM (Imagen subida por el usuario) -->
+                    <img src="logo_STM.png" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/36x36/5A377B/FFFFFF?text=STM';"
+                         alt="Logo STM" 
+                         class="stm-logo-header mr-3">
+                         
+                    <!-- TÍTULO y SUBTÍTULO (en una columna) -->
+                    <div>
+                        <h1 class="header-title text-2xl tracking-tight">
+                            CONVENIOS STM
+                        </h1>
+                        <p class="text-indigo-200 text-sm font-light leading-none">
+                            Convenios exclusivos para vos.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Lado Derecho: BOTÓN DE ACCIÓN (Consulta) -->
+                <!-- NUEVO BOTÓN DE CONSULTA SOLICITADO -->
+                <a href="consulta.html" class="flex flex-col items-center text-center -mt-2">
+                    <div class="consulta-icon-bg">
+                        <!-- Icono de información 'i' dentro del círculo -->
+                        <i class="fas fa-info text-2xl"></i>
+                    </div>
+                    <span class="consulta-text mt-1">Consulta</span>
+                </a>
             </div>
-            <!-- SUBTÍTULO -->
-            <p class="text-indigo-200 text-sm mt-1 font-light">
-                Convenios exclusivos para vos.
-            </p>
+            
         </header>
 
         <!-- AREA DE CONTENIDO (ESTE CONTENEDOR ES EL QUE GIRA Y SCROLLEA) -->
