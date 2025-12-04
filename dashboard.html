@@ -7,6 +7,7 @@
     <link rel="icon" href="logo_STM.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
         /* Estilos generales limpios */
@@ -58,12 +59,21 @@
             box-shadow: 0 4px 15px -3px rgba(79, 70, 229, 0.4);
             transform: translateY(-2px);
         }
-        .btn-custom:not(.active-indigo) {
+        /* ESTILO VERDE para Gestor de Usuarios */
+        .btn-custom.active-green {
+            background-color: #10b981 !important; /* Tailwind Green-600 */
+            color: white !important;
+            border-color: #10b981;
+            box-shadow: 0 4px 15px -3px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-custom:not(.active-indigo):not(.active-green) {
             background-color: #ffffff;
             color: #4f46e5;
             border-color: #c7d2fe;
         }
-        .btn-custom:not(.active-indigo):hover {
+        .btn-custom:not(.active-indigo):not(.active-green):hover {
             background-color: #f5f6fa;
             border-color: #a5b4fc;
         }
@@ -119,37 +129,43 @@
             </div>
             
         </header>
-
-        <div id="btn-group" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4 p-4 bg-white rounded-xl shadow-xl">
+        
+        <div id="btn-group" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4 p-4 bg-white rounded-xl shadow-xl">
             <button 
                 data-sheet="tabla_consulta"
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg active-indigo"
             >
-                Consultas
+                <i class="fas fa-comments mr-2"></i> Consultas
             </button>
             <button 
                 data-sheet="gestor_afiliaciones_external"
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
             >
-                Gestor Afiliaciones
+                <i class="fas fa-user-plus mr-2"></i> Gestor Afiliaciones
             </button>
             <button 
                 data-sheet="gestor_novedades_external"
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
             >
-                Gestor Novedades
+                <i class="fas fa-bullhorn mr-2"></i> Gestor Novedades
             </button>
             <button 
                 data-sheet="gestor_convenios_external"
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
             >
-                Gestor Convenios
+                <i class="fas fa-handshake mr-2"></i> Gestor Convenios
             </button>
             <button 
                 data-sheet="credencial_qr"
                 class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
             >
-                Generar Credencial
+                <i class="fas fa-id-card mr-2"></i> Generar Credencial
+            </button>
+            <button 
+                data-sheet="gestor_usuarios_external"
+                class="btn-custom py-3 px-4 text-sm sm:text-lg font-semibold rounded-full shadow-lg"
+            >
+                <i class="fas fa-user-friends mr-2"></i> Gestor de Usuarios
             </button>
         </div>
         
@@ -220,6 +236,7 @@
             'gestor_afiliaciones_external': null, 
             'gestor_convenios_external': null, 
             'credencial_qr': null,
+            // NO necesitamos GID para gestor_usuarios_external porque es una redirección
         };
 
         // Elementos de UI
@@ -290,30 +307,34 @@
             }
         });
 
-        // --- FUNCIONES ESPECÍFICAS ---
+        // --- FUNCIONES ESPECÍFICAS (REDIRECCIONES) ---
 
         /**
-         * Nueva función: Ahora redirige a Gestor Afiliaciones en la misma ventana 
+         * Redirige a Gestor Afiliaciones en la misma ventana 
          */
         function openGestorAfiliaciones() {
-            // Utilizamos window.location.href para abrir en la misma pestaña
             window.location.href = 'gestor_afiliaciones.html';
         }
         
         /**
-         * Función para abrir el Gestor Novedades en la misma ventana.
+         * Redirige a Gestor Novedades en la misma ventana.
          */
         function openGestorNovedades() {
-            // Utilizamos window.location.href para abrir en la misma pestaña
             window.location.href = 'gestor_novedades.html';
         }
         
         /**
-         * Función para abrir el Gestor Convenios en la misma ventana.
+         * Redirige a Gestor Convenios en la misma ventana.
          */
         function openGestorConvenios() {
-            // Utilizamos window.location.href para abrir en la misma pestaña
             window.location.href = 'gestor_convenios.html';
+        }
+        
+        /**
+         * Redirige a Gestor de Usuarios en la misma ventana.
+         */
+        function openGestorUsuarios() {
+            window.location.href = 'gestor_usuarios.html';
         }
 
         /**
@@ -530,7 +551,7 @@
             }
         }
 
-        // --- 🇦🇷 LÓGICA DE PERMISOS (Corregida) ---
+        // --- 🇦🇷 LÓGICA DE PERMISOS ---
         
         /**
          * Función para aplicar la restricción de botones si el usuario NO es ADMIN.
@@ -539,8 +560,7 @@
             const userType = localStorage.getItem('stm_user_type');
             // Regla: Es Admin si el tipo es 'ADMIN'. Usamos .toUpperCase() por seguridad.
             const isAdmin = userType && String(userType).toUpperCase() === 'ADMIN'; 
-            const btnGroup = document.getElementById('btn-group');
-            const consultasBtn = document.querySelector('[data-sheet="tabla_consulta"]'); // Buscamos el botón de consultas
+            const consultasBtn = document.querySelector('[data-sheet="tabla_consulta"]'); 
 
             // Solo aplicar si NO es admin
             if (!isAdmin) {
@@ -554,18 +574,19 @@
                 
                 // 🇦🇷 ¡CLAVE! Forzar el botón "Consultas" a la derecha, manteniendo el tamaño.
                 if (consultasBtn) {
-                    // Usamos las clases 'col-start' de Tailwind para forzar el botón a la última columna de cada grid size.
-                    // Esto mantiene su tamaño original (1/5 del ancho total en desktop).
-                    consultasBtn.classList.add('col-start-2', 'sm:col-start-3', 'lg:col-start-5');
+                    // AJUSTE DE COLUMNA: Ahora apunta a la columna 6 de la grilla grande (lg:grid-cols-6)
+                    consultasBtn.classList.add('col-start-2', 'sm:col-start-3', 'lg:col-start-6');
                 }
                 
-                // 🇦🇷 ¡IMPORTANTE! Se eliminó el código que hacía que el contenedor cambiara a 'grid-cols-1' 
-                // para que el botón no se estire.
             } else {
                  // Si es ADMIN, nos aseguramos de que el botón de consultas esté en su posición inicial (izquierda)
                  if (consultasBtn) {
-                    consultasBtn.classList.remove('col-start-2', 'sm:col-start-3', 'lg:col-start-5');
+                    consultasBtn.classList.remove('col-start-2', 'sm:col-start-3', 'lg:col-start-6');
                 }
+                // Si es ADMIN, todos los botones deben estar visibles
+                buttons.forEach(btn => {
+                    btn.classList.remove('hidden');
+                });
             }
         }
 
@@ -577,53 +598,59 @@
          */
         function loadView(sheetName) {
             
-            // 1. Manejo especial para el gestor de afiliaciones (AHORA ABRE EN LA MISMA PESTAÑA)
+            // 1. Manejo especial para el gestor de afiliaciones 
             if (sheetName === 'gestor_afiliaciones_external') {
                 openGestorAfiliaciones();
-                // REDIRECCIÓN COMPLETA: Salimos de la función
                 return; 
             }
             
-            // 2. Manejo especial para el gestor de novedades (AHORA ABRE EN LA MISMA PESTAÑA)
+            // 2. Manejo especial para el gestor de novedades 
             if (sheetName === 'gestor_novedades_external') {
                 openGestorNovedades();
-                // REDIRECCIÓN COMPLETA: Salimos de la función
                 return; 
             }
 
-            // 3. Manejo especial para el gestor de convenios (AHORA ABRE EN LA MISMA PESTAÑA)
+            // 3. Manejo especial para el gestor de convenios 
             if (sheetName === 'gestor_convenios_external') {
                 openGestorConvenios();
-                // REDIRECCIÓN COMPLETA: Salimos de la función
                 return; 
             }
 
-            // 4. REDIRECCIÓN PARA CREDENCIAL_QR (AHORA ABRE EN LA MISMA PESTAÑA)
+            // 4. Redirección para CREDENCIAL_QR
             if (sheetName === 'credencial_qr') {
-                window.location.href = 'credencial_qr.html'; // Abre en la misma pestaña
-                // REDIRECCIÓN COMPLETA: Salimos de la función
+                window.location.href = 'credencial_qr.html'; 
                 return;
             }
             
-            // 5. Cargar datos
+            // 5. NUEVA Redirección para GESTOR DE USUARIOS
+            if (sheetName === 'gestor_usuarios_external') {
+                openGestorUsuarios(); 
+                return;
+            }
+            
+            // 6. Cargar datos (solo si es una vista de tabla, como tabla_consulta)
             const gid = sheetGids[sheetName];
-            if (gid) { // Solo cargamos data si es una vista de tabla con GID (tabla_consulta)
+            if (gid) { 
                  loadSheetData(sheetName);
             }
            
-            // 6. Actualizar el estado del último botón activo
+            // 7. Actualizar el estado del último botón activo
             lastActiveSheet = sheetName;
 
-            // 7. Actualizar botones activos (solo los de las vistas de tabla)
+            // 8. Actualizar botones activos (solo los de las vistas de tabla, que son solo 'tabla_consulta')
             buttons.forEach(btn => {
                 const btnSheet = btn.getAttribute('data-sheet');
                 
-                // Desactiva el estilo 'active-indigo' para todos
-                btn.classList.remove('active-indigo');
+                // Desactiva el estilo 'active-indigo' y 'active-green' para todos
+                btn.classList.remove('active-indigo', 'active-green');
 
-                // Si es un botón de vista de tabla y es el seleccionado, lo activa.
-                if (btnSheet !== 'gestor_novedades_external' && btnSheet !== 'gestor_afiliaciones_external' && btnSheet !== 'gestor_convenios_external' && btnSheet !== 'credencial_qr' && btnSheet === sheetName) {
+                // Si es la vista de tabla 'tabla_consulta', la activa con el estilo índigo
+                if (btnSheet === 'tabla_consulta' && btnSheet === sheetName) {
                     btn.classList.add('active-indigo');
+                }
+                // Si es el gestor de usuarios, lo activa con el estilo verde 
+                if (btnSheet === 'gestor_usuarios_external' && btnSheet === sheetName) {
+                     btn.classList.add('active-green');
                 }
             });
         }
@@ -637,7 +664,7 @@
 
         // Carga inicial
         document.addEventListener('DOMContentLoaded', () => {
-            // 🇦🇷 ¡NUEVO! Aplicar los permisos antes de cargar la vista por defecto
+            // Aplicar los permisos (ocultar botones si no es admin)
             applyUserPermissions(); 
             
             // Carga la vista de "Tabla Consulta" por defecto
