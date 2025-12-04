@@ -6,7 +6,7 @@
     <!-- TÍTULO ACTUALIZADO -->
     <title>Convenios STM</title>
     <!-- Cargamos la tipografía ROBOTO (como en novedades.html) -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght:300;400;500;700;900&display=swap" rel="stylesheet">
     <!-- Incluimos Tailwind CSS para un diseño moderno y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Usamos Font Awesome 6 para iconos -->
@@ -36,7 +36,7 @@
             height: 100%; 
             margin: 0;
             padding: 0;
-            /* CRUCIAL PARA SCROLL TÁCTIL: Añadir overflow-hidden en el body para evitar que la página entera scrollee */
+            /* CRUCIAL: El body debe estar fijo, el scroll lo maneja el flip-face */
             overflow: hidden; 
         }
         
@@ -52,14 +52,13 @@
             background-color: var(--color-card-bg); 
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); 
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Contenedor principal en columna */
         }
         
         .content-area {
-            flex: 1; /* Esto asegura que ocupe todo el espacio disponible */
+            flex: 1; /* Ocupa todo el espacio entre header y footer */
             position: relative;
-            /* IMPORTANTE: Quitamos el overflow del content-area, lo gestionarán las caras internas */
-            /* overflow-y: auto; */ 
+            /* El overflow-y: auto lo manejamos en .flip-face */
             background-color: var(--color-card-bg);
         }
 
@@ -89,20 +88,22 @@
             flex-direction: column;
             overflow-y: auto; /* AHORA EL SCROLL SE GESTIONA AQUÍ */
             -webkit-overflow-scrolling: touch; /* Mejora el desplazamiento en iOS */
-            padding-bottom: 1rem; 
+            /* Quitamos padding-bottom de aquí, lo pondremos en el grid */
         }
         
         /* AJUSTE CLAVE PARA LA CARA FRONTAL (BOTONERA) */
         .front-face {
-            /* Forzar que el contenido de scroll inicie más arriba */
             padding-top: 1rem; 
-            /* Asegurar que el contenido pueda scrollear incluso si es corto */
-            min-height: calc(100% + 1px); 
         }
 
         .back-face {
             transform: rotateY(180deg);
             padding: 1rem; 
+        }
+
+        /* AJUSTE CLAVE: Darle mucho padding al grid para forzar el scroll */
+        #rubroGrid {
+            padding-bottom: 5rem; /* Asegura un área de arrastre (scroll) debajo de los últimos iconos */
         }
 
         /* ==================================== */
