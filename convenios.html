@@ -94,33 +94,36 @@
         }
 
         /* ==================================== */
-        /* Estilos de Rubro Tile (Estilo Sólido/Bootstrap) */
+        /* ESTILOS MODERNOS DE BOTONERA (RUBRO TILE) */
         /* ==================================== */
         
         .rubro-tile {
-            transition: all 0.2s ease;
+            transition: all 0.3s ease-in-out;
             cursor: pointer;
-            border-radius: 0.5rem; /* Menos redondeado, más estilo Bootstrap */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
-            background-color: var(--color-bg-light); /* Fondo claro para resaltar icono */
-            padding: 1rem 0.5rem;
+            border-radius: 1rem; /* Más redondeado */
+            background-color: var(--color-card-bg); /* Fondo blanco */
+            padding: 1.25rem 0.5rem; /* Más padding para que se vea más grande */
             text-align: center;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            border: 1px solid #e5e7eb;
+            /* Sombra moderna y suave (soft shadow) */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.05); 
+            border: 1px solid rgba(229, 231, 235, 0.5); /* Borde muy sutil */
         }
         
         .rubro-tile:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px); /* Un pequeño levantamiento */
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.08);
         }
         
         .rubro-tile.active {
-            border-color: var(--color-stm-teal);
-            box-shadow: 0 0 0 3px rgba(52, 179, 197, 0.3);
-            transform: scale(1.0); /* Mantenemos escala para simpleza */
+            border-color: var(--color-stm-purple); /* Borde fuerte del color principal */
+            background-color: #fcfaff; /* Fondo ligeramente teñido */
+            transform: scale(1.0); 
+            /* Sombra de acento para la selección */
+            box-shadow: 0 0 0 4px rgba(90, 55, 123, 0.2); 
         }
         
         /* Contenedor del icono/imagen */
@@ -128,16 +131,27 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            width: 3.5rem; /* Icono más chico */
-            height: 3.5rem; 
+            width: 4rem; /* Icono un poco más grande */
+            height: 4rem; 
             border-radius: 50%;
-            font-size: 1.5rem; 
-            margin-bottom: 0.5rem;
+            font-size: 1.8rem; /* Tamaño del icono interno */
+            margin-bottom: 0.75rem;
             margin-left: auto;
             margin-right: auto;
-            background-color: #f0f0f0; /* Fondo gris claro */
+            /* Fondo del icono ahora es más sutil y se define por getRubroColor */
+            background-color: #f0f0f0; 
             color: #333;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06); /* Sombra interna sutil */
+            transition: all 0.3s ease;
         }
+        
+        .rubro-tile:hover .rubro-icon-bg {
+             transform: scale(1.05) rotate(-3deg);
+        }
+        
+        /* ==================================== */
+        /* Estilos generales (Mantenidos) */
+        /* ==================================== */
 
         .stm-logo-header {
             width: 36px;
@@ -145,13 +159,12 @@
             object-fit: contain;
         }
         
-        /* Estilos de las tarjetas (Acordeón) */
         .convenio-card {
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             cursor: pointer;
             border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); /* Sombra más sutil */
-            border-radius: 0.75rem; /* Ajuste a estilo más sobrio */
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); 
+            border-radius: 0.75rem; 
             overflow: hidden;
             background-color: var(--color-card-bg);
         }
@@ -159,14 +172,14 @@
         .convenio-card:hover, .convenio-card.open {
             border-color: var(--color-stm-teal); 
             box-shadow: 0 4px 8px rgba(52, 179, 197, 0.2); 
-            transform: none; /* Desactivamos el transform de hover */
+            transform: none; 
         }
         
         .rubro-tag {
             transition: all 0.2s ease;
             background-color: var(--color-stm-purple); 
-            box-shadow: none; /* Quitamos sombra exagerada */
-            font-weight: 500; /* Peso de fuente medio */
+            box-shadow: none; 
+            font-weight: 500; 
         }
 
         .convenio-content {
@@ -174,7 +187,7 @@
             overflow: hidden;
             transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
             padding: 0 1.25rem;
-            background-color: #fcfcfc; /* Fondo ligeramente diferente para el contenido */
+            background-color: #fcfcfc; 
         }
         
         .convenio-card.open .convenio-content {
@@ -184,7 +197,7 @@
 
         .chevron {
             transition: transform 0.4s ease-out; 
-            color: var(--color-stm-purple); /* Cambiamos a púrpura para mejor contraste */
+            color: var(--color-stm-purple); 
             font-size: 1rem;
         }
         .convenio-card.open .chevron {
@@ -195,10 +208,14 @@
             padding: 0 1rem 1rem 1rem;
         }
 
-        /* Estilos específicos para el título principal, más grandes y prominentes */
         .header-title {
-            font-weight: 700; /* Bold */
-            letter-spacing: -0.02em; /* Traking ajustado */
+            font-weight: 700; 
+            letter-spacing: -0.02em; 
+        }
+        
+        .detalle-content {
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
         }
     </style>
 </head>
@@ -234,9 +251,9 @@
                 <!-- CARA FRONTAL: GRID DE RUBROS -->
                 <div id="frontFace" class="flip-face front-face pt-4">
                     <div class="filter-container">
-                        <!-- Título actualizado: Explorar Rubros -->
+                        <!-- Título: Explorar Rubros (Icono cambiado: a fa-tags) -->
                         <h2 class="text-lg font-bold text-gray-800 pt-1 mb-3 px-1">
-                            <i class="fas fa-cubes text-[var(--color-stm-teal)] mr-2"></i> Explorar Rubros
+                            <i class="fas fa-tags text-[var(--color-stm-teal)] mr-2"></i> Explorar Rubros
                         </h2>
     
                         <!-- Grid para mostrar los rubros como tarjetas -->
@@ -249,10 +266,10 @@
                 <!-- CARA TRASERA: LISTA DE CONVENIOS -->
                 <div id="backFace" class="flip-face back-face">
                     
-                    <!-- Botón para volver a la lista de Rubros (Back Button) -->
+                    <!-- Botón para volver a la lista de Rubros (Back Button) (Icono cambiado: a fa-chevron-left) -->
                     <button id="backToRubros" 
                             class="mb-4 flex items-center text-sm font-medium text-white bg-[var(--color-stm-teal)] hover:bg-[#2092a4] active:bg-[#1a7080] transition duration-150 py-2 px-4 rounded-full shadow-md self-start">
-                        <i class="fas fa-arrow-left mr-2"></i> Volver a Rubros
+                        <i class="fas fa-chevron-left mr-2"></i> Volver a Rubros
                     </button>
                     
                     <h2 class="text-xl font-bold text-gray-800 mb-4 px-1" id="conveniosTitle">
@@ -280,17 +297,10 @@
             </div>
         </div>
         
-        <!-- Botón de Consultas (Fijo y Visible) -->
-        <!-- Mantenido el href="consultas.html" según lo solicitado -->
-        <div id="consultasButtonContainer" class="p-3 bg-white border-t shadow-2xl flex-shrink-0">
-            <a href="consulta.html" 
-               class="w-full inline-flex items-center justify-center py-3 rounded-lg font-bold text-lg transition duration-200 hover:scale-[1.01]"
-               style="background-color: var(--color-stm-purple); color: white; box-shadow: 0 4px 10px rgba(90, 55, 123, 0.4);">
-                <i class="fas fa-comment-dots mr-2"></i> Formulario de Consultas
-            </a>
-        </div>
+        <!-- El bloque del Botón de Consultas fue eliminado de aquí -->
 
         <!-- FOOTER (ESTÁTICO) - TEXTO Y AÑO ACTUALIZADOS -->
+        <!-- Nota: El footer ahora se pegará directamente al área de contenido, ya que el botón fijo no está. -->
         <footer class="p-4 text-center text-xs text-gray-500 border-t mt-auto bg-gray-50 flex-shrink-0">
             <p>&copy; 2025 STM Sindicato de Trabajadores Municipales</p>
         </footer>
@@ -443,77 +453,87 @@
                 case 'GASTRONOMIA': case 'COMIDA': return { color: 'var(--color-rubro-secondary)', bg: '#f8f9fa' };
                 case 'SALUD': case 'MEDICINA': case 'BELLEZA': case 'ESTETICA': return { color: 'var(--color-rubro-danger)', bg: '#fef3f4' }; 
                 case 'EDUCACION': case 'FORMACION': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' };
-                case 'TURISMO': case 'VIAJES': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' };
-                case 'COMERCIO': case 'COMPRAS': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' };
+                case 'TURISMO': case 'VIAJES': case 'BALNEARIO': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' }; // Agregado BALNEARIO
+                case 'COMERCIO': case 'COMPRAS': case 'TIENDA': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' };
                 case 'DEPORTES': case 'GIMNASIOS': case 'FITNESS': return { color: 'var(--color-stm-teal)', bg: '#f0fbff' }; 
                 
                 // Otros Rubros (Mantenidos)
                 case 'SERVICIOS': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' }; 
                 case 'FINANZAS': return { color: 'var(--color-rubro-success)', bg: '#f0fff4' };
                 case 'LEGAL': return { color: 'var(--color-rubro-secondary)', bg: '#f8f9fa' };
-                default: return { color: 'var(--color-stm-teal)', bg: '#f0fbff' };
+                case 'HOGAR': return { color: 'var(--color-rubro-primary)', bg: '#f0f6ff' }; // Nuevo rubro
+                case 'ACCESORIOS': return { color: 'var(--color-rubro-warning)', bg: '#fffaf0' }; // Nuevo rubro
+                default: return { color: 'var(--color-rubro-info)', bg: '#f0fbff' }; // INFO o DEFAULT (Azul claro)
             }
         }
         
         /**
-         * Devuelve el icono de Font Awesome 6 para el rubro.
-         * Lógica de `includes()` para ser robusto con nombres de rubro compuestos.
-         * **ICONOS ACTUALIZADOS SEGÚN SOLICITUD DEL USUARIO**
+         * Devuelve el icono de Font Awesome 6 para el rubro, LÓGICOS y CLAROS.
          */
         function getRubroIcon(rubro) {
             // Convertimos a mayúsculas para las comparaciones
             const r = rubro.toUpperCase(); 
 
             // 1. Todos
-            if (r === 'TODOS') return '<i class="fas fa-grip-vertical"></i>'; // Nuevo: fas fa-grip-vertical (grilla)
+            if (r === 'TODOS') return '<i class="fas fa-layer-group"></i>';
 
             // 2. Gastronomía
             if (r.includes('GASTRONOMIA') || r.includes('COMIDA') || r.includes('RESTAURANTE') || r.includes('CAFÉ')) {
-                return '<i class="fas fa-utensils"></i>'; // Nuevo: fas fa-utensils (Cubiertos)
+                return '<i class="fas fa-utensils"></i>'; // CAMBIO: fa-mug-hot -> fa-utensils (Cubiertos, más genérico de comida)
             }
             
             // 3. Salud y Estética
             if (r.includes('SALUD') || r.includes('MEDICINA') || r.includes('BELLEZA') || r.includes('ESTETICA') || r.includes('ODONTO')) {
-                return '<i class="fas fa-spa"></i>'; // Nuevo: fas fa-spa (Bienestar/Estética)
+                return '<i class="fas fa-stethoscope"></i>'; // CAMBIO: fa-clinic-medical -> fa-stethoscope (Estetoscopio, símbolo de medicina/salud)
             }
             
             // 4. Educación
             if (r.includes('EDUCACION') || r.includes('FORMACION') || r.includes('CURSO') || r.includes('ESCUELA')) {
-                return '<i class="fas fa-graduation-cap"></i>'; // Nuevo: fas fa-graduation-cap (Birrete)
+                return '<i class="fas fa-graduation-cap"></i>'; // CAMBIO: fa-book -> fa-graduation-cap (Gorro de graduación, más claro para educación)
             }
             
-            // 5. Turismo y Viajes
-            if (r.includes('TURISMO') || r.includes('VIAJES') || r.includes('HOTEL') || r.includes('AGENCIA')) {
-                return '<i class="fas fa-plane-departure"></i>'; // Nuevo: fas fa-plane-departure (Avión)
+            // 5. Turismo y Balnearios
+            if (r.includes('TURISMO') || r.includes('VIAJES') || r.includes('HOTEL') || r.includes('AGENCIA') || r.includes('BALNEARIO')) {
+                return '<i class="fas fa-beach-umbrella"></i>'; // CAMBIO: fa-suitcase-rolling -> fa-beach-umbrella (Sombrilla de playa, específico para balneario/turismo)
             }
             
-            // 6. Comercio
+            // 6. Comercio y Tienda
             if (r.includes('COMERCIO') || r.includes('COMPRAS') || r.includes('TIENDA') || r.includes('MERCADO') || r.includes('ROPA')) {
-                return '<i class="fas fa-store"></i>'; // Nuevo: fas fa-store (Tienda/Local)
+                return '<i class="fas fa-cart-shopping"></i>'; // CAMBIO: fa-cash-register -> fa-cart-shopping (Carrito de compras, más directo)
             }
             
             // 7. Fitness/Deportes
             if (r.includes('DEPORTES') || r.includes('GIMNASIO') || r.includes('FITNESS') || r.includes('ENTRENAMIENTO')) {
-                return '<i class="fas fa-dumbbell"></i>'; // Nuevo: fas fa-dumbbell (Pesa)
+                return '<i class="fas fa-person-running"></i>'; // CAMBIO: fa-dumbbell -> fa-person-running (Persona corriendo/movimiento)
             }
             
             // 8. Servicios
             if (r.includes('SERVICIO')) {
-                 return '<i class="fas fa-wrench"></i>'; // Nuevo: fas fa-wrench (Llave inglesa - simple)
+                 return '<i class="fas fa-headset"></i>'; // CAMBIO: fa-gears -> fa-headset (Auriculares de atención al cliente/servicio)
             }
             
             // 9. Finanzas
             if (r.includes('FINANZA') || r.includes('BANCO')) {
-                return '<i class="fas fa-money-bill-transfer"></i>'; // Nuevo: fas fa-money-bill-transfer (Transferencia/Dinero)
+                return '<i class="fas fa-wallet"></i>'; // CAMBIO: fa-coins -> fa-wallet (Billetera/Cartera, símbolo de dinero personal)
             }
             
             // 10. Legal
-            if (r.includes('LEGAL') || r.includes('ABOGADO')) {
-                return '<i class="fas fa-balance-scale-left"></i>'; // Nuevo: fas fa-balance-scale-left (Balanza de justicia)
+            if (r.includes('LEGAL') || r.includes('ABOGADO') || r.includes('ASESORAMIENTO')) {
+                return '<i class="fas fa-scale-balanced"></i>'; // CAMBIO: fa-gavel -> fa-scale-balanced (Balanza de justicia)
             }
 
-            // Icono de Fallback
-            return '<i class="fas fa-star"></i>'; // Nuevo Fallback: fas fa-star (Destacado)
+            // 11. Hogar
+            if (r.includes('HOGAR') || r.includes('MUEBLES') || r.includes('DECORACION')) {
+                return '<i class="fas fa-house-chimney"></i>'; // Icono de casa
+            }
+            
+            // 12. Accesorios / Tecnología
+            if (r.includes('ACCESORIOS') || r.includes('TECNOLOGIA') || r.includes('CELULAR')) {
+                return '<i class="fas fa-mobile-screen-button"></i>'; // Icono de celular
+            }
+
+            // Icono de Fallback (Información/Otro, para asegurar que no se repita con ningún rubro)
+            return '<i class="fas fa-circle-info"></i>'; 
         }
 
         /**
@@ -604,7 +624,10 @@
             convenios.forEach(convenio => {
                 const rubro = (convenio.rubro || 'SIN RUBRO').toUpperCase().trim();
                 const titulo = convenio.titulo || 'Convenio sin Título';
-                const detalle = (convenio.detalle || 'Detalle no especificado.').replace(/\n/g, '<br>'); 
+                
+                // IMPORTANTE: Mantenemos el detalle TAL CUAL, sin reemplazar saltos de línea
+                const detalle = convenio.detalle || 'Detalle no especificado.'; 
+                
                 // Usamos la función de icono mejorada
                 const rubroIconHTML = getRubroIcon(rubro); 
                 const rubroColor = getRubroColor(rubro).color; // Color de acento
@@ -639,7 +662,8 @@
                         <div class="text-base text-gray-700 leading-relaxed">
                             <!-- Detalle del beneficio con color de acento del rubro -->
                             <h3 class="font-bold mb-3 border-b border-gray-200 pb-1 text-lg" style="color: ${rubroColor};">Detalles y Beneficios:</h3>
-                            <p class="text-sm">${detalle}</p>
+                            <!-- Usamos la clase detalle-content para mantener el formato original (pre-wrap) -->
+                            <p class="text-sm detalle-content">${detalle}</p> 
                         </div>
                     </div>
                 `;
