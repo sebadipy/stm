@@ -104,18 +104,59 @@
             transform: rotate(180deg);
         }
 
-        /* Estilo para el contenedor de filtros fijo */
-        .filter-sticky-container {
-            position: sticky;
-            top: 0;
-            z-index: 20;
+        /* Estilo para el contenedor de filtros ya no es sticky */
+        .filter-container {
+            padding: 0 1rem 1rem 1rem;
+        }
+        
+        /* Estilo para la tarjeta de rubro */
+        .rubro-tile {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             background-color: var(--color-card-bg);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            padding: 1rem 1.25rem; 
-            margin-bottom: 1rem;
-            border-bottom-left-radius: 1rem;
-            border-bottom-right-radius: 1rem;
-            transition: box-shadow 0.3s;
+            padding: 1rem;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 2px solid transparent;
+        }
+        
+        .rubro-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .rubro-tile.active {
+            border-color: var(--color-stm-teal);
+            box-shadow: 0 0 15px rgba(52, 179, 197, 0.5); /* Sombra turquesa */
+        }
+        
+        .rubro-icon-bg {
+            /* Fondo del icono Turquesa, borde Púrpura */
+            background-color: rgba(52, 179, 197, 0.1); /* Turquesa muy suave */
+            border: 2px solid var(--color-stm-purple);
+            color: var(--color-stm-teal);
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Clase para la imagen del logo STM */
+        .stm-logo-header {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            /* Aplicamos el mismo efecto visual de 'animate-pulse' al logo */
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
     </style>
 </head>
@@ -127,8 +168,12 @@
         <!-- HEADER / Barra de Navegación Estilo App (Full width, STM Purple) -->
         <header class="p-5 bg-[var(--color-stm-purple)] text-white shadow-xl">
             <div class="flex items-center">
-                <!-- Icono/Logo STM (Color de acento Turquesa) -->
-                <i class="fas fa-hand-holding-heart text-3xl text-[var(--color-stm-teal)] mr-3 animate-pulse"></i>
+                <!-- LOGO STM (Imagen subida por el usuario) -->
+                <img src="http://googleusercontent.com/image_generation_content/0" 
+                     onerror="this.onerror=null; this.src='https://placehold.co/36x36/5A377B/FFFFFF?text=STM';"
+                     alt="Logo STM" 
+                     class="stm-logo-header mr-3">
+                     
                 <!-- Usamos 'font-extrabold' y 'tracking-tight' de Poppins -->
                 <h1 class="text-2xl font-extrabold tracking-tight">
                     BENEFICIOS STM
@@ -139,25 +184,30 @@
             </p>
         </header>
 
-        <!-- Contenedor de Filtros (Fijo en la parte superior al hacer scroll) -->
-        <div class="filter-sticky-container">
-            
-            <!-- Filtro de Rubro (Categorías) -->
-            <div class="w-full">
-                <label for="rubroFilter" class="block text-sm font-semibold text-gray-800 mb-2">
-                    <i class="fas fa-magnifying-glass text-[var(--color-stm-teal)] mr-2"></i> Explorar Categorías
-                </label>
-                <select id="rubroFilter" class="w-full p-3 border-2 border-gray-200 rounded-xl shadow-md text-gray-800 font-medium focus:ring-4 focus:ring-[var(--color-stm-teal)] focus:border-[var(--color-stm-teal)] transition duration-200 appearance-none bg-white pr-8">
-                    <!-- Opciones se llenarán con JS -->
-                    <option value="TODOS" class="font-bold">TODOS los Convenios</option>
-                </select>
+        <!-- Contenedor de Rubros (Reemplaza el select filter) -->
+        <div class="filter-container">
+            <!-- Título actualizado: Explorar Rubros -->
+            <h2 class="text-lg font-bold text-gray-800 pt-5 mb-3 px-1">
+                <i class="fas fa-cubes text-[var(--color-stm-teal)] mr-2"></i> Explorar Rubros
+            </h2>
+
+            <!-- Grid para mostrar los rubros como tarjetas -->
+            <div id="rubroGrid" class="grid grid-cols-3 gap-3 mb-6">
+                <!-- Aquí se cargarán dinámicamente las tarjetas de rubros -->
+                <!-- Placeholder mientras carga -->
+                <div class="col-span-3 text-center p-4 text-gray-500" id="rubroGridLoading">Cargando rubros...</div>
             </div>
+            
+            <!-- Input de filtro anterior (oculto, solo para compatibilidad) -->
+            <select id="rubroFilter" class="hidden"></select>
         </div>
 
         <!-- Contenedor principal de los convenios (con padding interior) -->
         <div class="p-4 space-y-4">
             
-            <h2 class="text-xl font-bold text-gray-800 mb-4 px-1">Convenios Destacados:</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 px-1" id="conveniosTitle">
+                Convenios Destacados:
+            </h2>
 
             <div id="conveniosList" class="space-y-4 pb-12">
                 <!-- Spinner de carga inicial -->
@@ -172,8 +222,8 @@
             <!-- Mensaje de no resultados (oculto por defecto) -->
             <div id="noResults" class="hidden text-center p-10 bg-red-50 rounded-2xl shadow-md border-2 border-red-300 mt-6">
                 <i class="fas fa-search-minus text-4xl text-red-500"></i>
-                <p class="mt-4 text-red-700 font-bold">¡Uy! No hay convenios en esta categoría.</p>
-                <p class="text-sm text-red-600">Probá filtrando por "TODOS" para ver todo lo que tenemos.</p>
+                <p class="mt-4 text-red-700 font-bold">¡Uy! No hay convenios en este rubro.</p>
+                <p class="text-sm text-red-600">Probá seleccionando "TODOS" en los rubros de arriba.</p>
             </div>
             
         </div>
@@ -191,13 +241,17 @@
 
         const conveniosList = document.getElementById('conveniosList');
         const loadingSpinner = document.getElementById('loadingSpinner');
-        const rubroFilter = document.getElementById('rubroFilter');
+        const rubroGrid = document.getElementById('rubroGrid');
+        const rubroGridLoading = document.getElementById('rubroGridLoading');
         const noResults = document.getElementById('noResults');
+        const conveniosTitle = document.getElementById('conveniosTitle');
         let allConvenios = []; // Almacenará todos los convenios cargados
+        let uniqueRubros = new Set(); // Almacenará los rubros únicos
+        let currentFilter = 'TODOS'; // Filtro actual seleccionado
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchConvenios();
-            rubroFilter.addEventListener('change', filterConvenios);
+            // Ya no escuchamos el evento 'change' del select, sino los clics en la grilla.
         });
         
         /**
@@ -228,9 +282,9 @@
             loadingSpinner.classList.remove('hidden');
             conveniosList.innerHTML = '';
             noResults.classList.add('hidden');
+            rubroGridLoading.classList.remove('hidden');
 
             try {
-                // Hacemos el fetch, asumiendo que el AppScript soporta action=READ_ALL
                 const response = await fetchWithRetry(APPSSCRIPT_URL + '?action=READ_ALL');
                 const responseText = await response.text();
                 
@@ -238,22 +292,19 @@
                 try {
                     data = JSON.parse(responseText);
                 } catch(e) {
-                     // Si falla el JSON.parse, asumimos error de formato o AppScript no responde correctamente
                      throw new Error('Respuesta del servidor no es JSON válida o estructura inesperada.');
                 }
                 
-                // Usamos 'convenios' o 'novedades' dependiendo de la estructura que devuelva el AppScript
                 const dataArray = data.convenios || data.novedades; 
                 
                 if (data.status === 'success' && Array.isArray(dataArray)) {
-                    // Solo mantenemos los convenios que están 'ACTIVOS'
                     allConvenios = dataArray.filter(c => (c.ACTIVO || '').toUpperCase().trim() === 'SI');
                     
-                    // Ordenamos por Rubro para mejor visualización
-                    allConvenios.sort((a, b) => (a.rubro || '').localeCompare(b.rubro || ''));
+                    // 1. Obtener y renderizar los rubros en la grilla
+                    populateRubroGrid(allConvenios);
                     
-                    populateFilters(allConvenios);
-                    renderConvenios(allConvenios);
+                    // 2. Renderizar todos los convenios por defecto (currentFilter es 'TODOS')
+                    filterConvenios(currentFilter); 
 
                 } else {
                     throw new Error(data.message || 'Error: Formato de datos inesperado o status no es "success".');
@@ -267,88 +318,133 @@
                         <p class="text-sm mt-1">Detalle: ${error.message}</p>
                     </div>
                 `;
+                rubroGridLoading.classList.add('hidden');
             } finally {
                 loadingSpinner.classList.add('hidden');
             }
         }
 
         /**
-         * Rellena el select de filtros con los rubros únicos encontrados.
+         * Rellena el grid de rubros únicos y añade la opción TODOS.
          */
-        function populateFilters(convenios) {
-            const rubros = new Set();
+        function populateRubroGrid(convenios) {
+            rubroGrid.innerHTML = '';
+            uniqueRubros = new Set();
+
             convenios.forEach(c => {
                 if (c.rubro) {
-                    rubros.add(c.rubro.toUpperCase().trim());
+                    uniqueRubros.add(c.rubro.toUpperCase().trim());
                 }
             });
+            
+            let rubrosArray = Array.from(uniqueRubros).sort();
 
-            // Limpiar y añadir la opción 'TODOS'
-            rubroFilter.innerHTML = '<option value="TODOS" class="font-bold">TODOS los Convenios</option>';
+            // Agregar la opción "TODOS" al principio
+            rubrosArray.unshift('TODOS');
 
-            // Convertir el Set a Array, ordenar alfabéticamente y agregar opciones
-            Array.from(rubros).sort().forEach(rubro => {
-                const option = document.createElement('option');
-                option.value = rubro;
-                option.textContent = rubro;
-                rubroFilter.appendChild(option);
+            renderRubroGrid(rubrosArray);
+        }
+        
+        /**
+         * Renderiza la grilla de tarjetas de rubros.
+         */
+        function renderRubroGrid(rubros) {
+            rubroGridLoading.classList.add('hidden');
+            rubroGrid.innerHTML = '';
+            
+            rubros.forEach(rubro => {
+                const isTodos = rubro === 'TODOS';
+                const rubroName = isTodos ? 'TODOS los Rubros' : rubro;
+                const rubroIcon = isTodos ? '<i class="fas fa-search"></i>' : getRubroIcon(rubro, true);
+                
+                const card = document.createElement('div');
+                card.className = 'col-span-1';
+                card.innerHTML = `
+                    <div class="rubro-tile ${rubro === currentFilter ? 'active' : ''}" data-rubro="${rubro}">
+                        <div class="rubro-icon-bg mx-auto">
+                            ${rubroIcon}
+                        </div>
+                        <p class="text-xs font-bold text-gray-800 uppercase leading-tight">${rubroName}</p>
+                        <!-- Opcional: descripción corta si existiera -->
+                    </div>
+                `;
+                
+                // Asigna la función de filtro al hacer click
+                card.querySelector('.rubro-tile').onclick = function() {
+                    currentFilter = rubro;
+                    filterConvenios(rubro);
+                    // Actualiza la clase activa
+                    document.querySelectorAll('.rubro-tile').forEach(tile => tile.classList.remove('active'));
+                    this.classList.add('active');
+                };
+                
+                rubroGrid.appendChild(card);
             });
         }
         
         /**
-         * Filtra los convenios basados en la selección del rubro.
+         * Filtra los convenios basados en la selección del rubro y actualiza la vista.
          */
-        function filterConvenios() {
-            const selectedRubro = rubroFilter.value;
+        function filterConvenios(selectedRubro) {
+            currentFilter = selectedRubro;
             let filteredConvenios = [];
 
             if (selectedRubro === 'TODOS') {
                 filteredConvenios = allConvenios;
+                conveniosTitle.textContent = "Convenios Destacados:";
             } else {
                 filteredConvenios = allConvenios.filter(c => 
                     (c.rubro || '').toUpperCase().trim() === selectedRubro
                 );
+                conveniosTitle.textContent = `Convenios en: ${selectedRubro}`;
             }
 
             renderConvenios(filteredConvenios);
+            
+            // Si hay que hacer scroll al cambiar de rubro (opcional)
+            if (filteredConvenios.length > 0) {
+                 // Hacemos scroll suave a la lista de convenios
+                 conveniosTitle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         /**
          * Devuelve un icono de Font Awesome basado en el nombre del rubro.
+         * isTile=true cambia el icono a uno más general para la grilla
          */
-        function getRubroIcon(rubro) {
+        function getRubroIcon(rubro, isTile = false) {
             const r = rubro.toUpperCase().trim();
             // Iconos ajustados para ser más descriptivos
             switch (r) {
                 case 'SALUD':
                 case 'MEDICINA':
-                    return '<i class="fas fa-heart-pulse mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-kit-medical"></i>' : '<i class="fas fa-heart-pulse mr-1"></i>'; 
                 case 'EDUCACION':
                 case 'FORMACION':
-                    return '<i class="fas fa-book-open-reader mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-graduation-cap"></i>' : '<i class="fas fa-book-open-reader mr-1"></i>'; 
                 case 'TURISMO':
                 case 'VIAJES':
-                    return '<i class="fas fa-plane-departure mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-map-marked-alt"></i>' : '<i class="fas fa-plane-departure mr-1"></i>'; 
                 case 'DEPORTES':
                 case 'GIMNASIOS':
-                    return '<i class="fas fa-dumbbell mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-running"></i>' : '<i class="fas fa-dumbbell mr-1"></i>'; 
                 case 'COMERCIO':
                 case 'COMPRAS':
-                    return '<i class="fas fa-store mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-tags"></i>' : '<i class="fas fa-store mr-1"></i>'; 
                 case 'GASTRONOMIA':
                 case 'COMIDA':
-                    return '<i class="fas fa-utensils mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-burger"></i>' : '<i class="fas fa-utensils mr-1"></i>'; 
                 case 'SERVICIOS':
-                    return '<i class="fas fa-screwdriver-wrench mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-tools"></i>' : '<i class="fas fa-screwdriver-wrench mr-1"></i>'; 
                 case 'BELLEZA':
                 case 'ESTETICA':
-                    return '<i class="fas fa-spa mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-spa mr-1"></i>'; 
                 case 'FINANZAS':
-                    return '<i class="fas fa-sack-dollar mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-piggy-bank"></i>' : '<i class="fas fa-sack-dollar mr-1"></i>'; 
                 case 'LEGAL':
-                    return '<i class="fas fa-balance-scale-right mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-gavel"></i>' : '<i class="fas fa-balance-scale-right mr-1"></i>'; 
                 default:
-                    return '<i class="fas fa-star mr-1"></i>'; 
+                    return isTile ? '<i class="fas fa-star"></i>' : '<i class="fas fa-star mr-1"></i>'; 
             }
         }
 
@@ -357,6 +453,11 @@
          */
         function renderConvenios(convenios) {
             conveniosList.innerHTML = '';
+            
+            // Cierra todas las tarjetas abiertas antes de renderizar (limpieza visual)
+            document.querySelectorAll('.convenio-card.open').forEach(openCard => {
+                openCard.classList.remove('open');
+            });
             
             if (convenios.length === 0) {
                 noResults.classList.remove('hidden');
@@ -368,7 +469,7 @@
                 const rubro = (convenio.rubro || 'SIN RUBRO').toUpperCase().trim();
                 const titulo = convenio.titulo || 'Convenio sin Título';
                 const detalle = (convenio.detalle || 'Detalle no especificado.').replace(/\n/g, '<br>'); 
-                const rubroIcon = getRubroIcon(rubro); 
+                const rubroIcon = getRubroIcon(rubro, false); // Usamos el icono de lista (no tile)
 
                 const card = document.createElement('div');
                 card.className = 'convenio-card'; 
