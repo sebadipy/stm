@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directorio de Extensiones Internas</title>
+    
+    <!-- Cargamos la tipografía ROBOTO, como en el archivo de convenios -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Incluimos Tailwind CSS para un diseño moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Usamos Font Awesome 6 para iconos (como en el archivo de convenios) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        /* Configuraciones personalizadas de Tailwind (Paleta STM) */
+        :root {
+            --color-stm-purple: #5A377B; /* Púrpura principal */
+            --color-stm-teal: #34B3C5;   /* Turquesa (Acento Vibrante - Resalte) */
+            --color-bg-light: #f7f7f8;   /* Fondo muy claro */
+            --color-card-bg: #ffffff;    /* Fondo de tarjeta blanco puro */
+        }
+
+        /* ************************************************* */
+        /* ESTILOS DE FUENTE Y CONTENEDOR PRINCIPAL */
+        /* ************************************************* */
+        body {
+            font-family: 'Roboto', sans-serif; /* APLICAMOS ROBOTO */
+            background-color: var(--color-bg-light);
+            min-height: 100vh;
+        }
+
+        /* Contenedor principal centrado, simula la app */
+        .app-container {
+            max-width: 480px; 
+            margin: 0 auto;
+            min-height: 100vh; 
+            background-color: var(--color-card-bg); 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); 
+            display: flex;
+            flex-direction: column; 
+        }
+
+        /* ************************************************* */
+        /* ESTILOS DEL HEADER (IDÉNTICOS AL CONVENIO) */
+        /* ************************************************* */
+        .stm-logo-header {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+
+        .header-title {
+            font-weight: 700; 
+            letter-spacing: -0.02em; 
+        }
+        
+        /* ESTILOS ESPECÍFICOS DEL BOTÓN DE INFORMACIÓN (antes 'Consulta') */
+        .consulta-icon-bg {
+            background-color: #e5f6fa; 
+            color: var(--color-stm-teal); 
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            box-shadow: 0 0 0 5px rgba(52, 179, 197, 0.1); 
+        }
+        .consulta-text {
+            font-size: 0.75rem; 
+            font-weight: 500;
+            color: white; 
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        /* ************************************************* */
+        /* ESTILOS DE TARJETAS DE CONTACTO (MODIFICADOS PARA EL FLIP 3D) */
+        /* ************************************************* */
+        .card {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); 
+            transition: box-shadow 0.3s ease, height 0.6s ease; /* Transición de altura para el flip */
+            border-radius: 0.75rem; 
+            position: relative;
+            cursor: pointer;
+            perspective: 1000px; /* Habilita el espacio 3D */
+            height: 100px; /* Altura inicial del frente */
+            min-height: 100px;
+        }
+        .card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Contenedor que rota */
+        .card-flipper {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); /* Transición suave para el giro */
+            transform-style: preserve-3d; 
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Estado de volteado (Aplicado al contenedor principal .card) */
+        .card.flipped .card-flipper {
+            transform: rotateY(180deg);
+        }
+        /* Ajuste de altura para mostrar el contenido trasero cuando está volteado */
+        .card.flipped {
+            height: 160px; /* Ajustar esta altura si el contenido trasero es más alto/bajo */
+            min-height: 160px;
+        }
+
+        /* Caras de la tarjeta */
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; /* Oculta la cara cuando está girada */
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            background-color: var(--color-card-bg);
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+
+        .card-front {
+            z-index: 2;
+            transform: rotateY(0deg);
+            padding: 1rem;
+            /* Estilo del header sin el :active que teníamos antes */
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        .card-front:hover {
+            background-color: #f3f4f6; /* hover:bg-gray-100 */
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            padding: 1rem; /* El contenido interno se centra con flexbox */
+        }
+
+        /* Estilo para el botón de llamar */
+        .call-button {
+            background-color: var(--color-stm-teal); /* Usamos el turquesa STM */
+            transition: background-color 0.15s ease, transform 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .call-button:hover {
+            background-color: #2092a4; /* Tono más oscuro de teal */
+            transform: scale(1.03);
+        }
+
+        /* Estilo para el ícono de despliegue */
+        .transition-transform {
+            transition-property: transform;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+        
+        /* Aseguramos que los colores de acento sean STM */
+        .text-indigo-600 { /* Reemplazamos el color de extensión */
+            color: var(--color-stm-purple);
+        }
+        .text-indigo-500 { /* Reemplazamos el color del ícono de despliegue */
+            color: var(--color-stm-teal);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contenedor Principal que simula la pantalla de un móvil -->
+    <div class="app-container">
+        
+        <!-- HEADER / Barra de Navegación (IDÉNTICO AL CONVENIO) -->
+        <header class="p-5 bg-[var(--color-stm-purple)] text-white shadow-xl flex-shrink-0">
+            <div class="flex items-start justify-between">
+                
+                <!-- Lado Izquierdo: LOGO y TÍTULO -->
+                <div class="flex items-center">
+                    <!-- LOGO STM (Usamos el mismo placeholder que en el otro archivo) -->
+                    <img src="logo_STM.png" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/36x36/5A377B/FFFFFF?text=STM';"
+                         alt="Logo STM" 
+                         class="stm-logo-header mr-3">
+                         
+                    <!-- TÍTULO y SUBTÍTULO -->
+                    <div>
+                        <h1 class="header-title text-xl md:text-2xl tracking-tight">
+                            DIRECTORIO DE INTERNOS
+                        </h1>
+                        <p class="text-indigo-200 text-sm font-light leading-none">
+                            Acceso principal: 223 4723756 / 223 4729815
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Lado Derecho: BOTÓN DE ACCIÓN (Información) -->
+                <!-- Renombramos "Consulta" a "Información" por contexto -->
+                <a href="consulta.html" class="flex flex-col items-center text-center -mt-2">
+                    <div class="consulta-icon-bg">
+                        <!-- Ícono de Información -->
+                        <i class="fas fa-info text-2xl"></i>
+                    </div>
+                    <span class="consulta-text mt-1">Consulta</span>
+                </a>
+            </div>
+            
+        </header>
+
+        <!-- AREA DE CONTENIDO -->
+        <div class="p-4 md:p-6 flex-grow">
+            <!-- Campo de Búsqueda/Filtro -->
+            <div class="mb-6">
+                <input type="text" id="searchInput" onkeyup="filterContacts()" placeholder="Buscar Secretaría, Referente o Interno..."
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-stm-teal)] focus:border-[var(--color-stm-teal)] transition duration-150 ease-in-out">
+            </div>
+
+            <!-- Lista de Contactos -->
+            <div id="contactList" class="space-y-4">
+                <!-- Los contactos se cargarán aquí desde el script -->
+                <div class="text-center p-8 text-gray-500">Cargando directorio...</div>
+            </div>
+        </div>
+        
+        <!-- FOOTER (IDÉNTICO AL CONVENIO) -->
+        <footer class="p-4 text-center text-xs text-gray-500 border-t mt-auto bg-gray-50 flex-shrink-0">
+            <p>&copy; 2025 STM Sindicato de Trabajadores Municipales</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // NÚMERO DE TELÉFONO PRINCIPAL (USADO PARA TODOS LOS BOTONES LLAMAR)
+        // Usamos el primer número del header: 223 4723756
+        const primaryPhoneNumber = "2234723756";
+        
+        // Número de acceso principal para todas las extensiones, sin espacios.
+        // La coma (,) añade una pausa de ~2 segundos antes de marcar el interno.
+        const mainAccessNumber = "4723756"; 
+        
+        // Los datos de contacto del usuario.
+        const contacts = [
+            { name: "Sec. General", referent: "ZACARIAS, Daniel Alberto", extension: "301" },
+            { name: "Sec. Adjunto", referent: "MILASINCIC, Cristian Gabriel", extension: "302" },
+            { name: "Finanzas", referent: "ARMENDARIZ, Gaston Ignacio", extension: "303" },
+            { name: "Organización", referent: "MARQUEZ, Alejandro Jorge", extension: "304" },
+            { name: "Gremial", referent: "LEIVA, Soledad", extension: "305" },
+            { name: "Administrativo y de Actas", referent: "IRAZABAL, María de los Angeles", extension: "306" },
+            { name: "Acción Social y Obras", referent: "SALOME, Fernando N.", extension: "137" }, 
+            { name: "Previsión Social", referent: "MENDEZ, Sebastián G.", extension: "308" },
+            { name: "Prensa y Difusión", referent: "ALVEREZ LOZZI, Nicolas G.", extension: "309" },
+            { name: "Relac. Públicas y Sindicales", referent: "PIGNATARO, Ricardo A.", extension: "310" },
+            { name: "Mujer", referent: "GAUDIOSO, Cecilia M.", extension: "311" },
+            { name: "Docente", referent: "AYEK, Alejandra S.", extension: "312" },
+            { name: "Personal Jerárquico", referent: "CAMBARERI, Claudio J.", extension: "313" },
+            { name: "Higiene y Seguridad", referent: "MAIO, María V.", extension: "314" },
+            { name: "Personal Profesional", referent: "VILLALBA, María Laura", extension: "315" },
+        ];
+
+        const contactList = document.getElementById('contactList');
+        
+        /**
+         * Devuelve el SVG del icono de persona unificado.
+         * @returns {string} SVG del icono de persona unificado.
+         */
+        function getUnifiedPersonIcon() {
+            // Icono de Persona Genérico (Color Acento STM - Teal)
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[var(--color-stm-teal)] inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                </svg>
+            `;
+        }
+
+        /**
+         * Maneja el clic para voltear la tarjeta de contacto.
+         * @param {number} index - Índice del contacto en la lista.
+         */
+        function toggleContactDetail(index) {
+            // Referencia a la tarjeta principal
+            const card = document.getElementById(`card-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            
+            const isFlipped = card.classList.contains('flipped');
+
+            // 1. Cerrar todas las demás tarjetas volteadas (Comportamiento de Acordeón)
+            document.querySelectorAll('.card.flipped').forEach(openCard => {
+                if (openCard.id !== `card-${index}`) {
+                    openCard.classList.remove('flipped');
+                    // Resetear el ícono de las cerradas 
+                    const openIcon = openCard.querySelector('.transition-transform');
+                    if(openIcon) openIcon.classList.remove('rotate-180');
+                }
+            });
+
+
+            if (!isFlipped) {
+                // Voltear la actual
+                card.classList.add('flipped');
+                icon.classList.add('rotate-180');
+            } else {
+                // Regresar la actual
+                card.classList.remove('flipped');
+                icon.classList.remove('rotate-180');
+            } 
+        }
+
+
+        /**
+         * Renderiza la lista completa de contactos en el DOM.
+         * @param {Array<Object>} list - La lista de contactos a renderizar.
+         */
+        function renderContacts(list) {
+            contactList.innerHTML = ''; // Limpia la lista existente
+            list.forEach((contact, index) => {
+                const callHref = `tel:${primaryPhoneNumber}`;
+                const genderIcon = getUnifiedPersonIcon();
+
+                const item = document.createElement('div');
+                // IMPORTANTE: Se añade 'card-shadow-container' para mantener la sombra sin interferir con el 3D
+                item.className = 'card shadow-sm border border-gray-200';
+                item.id = `card-${index}`; // ID para el JS de flip
+                
+                // Estructura de despliegue (Flip 3D)
+                item.innerHTML = `
+                    <div class="card-flipper" onclick="toggleContactDetail(${index})">
+                        
+                        <!-- Cara Frontal (Header) -->
+                        <div class="card-front p-4">
+                            <!-- Nombres del Departamento y Referente -->
+                            <div class="flex flex-col truncate flex-grow">
+                                <span class="text-base font-bold text-gray-800">${contact.name}</span>
+                                <span class="text-sm font-medium text-gray-500 mt-0.5">${genderIcon}${contact.referent}</span>
+                            </div>
+
+                            <!-- Ícono de Despliegue (Flecha - Color Teal STM) -->
+                            <svg id="icon-${index}" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[var(--color-stm-teal)] transition-transform duration-300 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        
+                        <!-- Cara Trasera (Detalle) -->
+                        <div class="card-back p-4">
+                             <!-- Detalle / Área Oculta (SOLO Extensión y Botón de Llamar) -->
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center w-full">
+                                <!-- Muestra SOLO el número de interno -->
+                                <div class="mb-3 md:mb-0">
+                                    <span class="text-xs font-medium text-gray-500 block">Número de Interno</span>
+                                    <!-- Color principal de STM (Morado) para la extensión -->
+                                    <span class="text-xl font-extrabold text-[var(--color-stm-purple)]">Int. ${contact.extension}</span>
+                                </div>
+
+                                <!-- Botón de Llamar (Color Teal STM) -->
+                                <a href="${callHref}" class="call-button text-white text-sm px-4 py-2 rounded-lg focus:outline-none focus:ring-4 focus:ring-opacity-50 focus:ring-[var(--color-stm-teal)]" role="button" onclick="event.stopPropagation()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fill-rule="evenodd" d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zm3 16a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                    </svg>
+                                    Llamar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                contactList.appendChild(item);
+            });
+            // Si la lista está vacía al renderizar (por ejemplo, al iniciar), muestra un mensaje
+            if (list.length === 0) {
+                 contactList.innerHTML = '<div class="text-center p-8 text-gray-500"><i class="fas fa-search-minus mr-2"></i> No se encontraron coincidencias.</div>';
+            }
+        }
+        
+        /**
+         * Filtra la lista de contactos basándose en el texto de búsqueda.
+         */
+        function filterContacts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = contacts.filter(contact => {
+                const nameMatch = contact.name.toLowerCase().includes(searchTerm);
+                const referentMatch = contact.referent.toLowerCase().includes(searchTerm);
+                const extMatch = contact.extension.includes(searchTerm);
+                // Ahora busca en el nombre de la secretaría, el referente y la extensión.
+                return nameMatch || referentMatch || extMatch;
+            });
+            renderContacts(filtered);
+        }
+
+        // Inicializar la aplicación al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContacts(contacts);
+        });
+
+    </script>
+</body>
+</html>
